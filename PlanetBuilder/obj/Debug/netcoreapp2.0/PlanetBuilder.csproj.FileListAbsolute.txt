@@ -18,3 +18,13 @@ c:\Ludde\Sources\PlanetBuilder\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuild
 c:\Ludde\Sources\PlanetBuilder\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.AssemblyInfo.cs
 c:\Ludde\Sources\PlanetBuilder\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.dll
 c:\Ludde\Sources\PlanetBuilder\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.pdb
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.csproj.CoreCompileInputs.cache
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.AssemblyInfoInputs.cache
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.AssemblyInfo.cs
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.dll
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\obj\Debug\netcoreapp2.0\PlanetBuilder.pdb
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\bin\Debug\netcoreapp2.0\PlanetBuilder.deps.json
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\bin\Debug\netcoreapp2.0\PlanetBuilder.runtimeconfig.json
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\bin\Debug\netcoreapp2.0\PlanetBuilder.runtimeconfig.dev.json
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\bin\Debug\netcoreapp2.0\PlanetBuilder.dll
+c:\Ludde\Sources\PlanetMaker\PlanetBuilder\bin\Debug\netcoreapp2.0\PlanetBuilder.pdb

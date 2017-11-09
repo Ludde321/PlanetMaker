@@ -23,17 +23,18 @@ namespace PlanetBuilder
 
             var blurFilter = new BlurFilter(texture2);
             sw = Stopwatch.StartNew();
-            var texture3a = blurFilter.Blur(10 * (Math.PI / 180));
+            var texture3a = blurFilter.Blur2(10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
-            var texture3b = blurFilter.Blur2(10 * (Math.PI / 180));
+            var texture3b = blurFilter.Blur3(10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            for(int i=0;i<texture3a.Data.Length;i++)
-                if(texture3a.Data[i] != texture3b.Data[i])
+            for(int y=0;y<texture3a.Height;y++)
+                for(int x=0;x<texture3a.Width;x++)
+                    if(texture3a.Data[y][x] != texture3b.Data[y][x])
                     {
-                        Console.WriteLine($"{texture3a.Data[i]} != {texture3b.Data[i]}");
+                        Console.WriteLine($"{texture3a.Data[y][x]} != {texture3b.Data[y][x]}");
                     }
 
             FileHelper.SaveFile16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres360x180Blur3.raw", texture3a);
