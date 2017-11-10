@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PlanetBuilder
 {
-    public static class FileHelper
+    public static class TextureHelper
     {
         public static Texture<short> LoadRaw16(string inputFilename, int width, int height)
         {
