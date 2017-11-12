@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace PlanetBuilder
 {
+
     class Program
     {
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to PlanetBuilder!");
 
-            var ceres = new Ceres();
-            ceres.Create();
-            ceres.Save($@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres{ceres.RecursionLevel}.x3d");
+            Directory.SetCurrentDirectory(@"c:\Ludde\FractalWorlds");
+
+            // var ceres = new Ceres();
+            // ceres.Create();
+
+            // var vesta = new Vesta();
+            // vesta.Create();
+
+            var pluto = new Pluto();
+            pluto.Create();
 
             // var sw = Stopwatch.StartNew();
             // var texture = TextureHelper.LoadRaw16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);

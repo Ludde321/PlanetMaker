@@ -13,9 +13,12 @@ namespace PlanetBuilder
         private readonly Texture<short> _inputTexture;
         private readonly Texture<Vector3d> _vectorMap;
 
-        public BlurFilter(Texture<short> inputTexture)
+        private readonly Projection _projection;
+
+        public BlurFilter(Texture<short> inputTexture, Projection projection)
         {
             _inputTexture = inputTexture;
+            _projection = projection;
 
             _vectorMap = CreateVectorMap();
         }
@@ -27,22 +30,45 @@ namespace PlanetBuilder
 
             var vmap = new Texture<Vector3d>(width, height);
 
-            for (int y = 0; y < height; y++)
+            switch(_projection)
             {
-                double lat = Math.PI * y / (height - 1);
-
-                double sinLat = Math.Sin(lat);
-                double cosLat = Math.Cos(lat);
-
-                for (int x = 0; x < width; x++)
+                case Projection.Equirectangular:
                 {
-                    double lon = Math.PI * 2 * x / width;
+                    for (int y = 0; y < height; y++)
+                    {
+                        double lat = Math.PI * y / (height - 1);
 
-                    vmap.Data[y][x] = new Vector3d(
-                        Math.Cos(lon) * sinLat,
-                        Math.Sin(lon) * sinLat,
-                        cosLat);
-                }
+                        double sinLat = Math.Sin(lat);
+                        double cosLat = Math.Cos(lat);
+
+                        for (int x = 0; x < width; x++)
+                        {
+                            double lon = Math.PI * 2 * x / width;
+
+                            vmap.Data[y][x] = new Vector3d(
+                                Math.Cos(lon) * sinLat,
+                                cosLat,
+                                Math.Sin(lon) * sinLat);
+                        }
+                    }
+                } break;
+                case Projection.SimpleCylindrical:
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        double z = 1 - 2.0 * y / (height - 1);
+
+                        for (int x = 0; x < width; x++)
+                        {
+                            double lon = Math.PI * 2 * x / width;
+
+                            vmap.Data[y][x] = Vector3d.Normalize(new Vector3d(
+                                Math.Cos(lon),
+                                z,
+                                Math.Sin(lon)));
+                        }
+                    }
+                } break;
             }
             return vmap;
         }

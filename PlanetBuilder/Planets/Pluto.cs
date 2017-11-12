@@ -7,15 +7,15 @@ using ImageMagick;
 
 namespace PlanetBuilder
 {
-    public class Ceres : Planet
+    public class Pluto : Planet
     {
         private Texture<short> _elevationTextureSmall;
         private Texture<short> _elevationTextureBlur;
 
-        public Ceres()
+        public Pluto()
         {
-            PlanetRadius = 470000;
-            ElevationScale = 2;
+            PlanetRadius = 1188300;
+            ElevationScale = 4;
             RecursionLevel = 8;
             PlanetProjection = Projection.Equirectangular;
         }
@@ -23,7 +23,7 @@ namespace PlanetBuilder
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Ceres\Datasets\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);
+            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Planets\Pluto\Datasets\Pluto_NewHorizons_Global_DEM_300m_Jul2017_16bit.tif");
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
@@ -31,22 +31,22 @@ namespace PlanetBuilder
             _elevationTextureSmall = resampler.Resample(elevationTextureLarge, 1200, 600);
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-            TextureHelper.SaveFile16($@"Planets\Ceres\Generated\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Planets\Ceres\Generated\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            TextureHelper.SaveFile16($@"Planets\Pluto\Generated\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            TextureHelper.SavePng8($@"Planets\Pluto\Generated\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(_elevationTextureSmall, PlanetProjection);
             sw = Stopwatch.StartNew();
             _elevationTextureBlur = blurFilter.Blur2(10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveFile16($@"Planets\Ceres\Generated\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Planets\Ceres\Generated\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            TextureHelper.SaveFile16($@"Planets\Pluto\Generated\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            TextureHelper.SavePng8($@"Planets\Pluto\Generated\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes();
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveX3d($@"Planets\Ceres\Generated\Ceres{RecursionLevel}.x3d");
+            SaveX3d($@"Planets\Pluto\Generated\Pluto{RecursionLevel}.x3d");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)
@@ -60,7 +60,7 @@ namespace PlanetBuilder
             short h = ReadBilinearPixel(_elevationTextureSmall, tx, ty);
             short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
 
-            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
+            double r = PlanetRadius + h * ElevationScale;//(h - hAvg) * ElevationScale + hAvg;
 
             return Vector3d.Multiply(v, r * 0.00001);
         }

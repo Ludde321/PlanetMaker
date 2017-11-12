@@ -14,29 +14,12 @@ namespace PlanetBuilder
     {
         private readonly Icosphere _icosphere = new Icosphere();
 
-        // protected string AvgElevationFilename { get; set; }
-        // protected short[] AvgElevationMap { get; set; }
-        // protected uint AvgElevationWidth { get; set; }
-        // protected uint AvgElevationHeight { get; set; }
-
-        // protected string MinElevationFilename { get; set; }
-        // protected short[] MinElevationMap { get; set; }
-        // protected uint MinElevationWidth { get; set; }
-        // protected uint MinElevationHeight { get; set; }
-
-        // protected string MaxElevationFilename { get; set; }
-        // protected short[] MaxElevationMap { get; set; }
-        // protected uint MaxElevationWidth { get; set; }
-        // protected uint MaxElevationHeight { get; set; }
-
         public double PlanetRadius;
         public double ElevationScale;
 
         public int RecursionLevel = 3;
 
-        // protected string OutputFilename { get; set; }
-        // public double SphereRadius = 50;
-        // public double SphereThickness = 1.5;
+        public Projection PlanetProjection = Projection.Equirectangular;
 
         private List<Vector3d> _planetVertexes;
         private List<Triangle> _planetTriangles;
@@ -45,11 +28,8 @@ namespace PlanetBuilder
         {
             _icosphere.Create(RecursionLevel);
 
-            var vertexes = _icosphere.mVertexes;
-            var triangles = _icosphere.mTriangles;
-
-            _planetVertexes = vertexes.Select(v => ComputeModelElevation(v)).ToList();
-            _planetTriangles = triangles.ToList();
+            _planetVertexes = _icosphere.mVertexes.Select(v => ComputeModelElevation(v)).ToList();
+            _planetTriangles = _icosphere.mTriangles.ToList();
         }
 
         protected abstract Vector3d ComputeModelElevation(Vector3d v);
@@ -83,7 +63,7 @@ namespace PlanetBuilder
             return (short)(p00p01 + (p10p11 - p00p01) * fy);
         }
 
-        public void Save(string outputFilename)
+        protected void SaveX3d(string outputFilename)
         {
             var sw = Stopwatch.StartNew();
 
