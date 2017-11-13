@@ -29,6 +29,23 @@ namespace PlanetBuilder
             return texture;
         }
 
+        public static Texture<float> LoadRaw32f(string inputFilename, int width, int height)
+        {
+            var texture = new Texture<float>(width, height);
+
+            using (var stream = File.OpenRead(String.Format(inputFilename, width, height)))
+            {
+                var buffer = new byte[4 * width];
+                for (int y = 0; y < height; y++)
+                {
+                    stream.Read(buffer, 0, buffer.Length);
+
+                    Buffer.BlockCopy(buffer, 0, texture.Data[y], 0, buffer.Length);
+                }
+            }
+            return texture;
+        }
+
         public static Texture<short> LoadTiff16(string inputFilename)
         {
             int width;
@@ -108,6 +125,21 @@ namespace PlanetBuilder
                 image.Format = MagickFormat.Png;
                 image.Write(outputFilename);
             }
+        }
+
+        public static Texture<B> Convert<A,B>(Texture<A> inputTexture, Func<A, B> func)
+        {
+            int width = inputTexture.Width;
+            int height = inputTexture.Height;
+            var outputTexture = new Texture<B>(width, height);
+            for(int y =0;y<height;y++)
+            {
+                var inputLine = inputTexture.Data[y];
+                var outputLine = outputTexture.Data[y];
+                for(int x =0;x<width;x++)
+                    outputLine[x] = func(inputLine[x]);
+            }
+            return outputTexture;
         }
 
     }

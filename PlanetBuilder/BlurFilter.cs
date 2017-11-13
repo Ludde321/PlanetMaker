@@ -10,24 +10,15 @@ namespace PlanetBuilder
 {
     public class BlurFilter
     {
-        private readonly Texture<short> _inputTexture;
-        private readonly Texture<Vector3d> _vectorMap;
-
         private readonly Projection _projection;
 
-        public BlurFilter(Texture<short> inputTexture, Projection projection)
+        public BlurFilter(Projection projection)
         {
-            _inputTexture = inputTexture;
             _projection = projection;
-
-            _vectorMap = CreateVectorMap();
         }
 
-        private Texture<Vector3d> CreateVectorMap()
+        private Texture<Vector3d> CreateVectorMap(int width, int height)
         {
-            int width = _inputTexture.Width;
-            int height = _inputTexture.Height;
-
             var vmap = new Texture<Vector3d>(width, height);
 
             switch(_projection)
@@ -73,22 +64,22 @@ namespace PlanetBuilder
             return vmap;
         }
 
-        private Vector2us[] CreateLookup(int y, double blurAngle)
+        private Vector2us[] CreateLookup(Texture<Vector3d> vectorMap, int y, double blurAngle)
         {
-            int width = _inputTexture.Width;
-            int height = _inputTexture.Height;
+            int width = vectorMap.Width;
+            int height = vectorMap.Height;
 
             var cosBlurAngle = Math.Cos(blurAngle);
 
             var lookup = new List<Vector2us>();
 
-            var v0 = _vectorMap.Data[y][0];
+            var v0 = vectorMap.Data[y][0];
 
             for (ushort y1 = 0; y1 < height; y1++)
             {
                 for (ushort x1 = 0; x1 < width; x1++)
                 {
-                    var v1 = _vectorMap.Data[y1][x1];
+                    var v1 = vectorMap.Data[y1][x1];
 
                     var cosAngle = Vector3d.Dot(v0, v1);
 
@@ -100,10 +91,13 @@ namespace PlanetBuilder
             return lookup.ToArray();
         }
 
-        public Texture<short> Blur(double blurAngle)
+        public Texture<short> Blur(Texture<short> inputTexture, double blurAngle)
         {
-            int width = _inputTexture.Width;
-            int height = _inputTexture.Height;
+            int width = inputTexture.Width;
+            int height = inputTexture.Height;
+
+            var vectorMap = CreateVectorMap(width, height);
+
             var outputTexture = new Texture<short>(width, height);
 
             var cosBlurAngle = Math.Cos(blurAngle);
@@ -112,7 +106,7 @@ namespace PlanetBuilder
             {
                 for (int x0 = 0; x0 < width; x0++)
                 {
-                    var v0 = _vectorMap.Data[y0][x0];
+                    var v0 = vectorMap.Data[y0][x0];
                     long avgElevation = 0;
                     int countElevation = 0;
 
@@ -120,13 +114,13 @@ namespace PlanetBuilder
                     {
                         for (int x1 = 0; x1 < width; x1++)
                         {
-                            var v1 = _vectorMap.Data[y1][x1];
+                            var v1 = vectorMap.Data[y1][x1];
 
                             var cosAngle = Vector3d.Dot(v0, v1);
 
                             if (cosAngle >= cosBlurAngle)
                             {
-                                avgElevation += _inputTexture.Data[y1][x1];
+                                avgElevation += inputTexture.Data[y1][x1];
                                 countElevation++;
                             }
 
@@ -142,16 +136,19 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public Texture<short> Blur2(double blurAngle)
+        public Texture<short> Blur2(Texture<short> inputTexture, double blurAngle)
         {
-            int width = _inputTexture.Width;
-            int height = _inputTexture.Height;
+            int width = inputTexture.Width;
+            int height = inputTexture.Height;
+
+            var vectorMap = CreateVectorMap(width, height);
+
             var outputTexture = new Texture<short>(width, height);
 
             //for (short y = 0; y < Height; y++)
             Parallel.For(0, height, y =>
             {
-                var lookup = CreateLookup(y, blurAngle);
+                var lookup = CreateLookup(vectorMap, y, blurAngle);
 
                 //Console.WriteLine(lookup.Length);
 
@@ -162,7 +159,7 @@ namespace PlanetBuilder
                     foreach (var v in lookup)
                     {
                         int x0 = (x + v.x) % width;
-                        avgElevation += _inputTexture.Data[v.y][x0];
+                        avgElevation += inputTexture.Data[v.y][x0];
                     }
 
                     outputTexture.Data[y][x] = (short)(avgElevation / lookup.Length);
@@ -172,17 +169,51 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-
-        public Texture<short> Blur3(double blurAngle)
+        public Texture<float> Blur2(Texture<float> inputTexture, double blurAngle)
         {
-            int width = _inputTexture.Width;
-            int height = _inputTexture.Height;
+            int width = inputTexture.Width;
+            int height = inputTexture.Height;
+
+            var vectorMap = CreateVectorMap(width, height);
+
+            var outputTexture = new Texture<float>(width, height);
+
+            Parallel.For(0, height, y =>
+            {
+                var lookup = CreateLookup(vectorMap, y, blurAngle);
+
+                for (short x = 0; x < width; x++)
+                {
+                    float avgElevation = 0;
+
+                    foreach (var v in lookup)
+                    {
+                        int x0 = (x + v.x) % width;
+                        avgElevation += inputTexture.Data[v.y][x0];
+                    }
+
+                    outputTexture.Data[y][x] = avgElevation / lookup.Length;
+                }
+            });
+
+            return outputTexture;
+        }
+
+
+
+        public Texture<short> Blur3(Texture<short> inputTexture, double blurAngle)
+        {
+            int width = inputTexture.Width;
+            int height = inputTexture.Height;
+
+            var vectorMap = CreateVectorMap(width, height);
+
             var outputTexture = new Texture<short>(width, height);
 
             //for (short y = 0; y < Height; y++)
             Parallel.For(0, height, y =>
                                     {
-                                        var lookup1 = CreateLookup(y, blurAngle);
+                                        var lookup1 = CreateLookup(vectorMap, y, blurAngle);
                                         var lookup2 = lookup1.Select(v => new Vector2us((ushort)((v.x + 1) % width), v.y)).ToArray();
 
                                         var subs = lookup1.Except(lookup2).ToArray();
@@ -191,7 +222,7 @@ namespace PlanetBuilder
                                         long avgElevation = 0;
 
                                         foreach (var v in lookup1)
-                                            avgElevation += _inputTexture.Data[v.y][v.x];
+                                            avgElevation += inputTexture.Data[v.y][v.x];
 
                                         outputTexture.Data[y][0] = (short)(avgElevation / lookup1.Length);
 
@@ -200,12 +231,12 @@ namespace PlanetBuilder
                                             foreach (var v in adds)
                                             {
                                                 int x0 = (x + v.x - 1) % width;
-                                                avgElevation += _inputTexture.Data[v.y][x0];
+                                                avgElevation += inputTexture.Data[v.y][x0];
                                             }
                                             foreach (var v in subs)
                                             {
                                                 int x0 = (x + v.x - 1) % width;
-                                                avgElevation -= _inputTexture.Data[v.y][x0];
+                                                avgElevation -= inputTexture.Data[v.y][x0];
                                             }
 
                                             outputTexture.Data[y][x] = (short)(avgElevation / lookup1.Length);

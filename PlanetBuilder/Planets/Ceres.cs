@@ -31,16 +31,15 @@ namespace PlanetBuilder
             // Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
-            var resampler = new Resampler();
-            _elevationTextureSmall = resampler.Resample(elevationTextureLarge, 1200, 600);
+            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600);
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
             TextureHelper.SaveFile16($@"Planets\Ceres\Generated\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             TextureHelper.SavePng8($@"Planets\Ceres\Generated\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
-            var blurFilter = new BlurFilter(_elevationTextureSmall, PlanetProjection);
+            var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
-            _elevationTextureBlur = blurFilter.Blur2(10 * (Math.PI / 180));
+            _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, 10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             TextureHelper.SaveFile16($@"Planets\Ceres\Generated\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);

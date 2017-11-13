@@ -13,11 +13,11 @@ namespace PlanetBuilder
 
             Directory.SetCurrentDirectory(@"c:\Ludde\FractalWorlds");
 
-            var ceres = new Ceres();
-            ceres.Create();
+            // var ceres = new Ceres();
+            // ceres.Create();
 
-            // var vesta = new Vesta();
-            // vesta.Create();
+            var vesta = new Vesta();
+            vesta.Create();
 
             //var pluto = new Pluto();
             //pluto.Create();
