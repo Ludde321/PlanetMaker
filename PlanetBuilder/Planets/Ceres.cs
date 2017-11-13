@@ -23,8 +23,12 @@ namespace PlanetBuilder
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Ceres\Datasets\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);
+            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Planets\Ceres\Datasets\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.tif");
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
+            
+            // var sw = Stopwatch.StartNew();
+            // var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Ceres\Datasets\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);
+            // Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
             var resampler = new Resampler();
@@ -60,7 +64,7 @@ namespace PlanetBuilder
             short h = ReadBilinearPixel(_elevationTextureSmall, tx, ty);
             short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
 
-            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
+            double r = PlanetRadius + /*(h - hAvg) * ElevationScale*/ + hAvg;
 
             return Vector3d.Multiply(v, r * 0.00001);
         }

@@ -13,14 +13,14 @@ namespace PlanetBuilder
 
             Directory.SetCurrentDirectory(@"c:\Ludde\FractalWorlds");
 
-            // var ceres = new Ceres();
-            // ceres.Create();
+            var ceres = new Ceres();
+            ceres.Create();
 
             // var vesta = new Vesta();
             // vesta.Create();
 
-            var pluto = new Pluto();
-            pluto.Create();
+            //var pluto = new Pluto();
+            //pluto.Create();
 
             // var sw = Stopwatch.StartNew();
             // var texture = TextureHelper.LoadRaw16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);
