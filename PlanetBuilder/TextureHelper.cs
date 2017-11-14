@@ -57,7 +57,7 @@ namespace PlanetBuilder
                 height = image.Height;
 
                 image.Format = MagickFormat.Gray;
-                image.Endian = Endian.MSB;
+                image.Endian = Endian.LSB;
                 buffer = image.ToByteArray();
             }
 
@@ -66,13 +66,8 @@ namespace PlanetBuilder
             int idx = 0;
             for (int y = 0; y < height; y++)
             {
-                var line = texture.Data[y];
-                for (int x = 0; x < width; x++)
-                {
-                    byte b0 = buffer[idx++];
-                    byte b1 = buffer[idx++];
-                    line[x] = (short)((b0 << 8) + b1);
-                }
+                Buffer.BlockCopy(buffer, idx, texture.Data[y], 0, width * 2);
+                idx += width * 2;
             }
 
             return texture;

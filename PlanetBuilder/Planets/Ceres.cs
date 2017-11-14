@@ -63,7 +63,7 @@ namespace PlanetBuilder
             short h = ReadBilinearPixel(_elevationTextureSmall, tx, ty);
             short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
 
-            double r = PlanetRadius + /*(h - hAvg) * ElevationScale*/ + hAvg;
+            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
             return Vector3d.Multiply(v, r * 0.00001);
         }

@@ -22,10 +22,6 @@ namespace PlanetBuilder
 
         public void Create()
         {
-            // var sw = Stopwatch.StartNew();
-            // var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Vesta\Datasets\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd_16bit_msb_cropped.raw", 17280, 8640);
-            // Console.WriteLine($"Loading texture used {sw.Elapsed}");
-
             var sw = Stopwatch.StartNew();
             var elevationTextureLarge = TextureHelper.LoadRaw32f(@"Planets\Vesta\Datasets\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.raw", 17280, 8640);
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
@@ -53,21 +49,6 @@ namespace PlanetBuilder
 
             SaveX3d($@"Planets\Vesta\Generated\Vesta{RecursionLevel}.x3d");
         }
-
-        // protected override Vector3d ComputeModelElevation(Vector3d v)
-        // {
-        //     double lon = Math.Atan2(v.x, v.z);
-
-        //     double ty = (1 - v.y) * 0.5;
-        //     double tx = (Math.PI + lon) / (Math.PI * 2);
-
-        //     short h = ReadBilinearPixel(_elevationTextureSmall, tx, ty);
-        //     short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
-
-        //     double r = PlanetRadius + h;//(h - hAvg) * ElevationScale + hAvg;
-
-        //     return Vector3d.Multiply(v, r * 0.00001);
-        // }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)
         {
