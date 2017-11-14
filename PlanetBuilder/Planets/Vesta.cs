@@ -48,6 +48,7 @@ namespace PlanetBuilder
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
             SaveX3d($@"Planets\Vesta\Generated\Vesta{RecursionLevel}.x3d");
+            SaveSTL($@"Planets\Vesta\Generated\Vesta{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)

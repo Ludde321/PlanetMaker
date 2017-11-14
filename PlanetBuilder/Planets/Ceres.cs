@@ -50,6 +50,7 @@ namespace PlanetBuilder
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
             SaveX3d($@"Planets\Ceres\Generated\Ceres{RecursionLevel}.x3d");
+            SaveSTL($@"Planets\Ceres\Generated\Ceres{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)
