@@ -9,6 +9,7 @@ namespace PlanetBuilder
 {
     public class Vesta : Planet
     {
+        public int RecursionLevel;
         private Texture<float> _elevationTextureSmall;
         private Texture<float> _elevationTextureBlur;
 
@@ -44,10 +45,9 @@ namespace PlanetBuilder
             TextureHelper.SavePng8($@"Planets\Vesta\Generated\VestaBlur{textureBlur.Width}x{textureBlur.Height}.png", textureBlur);
 
             sw = Stopwatch.StartNew();
-            CreatePlanetVertexes();
+            CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveX3d($@"Planets\Vesta\Generated\Vesta{RecursionLevel}.x3d");
             SaveSTL($@"Planets\Vesta\Generated\Vesta{RecursionLevel}.stl");
         }
 

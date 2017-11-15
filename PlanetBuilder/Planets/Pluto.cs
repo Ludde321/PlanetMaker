@@ -9,6 +9,7 @@ namespace PlanetBuilder
 {
     public class Pluto : Planet
     {
+        public int RecursionLevel;
         private Texture<short> _elevationTextureSmall;
         private Texture<short> _elevationTextureBlur;
 
@@ -42,10 +43,9 @@ namespace PlanetBuilder
             TextureHelper.SavePng8($@"Planets\Pluto\Generated\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
-            CreatePlanetVertexes();
+            CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveX3d($@"Planets\Pluto\Generated\Pluto{RecursionLevel}.x3d");
             SaveSTL($@"Planets\Pluto\Generated\Pluto{RecursionLevel}.stl");
         }
 

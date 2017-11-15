@@ -21,45 +21,47 @@ namespace PlanetBuilder
         {
             var vmap = new Texture<Vector3d>(width, height);
 
-            switch(_projection)
+            switch (_projection)
             {
                 case Projection.Equirectangular:
-                {
-                    for (int y = 0; y < height; y++)
                     {
-                        double lat = Math.PI * y / (height - 1);
-
-                        double sinLat = Math.Sin(lat);
-                        double cosLat = Math.Cos(lat);
-
-                        for (int x = 0; x < width; x++)
+                        for (int y = 0; y < height; y++)
                         {
-                            double lon = Math.PI * 2 * x / width;
+                            double lat = Math.PI * y / (height - 1);
 
-                            vmap.Data[y][x] = new Vector3d(
-                                Math.Cos(lon) * sinLat,
-                                cosLat,
-                                Math.Sin(lon) * sinLat);
+                            double sinLat = Math.Sin(lat);
+                            double cosLat = Math.Cos(lat);
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                double lon = Math.PI * 2 * x / width;
+
+                                vmap.Data[y][x] = new Vector3d(
+                                    Math.Cos(lon) * sinLat,
+                                    cosLat,
+                                    Math.Sin(lon) * sinLat);
+                            }
                         }
                     }
-                } break;
+                    break;
                 case Projection.SimpleCylindrical:
-                {
-                    for (int y = 0; y < height; y++)
                     {
-                        double z = 1 - 2.0 * y / (height - 1);
-
-                        for (int x = 0; x < width; x++)
+                        for (int y = 0; y < height; y++)
                         {
-                            double lon = Math.PI * 2 * x / width;
+                            double z = 1 - 2.0 * y / (height - 1);
 
-                            vmap.Data[y][x] = Vector3d.Normalize(new Vector3d(
-                                Math.Cos(lon),
-                                z,
-                                Math.Sin(lon)));
+                            for (int x = 0; x < width; x++)
+                            {
+                                double lon = Math.PI * 2 * x / width;
+
+                                vmap.Data[y][x] = Vector3d.Normalize(new Vector3d(
+                                    Math.Cos(lon),
+                                    z,
+                                    Math.Sin(lon)));
+                            }
                         }
                     }
-                } break;
+                    break;
             }
             return vmap;
         }
@@ -163,6 +165,50 @@ namespace PlanetBuilder
                     }
 
                     outputTexture.Data[y][x] = (short)(avgElevation / lookup.Length);
+                }
+            });
+
+            return outputTexture;
+        }
+
+        public Texture<short> Blur2(Texture<short> inputTexture, double blurAngle, Func<short, short?> func)
+        {
+            int width = inputTexture.Width;
+            int height = inputTexture.Height;
+
+            var vectorMap = CreateVectorMap(width, height);
+
+            var outputTexture = new Texture<short>(width, height);
+
+            //for (short y = 0; y < Height; y++)
+            Parallel.For(0, height, y =>
+            {
+                var lookup = CreateLookup(vectorMap, y, blurAngle);
+
+                //Console.WriteLine(lookup.Length);
+
+                for (short x = 0; x < width; x++)
+                {
+                    short? oh = func(inputTexture.Data[y][x]);
+                    if (oh != null)
+                    {
+                        long avgElevation = 0;
+                        int avgCount = 0;
+
+                        foreach (var v in lookup)
+                        {
+                            int x0 = (x + v.x) % width;
+                            short? h = func(inputTexture.Data[v.y][x0]);
+                            if (h != null)
+                            {
+                                avgElevation += (short)h;
+                                avgCount++;
+                            }
+                        }
+                        outputTexture.Data[y][x] = (short)(avgElevation / avgCount);
+                    }
+                    else
+                        outputTexture.Data[y][x] = inputTexture.Data[y][x];
                 }
             });
 

@@ -7,15 +7,15 @@ using ImageMagick;
 
 namespace PlanetBuilder
 {
-    public class Ceres : Planet
+    public class Moon : Planet
     {
         public int RecursionLevel;
         private Texture<short> _elevationTextureSmall;
         private Texture<short> _elevationTextureBlur;
 
-        public Ceres()
+        public Moon()
         {
-            PlanetRadius = 470000;
+            PlanetRadius = 1737400;
             ElevationScale = 2;
             RecursionLevel = 8;
             PlanetProjection = Projection.Equirectangular;
@@ -24,29 +24,29 @@ namespace PlanetBuilder
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Planets\Ceres\Datasets\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.tif");
+            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Planets\Moon\Datasets\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014_small.tif");
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
             
             sw = Stopwatch.StartNew();
             _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600);
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-            TextureHelper.SaveFile16($@"Planets\Ceres\Generated\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Planets\Ceres\Generated\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            TextureHelper.SaveFile16($@"Planets\Moon\Generated\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            TextureHelper.SavePng8($@"Planets\Moon\Generated\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
             _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, 10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveFile16($@"Planets\Ceres\Generated\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Planets\Ceres\Generated\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            TextureHelper.SaveFile16($@"Planets\Moon\Generated\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            TextureHelper.SavePng8($@"Planets\Moon\Generated\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Planets\Ceres\Generated\Ceres{RecursionLevel}.stl");
+            SaveSTL($@"Planets\Moon\Generated\Moon{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)

@@ -12,24 +12,21 @@ namespace PlanetBuilder
 {
     public abstract class Planet
     {
-        private readonly Icosphere _icosphere = new Icosphere();
-
         public double PlanetRadius;
         public double ElevationScale;
-
-        public int RecursionLevel = 3;
 
         public Projection PlanetProjection = Projection.Equirectangular;
 
         private List<Vector3d> _planetVertexes;
         private List<Triangle> _planetTriangles;
 
-        protected void CreatePlanetVertexes()
+        protected void CreatePlanetVertexes(int recursionLevel)
         {
-            _icosphere.Create(RecursionLevel);
+            var icosphere = new Icosphere();
+            icosphere.Create(recursionLevel);
 
-            _planetVertexes = _icosphere.mVertexes.Select(v => ComputeModelElevation(v)).ToList();
-            _planetTriangles = _icosphere.mTriangles.ToList();
+            _planetVertexes = icosphere.mVertexes.Select(v => ComputeModelElevation(v)).ToList();
+            _planetTriangles = icosphere.mTriangles.ToList();
         }
 
         protected abstract Vector3d ComputeModelElevation(Vector3d v);
