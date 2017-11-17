@@ -17,7 +17,7 @@ namespace PlanetBuilder
         {
             PlanetRadius = 6051000;
             ElevationScale = 12;
-            RecursionLevel = 8;
+            RecursionLevel = 9;
             PlanetProjection = Projection.Equirectangular;
         }
 
@@ -48,7 +48,7 @@ namespace PlanetBuilder
             if(!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca.raw", 8192, 4096);
+                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
                 
                 sw = Stopwatch.StartNew();
