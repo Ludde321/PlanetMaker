@@ -25,11 +25,18 @@ namespace PlanetBuilder
             // var charon = new Charon();
             // charon.Create();
 
-            var moon = new Moon();
-            moon.Create();
+            // var moon = new Moon();
+            // moon.Create();
+
+            // var mercury = new Mercury();
+            // mercury.Create();
 
             // var mars = new Mars();
             // mars.Create();
+
+            var venus = new Venus();
+            venus.Create();
+
 
             // var sw = Stopwatch.StartNew();
             // var texture = TextureHelper.LoadRaw16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);
