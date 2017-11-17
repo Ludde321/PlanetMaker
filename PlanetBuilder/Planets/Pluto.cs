@@ -31,7 +31,7 @@ namespace PlanetBuilder
             _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600);
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-            TextureHelper.SaveFile16($@"Planets\Pluto\Generated\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            TextureHelper.SaveRaw16($@"Planets\Pluto\Generated\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             TextureHelper.SavePng8($@"Planets\Pluto\Generated\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
@@ -39,7 +39,7 @@ namespace PlanetBuilder
             _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, 10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveFile16($@"Planets\Pluto\Generated\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            TextureHelper.SaveRaw16($@"Planets\Pluto\Generated\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
             TextureHelper.SavePng8($@"Planets\Pluto\Generated\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();

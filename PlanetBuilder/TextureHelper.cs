@@ -16,14 +16,7 @@ namespace PlanetBuilder
                 for (int y = 0; y < height; y++)
                 {
                     stream.Read(buffer, 0, buffer.Length);
-
-                    var line = texture.Data[y];
-                    for (int x = 0; x < width; x++)
-                    {
-                        byte b0 = buffer[x + x];
-                        byte b1 = buffer[x + x + 1];
-                        line[x] = (short)((b0 << 8) + b1);
-                    }
+                    Buffer.BlockCopy(buffer, 0, texture.Data[y], 0, buffer.Length);
                 }
             }
             return texture;
@@ -73,28 +66,21 @@ namespace PlanetBuilder
             return texture;
         }
 
-        public static void SaveFile16(string outputFilename, Texture<short> texture)
+        public static void SaveRaw16(string outputFilename, Texture<short> texture)
         {
             using (var outputStream = new FileStream(String.Format(outputFilename, texture.Width, texture.Height), FileMode.Create))
             {
-                SaveFile16(outputStream, texture);
+                SaveRaw16(outputStream, texture);
             }
         }
 
-        public static void SaveFile16(Stream outputStream, Texture<short> texture)
+        public static void SaveRaw16(Stream outputStream, Texture<short> texture)
         {
             var buffer = new byte[2 * texture.Width];
 
             for (int y = 0; y < texture.Height; y++)
             {
-                var line = texture.Data[y];
-                for (int x = 0; x < texture.Width; x++)
-                {
-                    short h = line[x];
-
-                    buffer[x + x] = (byte)(h >> 8);
-                    buffer[x + x + 1] = (byte)h;
-                }
+                Buffer.BlockCopy(texture.Data[y], 0, buffer, 0, buffer.Length);
                 outputStream.Write(buffer, 0, buffer.Length);
             }
         }
