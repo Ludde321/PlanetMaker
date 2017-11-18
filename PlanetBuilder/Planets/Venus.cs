@@ -16,8 +16,8 @@ namespace PlanetBuilder
         public Venus()
         {
             PlanetRadius = 6051000;
-            ElevationScale = 12;
-            RecursionLevel = 9;
+            ElevationScale = 14;
+            RecursionLevel = 8;
             PlanetProjection = Projection.Equirectangular;
         }
 
@@ -36,11 +36,11 @@ namespace PlanetBuilder
             //         }
             // TextureHelper.SaveRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02.raw", t1);
 
-            // var t1 = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca.raw", 8192, 4096);
+            // var t1 = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
             // for(int y = 0;y<t1.Height;y++)
             //     for(int x = 0;x<t1.Width;x++)
             //         t1.Data[y][x] -= 2951;
-            // TextureHelper.SaveRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca.raw", t1);
+            // TextureHelper.SaveRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", t1);
 
             int width = 2880;
             int height = 1440;
@@ -48,9 +48,14 @@ namespace PlanetBuilder
             if(!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca.raw", 8192, 4096);
+                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
-                
+
+                // sw = Stopwatch.StartNew();
+                // var elevationTextureLarge8 = TextureHelper.LoadAny8(@"Planets\Venus\Datasets\4kVenus.png");
+                // var elevationTextureLarge = TextureHelper.Convert(elevationTextureLarge8, (p) => {return (short)(p*64);});
+                // Console.WriteLine($"Loading texture used {sw.Elapsed}");
+
                 sw = Stopwatch.StartNew();
                 _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
