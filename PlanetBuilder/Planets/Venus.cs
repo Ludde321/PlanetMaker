@@ -26,7 +26,7 @@ namespace PlanetBuilder
             Stopwatch sw;
 
 
-            // var t1 = TextureHelper.LoadTiff16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02.tif");
+            // var t1 = TextureHelper.LoadTiff16(@"Datasets\Planets\Venus\Venus_Magellan_Topography_Global_4641m_v02.tif");
             // for(int y = 0;y<t1.Height;y++)
             //     for(int x = 0;x<t1.Width;x++)
             //         {
@@ -34,25 +34,25 @@ namespace PlanetBuilder
             //             if(h != -32678) // NoData
             //                 t1.Data[y][x] += 2951;
             //         }
-            // TextureHelper.SaveRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02.raw", t1);
+            // TextureHelper.SaveRaw16(@"Datasets\Planets\Venus\Venus_Magellan_Topography_Global_4641m_v02.raw", t1);
 
-            // var t1 = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
+            // var t1 = TextureHelper.LoadRaw16(@"Datasets\Planets\Venus\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
             // for(int y = 0;y<t1.Height;y++)
             //     for(int x = 0;x<t1.Width;x++)
             //         t1.Data[y][x] -= 2951;
-            // TextureHelper.SaveRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", t1);
+            // TextureHelper.SaveRaw16(@"Datasets\Planets\Venus\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", t1);
 
             int width = 2880;
             int height = 1440;
-            string elevationTextureSmallFilename = $@"Planets\Venus\Generated\Venus{width}x{height}.raw";
+            string elevationTextureSmallFilename = $@"Generated\Planets\Venus\Venus{width}x{height}.raw";
             if(!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Planets\Venus\Datasets\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
+                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Datasets\Planets\Venus\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
                 // sw = Stopwatch.StartNew();
-                // var elevationTextureLarge8 = TextureHelper.LoadAny8(@"Planets\Venus\Datasets\4kVenus.png");
+                // var elevationTextureLarge8 = TextureHelper.LoadAny8(@"Datasets\Planets\Venus\4kVenus.png");
                 // var elevationTextureLarge = TextureHelper.Convert(elevationTextureLarge8, (p) => {return (short)(p*64);});
                 // Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
@@ -60,15 +60,15 @@ namespace PlanetBuilder
                 _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                TextureHelper.SaveRaw16($@"Planets\Venus\Generated\Venus{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                TextureHelper.SaveRaw16($@"Generated\Planets\Venus\Venus{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             }
             else
             {
                 _elevationTextureSmall = TextureHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-                TextureHelper.SavePng8($@"Planets\Venus\Generated\Venus{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+                TextureHelper.SavePng8($@"Generated\Planets\Venus\Venus{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
-            string elevationTextureBlurFilename = $@"Planets\Venus\Generated\VenusBlur{width}x{height}.raw";
+            string elevationTextureBlurFilename = $@"Generated\Planets\Venus\VenusBlur{width}x{height}.raw";
             if(!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
@@ -76,19 +76,19 @@ namespace PlanetBuilder
                 _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, 10 * (Math.PI / 180));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
-                TextureHelper.SaveRaw16($@"Planets\Venus\Generated\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+                TextureHelper.SaveRaw16($@"Generated\Planets\Venus\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
             }
             else
             {
                 _elevationTextureBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
             }
-                TextureHelper.SavePng8($@"Planets\Venus\Generated\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+                TextureHelper.SavePng8($@"Generated\Planets\Venus\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Planets\Venus\Generated\Venus{RecursionLevel}.stl");
+            SaveSTL($@"Generated\Planets\Venus\Venus{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)

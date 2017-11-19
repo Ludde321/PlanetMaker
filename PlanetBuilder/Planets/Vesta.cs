@@ -24,7 +24,7 @@ namespace PlanetBuilder
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadRaw32f(@"Planets\Vesta\Datasets\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.raw", 17280, 8640);
+            var elevationTextureLarge = TextureHelper.LoadRaw32f(@"Datasets\Planets\Vesta\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.raw", 17280, 8640);
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
@@ -32,8 +32,8 @@ namespace PlanetBuilder
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
             var textureSmall = TextureHelper.Convert(_elevationTextureSmall, (h) => {return (short)(h-PlanetRadius);});
-            // TextureHelper.SaveFile16($@"Planets\Vesta\Generated\Vesta{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Planets\Vesta\Generated\Vesta{textureSmall.Width}x{textureSmall.Height}.png", textureSmall);
+            // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\Vesta{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            TextureHelper.SavePng8($@"Generated\Planets\Vesta\Vesta{textureSmall.Width}x{textureSmall.Height}.png", textureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
@@ -41,14 +41,14 @@ namespace PlanetBuilder
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             var textureBlur = TextureHelper.Convert(_elevationTextureBlur, (h) => {return (short)(h-PlanetRadius);});
-            // TextureHelper.SaveFile16($@"Planets\Vesta\Generated\VestaBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Planets\Vesta\Generated\VestaBlur{textureBlur.Width}x{textureBlur.Height}.png", textureBlur);
+            // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\VestaBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            TextureHelper.SavePng8($@"Generated\Planets\Vesta\VestaBlur{textureBlur.Width}x{textureBlur.Height}.png", textureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Planets\Vesta\Generated\Vesta{RecursionLevel}.stl");
+            SaveSTL($@"Generated\Planets\Vesta\Vesta{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)

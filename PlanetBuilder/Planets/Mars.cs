@@ -24,29 +24,29 @@ namespace PlanetBuilder
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Planets\Mars\Datasets\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
+            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Earth\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
             
             sw = Stopwatch.StartNew();
             _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 2400, 1200);
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-            TextureHelper.SaveRaw16($@"Planets\Mars\Generated\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Planets\Mars\Generated\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            TextureHelper.SaveRaw16($@"Generated\Planets\Earth\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            TextureHelper.SavePng8($@"Generated\Planets\Earth\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
             _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, 10 * (Math.PI / 180));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveRaw16($@"Planets\Mars\Generated\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Planets\Mars\Generated\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            TextureHelper.SaveRaw16($@"Generated\Planets\Earth\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            TextureHelper.SavePng8($@"Generated\Planets\Earth\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Planets\Mars\Generated\Mars{RecursionLevel}.stl");
+            SaveSTL($@"Generated\Planets\Earth\Mars{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)
