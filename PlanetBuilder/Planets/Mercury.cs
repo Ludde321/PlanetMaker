@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using ImageMagick;
 
-namespace PlanetBuilder
+namespace PlanetBuilder.Planets
 {
     public class Mercury : Planet
     {
@@ -51,7 +51,7 @@ namespace PlanetBuilder
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
-                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, 10 * (Math.PI / 180));
+                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);

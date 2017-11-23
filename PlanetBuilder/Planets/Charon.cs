@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using ImageMagick;
 
-namespace PlanetBuilder
+namespace PlanetBuilder.Planets
 {
     public class Charon : Planet
     {
@@ -37,7 +37,7 @@ namespace PlanetBuilder
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
-            _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, 10 * (Math.PI / 180), (h) => { return h != -32640 ? (short?)h : null;});
+            _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, MathHelper.ToRadians(10), (h) => { return h != -32640 ? (short?)h : null;});
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             TextureHelper.SaveRaw16($@"Generated\Planets\Charon\CharonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);

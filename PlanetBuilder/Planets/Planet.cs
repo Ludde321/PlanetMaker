@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlanetBuilder
+namespace PlanetBuilder.Planets
 {
     public abstract class Planet
     {
@@ -17,19 +17,22 @@ namespace PlanetBuilder
 
         public Projection PlanetProjection = Projection.Equirectangular;
 
-        private List<Vector3d> _planetVertexes;
-        private List<Triangle> _planetTriangles;
+        public List<Vector3d> PlanetVertexes;
+        public List<Triangle> PlanetTriangles;
 
         protected void CreatePlanetVertexes(int recursionLevel)
         {
             var icosphere = new Icosphere();
             icosphere.Create(recursionLevel);
 
-            _planetVertexes = icosphere.mVertexes.Select(v => ComputeModelElevation(v)).ToList();
-            _planetTriangles = icosphere.mTriangles.ToList();
+            PlanetVertexes = icosphere.Vertexes.Select(v => ComputeModelElevation(v)).ToList();
+            PlanetTriangles = icosphere.Triangles.ToList();
         }
 
-        protected abstract Vector3d ComputeModelElevation(Vector3d v);
+        protected virtual Vector3d ComputeModelElevation(Vector3d v) 
+        {
+            return v;
+        }
 
         protected byte ReadBilinearPixel(Texture<byte> texture, double tx, double ty)
         {
@@ -124,8 +127,8 @@ namespace PlanetBuilder
 
             string template = ReadTemplateX3d();
 
-            String indexes = string.Join(" ", _planetTriangles.Select(v => string.Format("{0} {1} {2} -1", v.i1, v.i2, v.i3)));
-            String points = string.Join(" ", _planetVertexes.Select(v => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.x, v.y, v.z)));
+            String indexes = string.Join(" ", PlanetTriangles.Select(v => string.Format("{0} {1} {2} -1", v.i1, v.i2, v.i3)));
+            String points = string.Join(" ", PlanetVertexes.Select(v => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.x, v.y, v.z)));
 
             File.WriteAllText(outputFilename, string.Format(template, indexes, points));
 
@@ -150,12 +153,12 @@ namespace PlanetBuilder
             using (var binaryWriter = new BinaryWriter(File.OpenWrite(outputFilename)))
             {
                 binaryWriter.Write(new byte[80]); // Header 80 bytes
-                binaryWriter.Write(_planetTriangles.Count);
-                foreach (var triangle in _planetTriangles)
+                binaryWriter.Write(PlanetTriangles.Count);
+                foreach (var triangle in PlanetTriangles)
                 {
-                    var v1 = _planetVertexes[triangle.i1];
-                    var v2 = _planetVertexes[triangle.i2];
-                    var v3 = _planetVertexes[triangle.i3];
+                    var v1 = PlanetVertexes[triangle.i1];
+                    var v2 = PlanetVertexes[triangle.i2];
+                    var v3 = PlanetVertexes[triangle.i3];
 
                     // Triangle Normal
                     binaryWriter.Write(0f);

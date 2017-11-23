@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using ImageMagick;
 
-namespace PlanetBuilder
+namespace PlanetBuilder.Planets
 {
     public class Moon : Planet
     {
@@ -28,12 +28,12 @@ namespace PlanetBuilder
             int width = 2880;
             int height = 1440;
             string elevationTextureSmallFilename = $@"Generated\Planets\Moon\Moon{width}x{height}.raw";
-            if(!File.Exists(elevationTextureSmallFilename))
+            if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
                 var elevationTextureLarge = TextureHelper.LoadRaw16(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.gray", 92160, 46080);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
-                
+
                 sw = Stopwatch.StartNew();
                 _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
@@ -44,14 +44,14 @@ namespace PlanetBuilder
             {
                 _elevationTextureSmall = TextureHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-                TextureHelper.SavePng8($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            TextureHelper.SavePng8($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             string elevationTextureBlurFilename = $@"Generated\Planets\Moon\MoonBlur{width}x{height}.raw";
-            if(!File.Exists(elevationTextureBlurFilename))
+            if (!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
-                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, 10 * (Math.PI / 180));
+                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Moon\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
@@ -60,7 +60,7 @@ namespace PlanetBuilder
             {
                 _elevationTextureBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
             }
-                TextureHelper.SavePng8($@"Generated\Planets\Moon\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            TextureHelper.SavePng8($@"Generated\Planets\Moon\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

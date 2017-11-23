@@ -167,7 +167,7 @@ namespace PlanetBuilder
                 {
                     short h = line[x];
 
-                    buffer[idx++] = (byte)(h >> 8);
+                    buffer[idx++] = (byte)((h >> 8) + 128);
                 }
             }
 

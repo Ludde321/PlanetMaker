@@ -9,8 +9,8 @@ namespace PlanetBuilder
 {
     public class Icosphere
     {
-        public List<Vector3d> mVertexes;
-        public List<Triangle> mTriangles;
+        public List<Vector3d> Vertexes;
+        public List<Triangle> Triangles;
 
         private Dictionary<ulong, int> mMiddlePointIndexCache;
 
@@ -21,16 +21,16 @@ namespace PlanetBuilder
             CreateIcosahedron();
             SubdivideTriangles(recursionLevel);
 
-            Console.WriteLine($"Vertexes: {mVertexes.Count}");
-            Console.WriteLine($"Triangles: {mTriangles.Count}");
+            Console.WriteLine($"Vertexes: {Vertexes.Count}");
+            Console.WriteLine($"Triangles: {Triangles.Count}");
             Console.WriteLine($"RecursionLevel: {recursionLevel}");
             Console.WriteLine($"Time used to create and subdivide icosphere: {sw.Elapsed}");
         }
 
         private void CreateIcosahedron()
         {
-            mVertexes = new List<Vector3d>();
-            mTriangles = new List<Triangle>();
+            Vertexes = new List<Vector3d>();
+            Triangles = new List<Triangle>();
 
             var t = (1.0 + System.Math.Sqrt(5.0)) / 2.0;
 
@@ -48,39 +48,39 @@ namespace PlanetBuilder
             AddVertex(new Vector3d(-t,  0,  1));
 
             // 5 faces around point 0
-            mTriangles.Add(new Triangle(0, 11, 5));
-            mTriangles.Add(new Triangle(0, 5, 1));
-            mTriangles.Add(new Triangle(0, 1, 7));
-            mTriangles.Add(new Triangle(0, 7, 10));
-            mTriangles.Add(new Triangle(0, 10, 11));
+            Triangles.Add(new Triangle(0, 11, 5));
+            Triangles.Add(new Triangle(0, 5, 1));
+            Triangles.Add(new Triangle(0, 1, 7));
+            Triangles.Add(new Triangle(0, 7, 10));
+            Triangles.Add(new Triangle(0, 10, 11));
  
             // 5 adjacent faces
-            mTriangles.Add(new Triangle(1, 5, 9));
-            mTriangles.Add(new Triangle(5, 11, 4));
-            mTriangles.Add(new Triangle(11, 10, 2));
-            mTriangles.Add(new Triangle(10, 7, 6));
-            mTriangles.Add(new Triangle(7, 1, 8));
+            Triangles.Add(new Triangle(1, 5, 9));
+            Triangles.Add(new Triangle(5, 11, 4));
+            Triangles.Add(new Triangle(11, 10, 2));
+            Triangles.Add(new Triangle(10, 7, 6));
+            Triangles.Add(new Triangle(7, 1, 8));
  
             // 5 faces around point 3
-            mTriangles.Add(new Triangle(3, 9, 4));
-            mTriangles.Add(new Triangle(3, 4, 2));
-            mTriangles.Add(new Triangle(3, 2, 6));
-            mTriangles.Add(new Triangle(3, 6, 8));
-            mTriangles.Add(new Triangle(3, 8, 9));
+            Triangles.Add(new Triangle(3, 9, 4));
+            Triangles.Add(new Triangle(3, 4, 2));
+            Triangles.Add(new Triangle(3, 2, 6));
+            Triangles.Add(new Triangle(3, 6, 8));
+            Triangles.Add(new Triangle(3, 8, 9));
  
             // 5 adjacent faces
-            mTriangles.Add(new Triangle(4, 9, 5));
-            mTriangles.Add(new Triangle(2, 4, 11));
-            mTriangles.Add(new Triangle(6, 2, 10));
-            mTriangles.Add(new Triangle(8, 6, 7));
-            mTriangles.Add(new Triangle(9, 8, 1));
+            Triangles.Add(new Triangle(4, 9, 5));
+            Triangles.Add(new Triangle(2, 4, 11));
+            Triangles.Add(new Triangle(6, 2, 10));
+            Triangles.Add(new Triangle(8, 6, 7));
+            Triangles.Add(new Triangle(9, 8, 1));
         }
 
         private void SubdivideTriangles(int recursionLevel)
         {
             mMiddlePointIndexCache = new Dictionary<ulong, int>();
 
-            var triangles = mTriangles;
+            var triangles = Triangles;
 
             for (int i = 0; i < recursionLevel; i++)
             {
@@ -100,7 +100,7 @@ namespace PlanetBuilder
                 triangles = triangles2;
             }
 
-            mTriangles = triangles;
+            Triangles = triangles;
         }
 
         // MurmurHash3 https://code.google.com/p/smhasher/wiki/MurmurHash3
@@ -129,8 +129,8 @@ namespace PlanetBuilder
                 return ret;
 
             // not in cache, calculate it
-            Vector3d v1 = mVertexes[i1];
-            Vector3d v2 = mVertexes[i2];
+            Vector3d v1 = Vertexes[i1];
+            Vector3d v2 = Vertexes[i2];
             Vector3d vm = Vector3d.MiddlePoint(v1, v2);
 
             int im = AddVertex(vm);
@@ -145,9 +145,9 @@ namespace PlanetBuilder
         {
             v = Vector3d.Normalize(v);
 
-            mVertexes.Add(v);
+            Vertexes.Add(v);
 
-            return mVertexes.Count - 1;
+            return Vertexes.Count - 1;
         }
 
     }
