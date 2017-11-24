@@ -76,10 +76,21 @@ namespace PlanetBuilder.Planets
                 Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2, ofsY + longitudeSegments2 + 1));
 
                 ofsY += 2;
-
-//                ofsY += longitudeSegments + longitudeSegments;
             }
 
+            int ofsYT = 0;
+            int ofsYB = longitudeSegments2 * (latitudeSegments - 1);
+            for (int x = 0; x < longitudeSegments - 1; x++)
+            {
+                Triangles.Add(new Triangle(ofsYT, ofsYT + 3, ofsYT + 1));
+                Triangles.Add(new Triangle(ofsYT, ofsYT + 2, ofsYT + 3));
+
+                Triangles.Add(new Triangle(ofsYB, ofsYB + 1, ofsYB + 3));
+                Triangles.Add(new Triangle(ofsYB, ofsYB + 3, ofsYB + 2));
+
+                ofsYT += 2;
+                ofsYB += 2;
+            }
         }
 
     }

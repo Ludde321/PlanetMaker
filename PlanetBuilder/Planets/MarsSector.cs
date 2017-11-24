@@ -16,8 +16,8 @@ namespace PlanetBuilder.Planets
         public MarsSector()
         {
             PlanetRadius = 3396190;
-            ElevationScale = 7;
-            NumSegments = 200;
+            ElevationScale = 4;
+            NumSegments = 1200;
             PlanetProjection = Projection.Equirectangular;
         }
 
@@ -25,26 +25,30 @@ namespace PlanetBuilder.Planets
         {
              Stopwatch sw;
 
+            sw = Stopwatch.StartNew();
+            _elevationTexture = TextureHelper.LoadTiff16(@"Datasets\Planets\Mars\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
+            Console.WriteLine($"Loading texture used {sw.Elapsed}");
+
             int width = 11520;
             int height = 5760;
-            string elevationTextureSmallFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
-            if (!File.Exists(elevationTextureSmallFilename))
-            {
-                sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Mars\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
-                Console.WriteLine($"Loading texture used {sw.Elapsed}");
+            // string elevationTextureSmallFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
+            // if (!File.Exists(elevationTextureSmallFilename))
+            // {
+            //     sw = Stopwatch.StartNew();
+            //     var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Mars\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
+            //     Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
-                sw = Stopwatch.StartNew();
-                _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height);
-                Console.WriteLine($"Resampling used {sw.Elapsed}");
+            //     sw = Stopwatch.StartNew();
+            //     _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height);
+            //     Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
-                TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
-            }
-            else
-            {
-                _elevationTexture = TextureHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
-            }
+            //     TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
+            //     TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            // }
+            // else
+            // {
+            //     _elevationTexture = TextureHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+            // }
 
             width = 2880;
             height = 1440;
@@ -73,7 +77,7 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(MathHelper.ToRadians(-20), MathHelper.ToRadians(-20), MathHelper.ToRadians(20), MathHelper.ToRadians(20), NumSegments, NumSegments);
+            sphericalSector.Create(MathHelper.ToRadians(-10), MathHelper.ToRadians(133), MathHelper.ToRadians(0), MathHelper.ToRadians(142), NumSegments, NumSegments);
 
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;
