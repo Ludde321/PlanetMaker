@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Data/template.x3d" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Magick.NET.Core-Q8" Version="7.0.5.900" />
   </ItemGroup>
 </Project>
