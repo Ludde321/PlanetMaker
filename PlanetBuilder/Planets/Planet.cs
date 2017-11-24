@@ -121,31 +121,6 @@ namespace PlanetBuilder.Planets
             return (float)(p00p01 + (p10p11 - p00p01) * fy);
         }
 
-        protected void SaveX3d(string outputFilename)
-        {
-            var sw = Stopwatch.StartNew();
-
-            string template = ReadTemplateX3d();
-
-            String indexes = string.Join(" ", PlanetTriangles.Select(v => string.Format("{0} {1} {2} -1", v.i1, v.i2, v.i3)));
-            String points = string.Join(" ", PlanetVertexes.Select(v => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.x, v.y, v.z)));
-
-            File.WriteAllText(outputFilename, string.Format(template, indexes, points));
-
-            Console.WriteLine($"Time used saving {outputFilename}: {sw.Elapsed}");
-        }
-
-        private string ReadTemplateX3d()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceStream = assembly.GetManifestResourceStream("PlanetBuilder.Data.template.x3d");
-
-            using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
-            {
-                return reader.ReadToEnd();
-            }
-        }
-
         protected void SaveSTL(string outputFilename)
         {
             var sw = Stopwatch.StartNew();
