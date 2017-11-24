@@ -31,6 +31,7 @@ namespace PlanetBuilder.Planets
 
             int width = 11520;
             int height = 5760;
+            
             // string elevationTextureSmallFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
             // if (!File.Exists(elevationTextureSmallFilename))
             // {
