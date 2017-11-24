@@ -1,6 +1,6 @@
 # PlanetMaker
 
-PlanetBuilder is a tool that takes large datasets of planets, moons and astroids and generate 3D models used for 3D printing.
+PlanetBuilder is a tool that takes large datasets of planets, moons and asteroids and generate 3D models used for 3D printing.
 
 It can generate models of whole planets or a specified sub-section.
 
