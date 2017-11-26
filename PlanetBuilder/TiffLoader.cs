@@ -4,10 +4,16 @@ using System.IO;
 
 namespace PlanetBuilder
 {
+    // https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf
+    // https://www.awaresystems.be/imaging/tiff/bigtiff.html
+
+
     public class TiffLoader
     {
         private Stream _stream;
         private BinaryReader2 _reader;
+
+        private bool _bigTiff = false;
 
         public TiffLoader(Stream stream)
         {
@@ -25,41 +31,51 @@ namespace PlanetBuilder
             else if (byteOrder == 0x4d4d)
                 _reader.StreamIsLittleEndian = false;
             else
-                throw new Exception("Not a TIFF file");
+                throw new Exception($"Not a TIFF file: {byteOrder}");
 
             short meaningOfLife = _reader.ReadInt16();
-            if (meaningOfLife != 42)
-                throw new Exception("Not a TIFF file");
+            if (meaningOfLife == 42)
+                _bigTiff = false;
+            else if (meaningOfLife == 43)
+                _bigTiff = true;
+            else
+                throw new Exception($"Not a TIFF file. Life: {meaningOfLife}");
+
+            if(_bigTiff)
+            {
+                _reader.ReadUInt16(); // always 8
+                _reader.ReadUInt16(); // always 0
+            }
 
             // Read Image File Directories
             var ifdList = new List<ImageFileDirectory>();
 
-            uint ifdOffset = _reader.ReadUInt32();
+            long ifdOffset = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
             while (ifdOffset > 0)
             {
                 _reader.Stream.Position = ifdOffset;
 
                 var ifd = new ImageFileDirectory();
 
-                ushort numFields = _reader.ReadUInt16();
+                long numFields = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt16();
 
                 for (int i = 0; i < numFields; i++)
                 {
                     ushort tag = _reader.ReadUInt16();
                     ushort type = _reader.ReadUInt16();
-                    uint numValues = _reader.ReadUInt32();
-                    uint valueOffset = _reader.ReadUInt32();
+                    long numValues = _bigTiff ? _reader.ReadInt64() :_reader.ReadUInt32();
+                    long valueOffset = _bigTiff ? _reader.ReadInt64() :_reader.ReadUInt32();
 
                     switch ((IfdTag)tag)
                     {
                         case IfdTag.ImageWidth:
                             {
-                                ifd.ImageWidth = valueOffset;
+                                ifd.ImageWidth = (uint)valueOffset;
                             }
                             break;
                         case IfdTag.ImageHeight:
                             {
-                                ifd.ImageHeight = valueOffset;
+                                ifd.ImageHeight = (uint)valueOffset;
                             }
                             break;
                         case IfdTag.BitsPerSample:
@@ -79,7 +95,7 @@ namespace PlanetBuilder
                             break;
                         case IfdTag.StripOffsets:
                             {
-                                ifd.NumStripOffsets = numValues;
+                                ifd.NumStripOffsets = (uint)numValues;
                                 ifd.StripOffsets = valueOffset;
                             }
                             break;
@@ -90,12 +106,12 @@ namespace PlanetBuilder
                             break;
                         case IfdTag.RowsPerStrip:
                             {
-                                ifd.RowsPerStrip = valueOffset;
+                                ifd.RowsPerStrip = (uint)valueOffset;
                             }
                             break;
                         case IfdTag.StripByteCounts:
                             {
-                                ifd.NumStripByteCounts = numValues;
+                                ifd.NumStripByteCounts = (uint)numValues;
                                 ifd.StripByteCounts = valueOffset;
                             }
                             break;
@@ -182,11 +198,11 @@ namespace PlanetBuilder
             public ushort PhotometricInterpretation; // 0 = WhiteIsZero, 1 = BlackIsZero
             public ushort Compression;
             public uint NumStripOffsets;
-            public uint StripOffsets;
+            public long StripOffsets;
             public ushort SamplesPerPixel;
             public uint RowsPerStrip;
             public uint NumStripByteCounts;
-            public uint StripByteCounts;
+            public long StripByteCounts;
             public ushort PlanarConfiguration; // 1 = Chunky format, 2 = Planar format
             public ushort SampleFormat; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
 
