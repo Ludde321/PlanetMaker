@@ -35,8 +35,8 @@ namespace PlanetBuilder
             // var mars = new MarsSector();
             // mars.Create();
 
-            var phobos = new Phobos();
-            phobos.Create();
+            // var phobos = new Phobos();
+            // phobos.Create();
 
             // var venus = new Venus();
             // venus.Create();
@@ -44,35 +44,20 @@ namespace PlanetBuilder
             // var earth = new Earth();
             // earth.Create();
 
-            // var sw = Stopwatch.StartNew();
-            // var texture = TextureHelper.LoadRaw16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.raw", 21600, 10800);
-            // Console.WriteLine($"Loading texture used {sw.Elapsed}");
+            var sw = Stopwatch.StartNew();
+            using(var stream = File.OpenRead(@"Datasets\Planets\Mars\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif"))
+            {
+                var loader = new TiffLoader(stream);
+                var ifds = loader.ReadImageFileDirectories();
 
-            // sw = Stopwatch.StartNew();
-            // var resampler = new Resampler();
-            // //resampler.Test(10, 4);
-            // var texture2 = resampler.Resample(texture, 360, 180);
-            // Console.WriteLine($"Resampling used {sw.Elapsed}");
+                var rows = loader.ReadImageFileAsInt16(ifds[0]);
 
-            // TextureHelper.SaveFile16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres360x180.raw", texture2);
-
-            // var blurFilter = new BlurFilter(texture2);
-            // sw = Stopwatch.StartNew();
-            // var texture3a = blurFilter.Blur2(MathHelper.ToRadians(10));
-            // Console.WriteLine($"Blur used {sw.Elapsed}");
-
-            // sw = Stopwatch.StartNew();
-            // var texture3b = blurFilter.Blur3(MathHelper.ToRadians(10));
-            // Console.WriteLine($"Blur used {sw.Elapsed}");
-
-            // for(int y=0;y<texture3a.Height;y++)
-            //     for(int x=0;x<texture3a.Width;x++)
-            //         if(texture3a.Data[y][x] != texture3b.Data[y][x])
-            //         {
-            //             Console.WriteLine($"{texture3a.Data[y][x]} != {texture3b.Data[y][x]}");
-            //         }
-
-            // TextureHelper.SaveFile16(@"c:\Ludde\FractalWorlds\Planets\Ceres\Ceres360x180Blur3.raw", texture3a);
+                foreach(var row in rows)
+                {
+                    //Console.WriteLine(row.Length);
+                }
+            }
+            Console.WriteLine($"Used: {sw.Elapsed}");
 
             //convert -size 360x180 -depth 16 -endian MSB gray:Ceres360x180Blur.raw Ceres360x180Blur.png
 
