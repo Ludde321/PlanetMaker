@@ -6,7 +6,7 @@ It can generate models of whole planets or a specified sub-section.
 
 The 3d models are saved in STL format for futher processing.
 
-The following heavy bodies are currently available:
+The following heavenly bodies are currently available:
 
 Mercury, Venus, Mars, Phobos, Earth, Moon, Ceres, Vesta, Pluto and Charon.
 
