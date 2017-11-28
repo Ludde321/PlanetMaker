@@ -17,7 +17,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 3396190;
             ElevationScale = 10;
-            RecursionLevel = 8;
+            RecursionLevel = 9;
             PlanetProjection = Projection.Equirectangular;
         }
 
@@ -31,12 +31,13 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Mars\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
-                Console.WriteLine($"Loading texture used {sw.Elapsed}");
+                using(var elevationTextureLarge = new TiffTexture<short>(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif"))
+                {
+                    elevationTextureLarge.Width--; // Right-most pixel column in the Mars dataset is broken. This trick will skip it.
 
-                sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
-                Console.WriteLine($"Resampling used {sw.Elapsed}");
+                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
+                    Console.WriteLine($"Resampling used {sw.Elapsed}");
+                }
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Mars\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             }

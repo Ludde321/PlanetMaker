@@ -27,11 +27,14 @@ namespace PlanetBuilder
             // var charon = new Charon();
             // charon.Create();
 
-            var moon = new Moon();
-            moon.Create();
+            // var moon = new Moon();
+            // moon.Create();
 
             // var mercury = new Mercury();
             // mercury.Create();
+
+            var mars = new Mars();
+            mars.Create();
 
             // var mars = new MarsSector();
             // mars.Create();

@@ -17,7 +17,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 1737400;
             ElevationScale = 2.5;
-            RecursionLevel = 8;
+            RecursionLevel = 9;
             PlanetProjection = Projection.Equirectangular;
         }
 
@@ -33,17 +33,9 @@ namespace PlanetBuilder.Planets
                 sw = Stopwatch.StartNew();
                 using(var elevationTextureLarge = new TiffTexture<short>(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif"))
                 {
-                    // var test = elevationTextureLarge.ToTexture();
-                    // _elevationTextureSmall = Resampler.Resample(test, width, height);
                     _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
-                // var elevationTextureLarge = TextureHelper.LoadEnumerableTiff16(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif");
-                // Console.WriteLine($"Loading texture used {sw.Elapsed}");
-
-                // sw = Stopwatch.StartNew();
-                // _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
-                // Console.WriteLine($"Resampling used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             }
