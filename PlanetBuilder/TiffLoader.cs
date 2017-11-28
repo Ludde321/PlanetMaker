@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace PlanetBuilder
 {
@@ -70,12 +71,12 @@ namespace PlanetBuilder
                     {
                         case IfdTag.ImageWidth:
                             {
-                                ifd.ImageWidth = (uint)valueOffset;
+                                ifd.ImageWidth = (int)valueOffset;
                             }
                             break;
                         case IfdTag.ImageHeight:
                             {
-                                ifd.ImageHeight = (uint)valueOffset;
+                                ifd.ImageHeight = (int)valueOffset;
                             }
                             break;
                         case IfdTag.BitsPerSample:
@@ -95,6 +96,7 @@ namespace PlanetBuilder
                             break;
                         case IfdTag.StripOffsets:
                             {
+                                ifd.StripOffsetsType = type;
                                 ifd.NumStripOffsets = (uint)numValues;
                                 ifd.StripOffsets = valueOffset;
                             }
@@ -111,6 +113,7 @@ namespace PlanetBuilder
                             break;
                         case IfdTag.StripByteCounts:
                             {
+                                ifd.StripByteCountsType = type;
                                 ifd.NumStripByteCounts = (uint)numValues;
                                 ifd.StripByteCounts = valueOffset;
                             }
@@ -140,20 +143,14 @@ namespace PlanetBuilder
             return ifdList.ToArray();
         }
 
-        public IEnumerable<short[]> ReadImageFileAsInt16(ImageFileDirectory ifd)
+        public IEnumerable<T[]> ReadImageFileAs<T>(ImageFileDirectory ifd)
         {
             var rows = ReadImageFile(ifd);
             foreach (var row in rows)
-                yield return ConvertRowToInt16(ifd, row);
-        }
-        public IEnumerable<float[]> ReadImageFileAsFloat(ImageFileDirectory ifd)
-        {
-            var rows = ReadImageFile(ifd);
-            foreach (var row in rows)
-                yield return ConvertRowToFloat(ifd, row);
+                yield return (T[])ConvertRow(ifd, row);
         }
 
-        public IEnumerable<byte[]> ReadImageFile(ImageFileDirectory ifd)
+        private IEnumerable<byte[]> ReadImageFile(ImageFileDirectory ifd)
         {
             if (ifd.PhotometricInterpretation != 1)
                 throw new NotSupportedException($"PhotometricInterpretation must be BlackIsZero: {ifd.PhotometricInterpretation}");
@@ -165,20 +162,20 @@ namespace PlanetBuilder
                 throw new NotSupportedException($"PlanarConfiguration must be ChunkyFormat: {ifd.PlanarConfiguration}");
 
             _reader.Stream.Position = ifd.StripOffsets;
-            var stripOffsets = new uint[ifd.NumStripOffsets];
+            var stripOffsets = new long[ifd.NumStripOffsets];
             for (int i = 0; i < ifd.NumStripOffsets; i++)
-                stripOffsets[i] = _reader.ReadUInt32();
+                stripOffsets[i] = ifd.StripOffsetsType == 16 ? _reader.ReadInt64() : _reader.ReadUInt32();
 
             _reader.Stream.Position = ifd.StripByteCounts;
-            var stripByteCounts = new uint[ifd.NumStripByteCounts];
+            var stripByteCounts = new long[ifd.NumStripByteCounts];
             for (int i = 0; i < ifd.NumStripByteCounts; i++)
-                stripByteCounts[i] = _reader.ReadUInt32();
+                stripByteCounts[i] = ifd.StripOffsetsType == 16 ? _reader.ReadInt64() : _reader.ReadUInt32();
 
             for (uint i = 0; i < ifd.NumStripOffsets; i++)
             {
                 _stream.Position = stripOffsets[i];
 
-                uint bytesPerRow = stripByteCounts[i] / ifd.RowsPerStrip;
+                long bytesPerRow = stripByteCounts[i] / ifd.RowsPerStrip;
 
                 for (uint j = 0; j < ifd.RowsPerStrip; j++)
                 {
@@ -192,20 +189,21 @@ namespace PlanetBuilder
 
         public class ImageFileDirectory
         {
-            public uint ImageWidth;
-            public uint ImageHeight;
+            public int ImageWidth;
+            public int ImageHeight;
             public ushort BitsPerSample;
             public ushort PhotometricInterpretation; // 0 = WhiteIsZero, 1 = BlackIsZero
             public ushort Compression;
+            public ushort StripOffsetsType;
             public uint NumStripOffsets;
             public long StripOffsets;
             public ushort SamplesPerPixel;
             public uint RowsPerStrip;
+            public ushort StripByteCountsType;
             public uint NumStripByteCounts;
             public long StripByteCounts;
             public ushort PlanarConfiguration; // 1 = Chunky format, 2 = Planar format
             public ushort SampleFormat; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
-
         }
 
         private enum IfdTag
@@ -223,12 +221,22 @@ namespace PlanetBuilder
             SampleFormat = 339,
         }
 
-        private short[] ConvertRowToInt16(ImageFileDirectory ifd, byte[] row)
+        private Array ConvertRow(ImageFileDirectory ifd, byte[] row)
         {
-            int width = (int)ifd.ImageWidth;
+            int width = ifd.ImageWidth;
             if (ifd.SamplesPerPixel == 1)
             {
-                if (ifd.BitsPerSample == 16)
+                if (ifd.BitsPerSample == 8)
+                {
+                    if (ifd.SampleFormat == 1) // 1 unsigned, 2 signed, 3 float
+                    {
+                        // var output = new byte[width];
+                        // Buffer.BlockCopy(row, 0, output, 0, width + width);
+                        // return output;
+                        return row;
+                    }
+                }
+                else if (ifd.BitsPerSample == 16)
                 {
                     if (ifd.SampleFormat == 1 || ifd.SampleFormat == 2)
                     {
@@ -247,16 +255,7 @@ namespace PlanetBuilder
                         return output;
                     }
                 }
-            }
-            return null;
-        }
-
-        private float[] ConvertRowToFloat(ImageFileDirectory ifd, byte[] row)
-        {
-            int width = (int)ifd.ImageWidth;
-            if (ifd.SamplesPerPixel == 1)
-            {
-                if (ifd.BitsPerSample == 32)
+                else if (ifd.BitsPerSample == 32)
                 {
                     if (ifd.SampleFormat == 3)
                     {
@@ -278,9 +277,69 @@ namespace PlanetBuilder
                         Buffer.BlockCopy(row, 0, output, 0, width + width);
                         return output;
                     }
-                }
+                }                
             }
             return null;
         }
+
+        // private short[] ConvertRowToInt16(ImageFileDirectory ifd, byte[] row)
+        // {
+        //     int width = ifd.ImageWidth;
+        //     if (ifd.SamplesPerPixel == 1)
+        //     {
+        //         if (ifd.BitsPerSample == 16)
+        //         {
+        //             if (ifd.SampleFormat == 1 || ifd.SampleFormat == 2)
+        //             {
+        //                 var output = new short[width];
+        //                 if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
+        //                 {
+        //                     int w2 = width + width;
+        //                     for (int i = 0; i < w2; i += 2)
+        //                     {
+        //                         byte b = row[i];
+        //                         row[i] = row[i + 1];
+        //                         row[i + 1] = b;
+        //                     }
+        //                 }
+        //                 Buffer.BlockCopy(row, 0, output, 0, width + width);
+        //                 return output;
+        //             }
+        //         }
+        //     }
+        //     return null;
+        // }
+
+        // private float[] ConvertRowToFloat(ImageFileDirectory ifd, byte[] row)
+        // {
+        //     int width = ifd.ImageWidth;
+        //     if (ifd.SamplesPerPixel == 1)
+        //     {
+        //         if (ifd.BitsPerSample == 32)
+        //         {
+        //             if (ifd.SampleFormat == 3)
+        //             {
+        //                 var output = new float[width];
+        //                 if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
+        //                 {
+        //                     int w4 = 4 * width;
+        //                     for (int i = 0; i < w4; i += 4)
+        //                     {
+        //                         byte b = row[i];
+        //                         row[i] = row[i + 3];
+        //                         row[i + 3] = b;
+
+        //                         b = row[i + 1];
+        //                         row[i + 1] = row[i + 2];
+        //                         row[i + 2] = b;
+        //                     }
+        //                 }
+        //                 Buffer.BlockCopy(row, 0, output, 0, width + width);
+        //                 return output;
+        //             }
+        //         }
+        //     }
+        //     return null;
+        // }
     }
 }

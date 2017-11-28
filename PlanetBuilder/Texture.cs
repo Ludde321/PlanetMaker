@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace PlanetBuilder
 {
     public class Texture<T>
@@ -13,6 +16,13 @@ namespace PlanetBuilder
             Data = new T[height][];
             for (int y = 0; y < height; y++)
                 Data[y] = new T[width];
+        }
+
+        public Texture(int width, int height, IEnumerable<T[]> data)
+        {
+            Width = width;
+            Height = height;
+            Data = data.ToArray();
         }
 
     }

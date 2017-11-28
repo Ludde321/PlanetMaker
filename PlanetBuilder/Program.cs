@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using PlanetBuilder.Planets;
 
 namespace PlanetBuilder
@@ -26,8 +27,8 @@ namespace PlanetBuilder
             // var charon = new Charon();
             // charon.Create();
 
-            // var moon = new Moon();
-            // moon.Create();
+            var moon = new Moon();
+            moon.Create();
 
             // var mercury = new Mercury();
             // mercury.Create();
@@ -82,12 +83,13 @@ namespace PlanetBuilder
             //     var loader = new TiffLoader(stream);
             //     var ifds = loader.ReadImageFileDirectories();
 
-            //     var rows = loader.ReadImageFileAsFloat(ifds[0]);
+            //     var rows = loader.ReadImageFileAsInt16(ifds[0]);
 
-            //     foreach(var row in rows)
-            //     {
-            //         //Console.WriteLine(row.Length);
-            //     }
+            //     var img = rows.ToArray();
+            //     // foreach(var row in rows)
+            //     // {
+            //     //     //Console.WriteLine(row.Length);
+            //     // }
             // }
             // Console.WriteLine($"Used: {sw.Elapsed}");
 

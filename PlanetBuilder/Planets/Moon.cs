@@ -17,7 +17,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 1737400;
             ElevationScale = 2.5;
-            RecursionLevel = 11;
+            RecursionLevel = 8;
             PlanetProjection = Projection.Equirectangular;
         }
 
@@ -31,12 +31,19 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.gray", 92160, 46080);
-                Console.WriteLine($"Loading texture used {sw.Elapsed}");
+                using(var elevationTextureLarge = new TiffTexture<short>(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif"))
+                {
+                    // var test = elevationTextureLarge.ToTexture();
+                    // _elevationTextureSmall = Resampler.Resample(test, width, height);
+                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
+                    Console.WriteLine($"Resampling used {sw.Elapsed}");
+                }
+                // var elevationTextureLarge = TextureHelper.LoadEnumerableTiff16(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif");
+                // Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
-                sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
-                Console.WriteLine($"Resampling used {sw.Elapsed}");
+                // sw = Stopwatch.StartNew();
+                // _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
+                // Console.WriteLine($"Resampling used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             }
