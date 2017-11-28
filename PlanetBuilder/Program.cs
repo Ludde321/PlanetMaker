@@ -33,11 +33,11 @@ namespace PlanetBuilder
             // var mercury = new Mercury();
             // mercury.Create();
 
-            var mars = new Mars();
-            mars.Create();
-
-            // var mars = new MarsSector();
+            // var mars = new Mars();
             // mars.Create();
+
+            var marsSector = new MarsSector();
+            marsSector.Create();
 
             // var phobos = new Phobos();
             // phobos.Create();
