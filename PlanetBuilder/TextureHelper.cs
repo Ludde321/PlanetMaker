@@ -6,9 +6,9 @@ namespace PlanetBuilder
 {
     public static class TextureHelper
     {
-        public static Texture<byte> LoadRaw8(string inputFilename, int width, int height)
+        public static Bitmap<byte> LoadRaw8(string inputFilename, int width, int height)
         {
-            var texture = new Texture<byte>(width, height);
+            var texture = new Bitmap<byte>(width, height);
 
             using (var stream = File.OpenRead(String.Format(inputFilename, width, height)))
             {
@@ -17,9 +17,9 @@ namespace PlanetBuilder
             }
             return texture;
         }
-        public static Texture<short> LoadRaw16(string inputFilename, int width, int height)
+        public static Bitmap<short> LoadRaw16(string inputFilename, int width, int height)
         {
-            var texture = new Texture<short>(width, height);
+            var texture = new Bitmap<short>(width, height);
 
             using (var stream = File.OpenRead(String.Format(inputFilename, width, height)))
             {
@@ -33,9 +33,9 @@ namespace PlanetBuilder
             return texture;
         }
 
-        public static Texture<float> LoadRaw32f(string inputFilename, int width, int height)
+        public static Bitmap<float> LoadRaw32f(string inputFilename, int width, int height)
         {
-            var texture = new Texture<float>(width, height);
+            var texture = new Bitmap<float>(width, height);
 
             using (var stream = File.OpenRead(String.Format(inputFilename, width, height)))
             {
@@ -50,7 +50,7 @@ namespace PlanetBuilder
             return texture;
         }
 
-        public static Texture<short> LoadTiff16(string inputFilename)
+        public static Bitmap<short> LoadTiff16(string inputFilename)
         {
             int width;
             int height;
@@ -65,7 +65,7 @@ namespace PlanetBuilder
                 buffer = image.ToByteArray();
             }
 
-            var texture = new Texture<short>(width, height);
+            var texture = new Bitmap<short>(width, height);
 
             int idx = 0;
             for (int y = 0; y < height; y++)
@@ -78,7 +78,7 @@ namespace PlanetBuilder
         }
 
 
-        public static Texture<byte> LoadAny8(string inputFilename)
+        public static Bitmap<byte> LoadAny8(string inputFilename)
         {
             int width;
             int height;
@@ -93,7 +93,7 @@ namespace PlanetBuilder
                 buffer = image.ToByteArray();
             }
 
-            var texture = new Texture<byte>(width, height);
+            var texture = new Bitmap<byte>(width, height);
 
             int idx = 0;
             for (int y = 0; y < height; y++)
@@ -105,7 +105,7 @@ namespace PlanetBuilder
             return texture;
         }
 
-        public static void SaveRaw8(string outputFilename, Texture<byte> texture)
+        public static void SaveRaw8(string outputFilename, Bitmap<byte> texture)
         {
             using (var outputStream = new FileStream(String.Format(outputFilename, texture.Width, texture.Height), FileMode.Create))
             {
@@ -113,13 +113,13 @@ namespace PlanetBuilder
             }
         }
 
-        public static void SaveRaw8(Stream outputStream, Texture<byte> texture)
+        public static void SaveRaw8(Stream outputStream, Bitmap<byte> texture)
         {
             for (int y = 0; y < texture.Height; y++)
                 outputStream.Write(texture.Data[y], 0, texture.Width);
         }
 
-        public static void SaveRaw16(string outputFilename, Texture<short> texture)
+        public static void SaveRaw16(string outputFilename, Bitmap<short> texture)
         {
             using (var outputStream = new FileStream(String.Format(outputFilename, texture.Width, texture.Height), FileMode.Create))
             {
@@ -127,7 +127,7 @@ namespace PlanetBuilder
             }
         }
 
-        public static void SaveRaw16(Stream outputStream, Texture<short> texture)
+        public static void SaveRaw16(Stream outputStream, Bitmap<short> texture)
         {
             var buffer = new byte[2 * texture.Width];
 
@@ -138,7 +138,7 @@ namespace PlanetBuilder
             }
         }
 
-        public static void SavePng8(string outputFilename, Texture<byte> texture)
+        public static void SavePng8(string outputFilename, Bitmap<byte> texture)
         {
             var buffer = new byte[texture.Width * texture.Height];
 
@@ -155,7 +155,7 @@ namespace PlanetBuilder
                 image.Write(outputFilename);
             }
         }
-        public static void SavePng8(string outputFilename, Texture<short> texture)
+        public static void SavePng8(string outputFilename, Bitmap<short> texture)
         {
             var buffer = new byte[texture.Width * texture.Height];
 
@@ -178,11 +178,11 @@ namespace PlanetBuilder
             }
         }
 
-        public static Texture<B> Convert<A,B>(Texture<A> inputTexture, Func<A, B> func)
+        public static Bitmap<B> Convert<A,B>(Bitmap<A> inputTexture, Func<A, B> func)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;
-            var outputTexture = new Texture<B>(width, height);
+            var outputTexture = new Bitmap<B>(width, height);
             for(int y =0;y<height;y++)
             {
                 var inputLine = inputTexture.Data[y];
@@ -193,7 +193,7 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public static void Process<A>(Texture<A> inputTexture, Func<A, A> func)
+        public static void Process<A>(Bitmap<A> inputTexture, Func<A, A> func)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace PlanetBuilder
@@ -9,20 +10,35 @@ namespace PlanetBuilder
     // https://www.awaresystems.be/imaging/tiff/bigtiff.html
 
 
-    public class TiffLoader
+    public class TiffFile : IDisposable
     {
         private Stream _stream;
         private BinaryReader2 _reader;
 
         private bool _bigTiff = false;
 
-        public TiffLoader(Stream stream)
+        private readonly ImageFileDirectory[] _ifds;
+
+        public TiffFile(Stream stream)
         {
             _stream = stream;
             _reader = new BinaryReader2(_stream, true);
+            _ifds = ReadImageFileDirectories();
         }
 
-        public ImageFileDirectory[] ReadImageFileDirectories()
+        public void Close()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            var stream = _stream;
+            _stream = null;
+            stream.Dispose();
+        }
+
+        private ImageFileDirectory[] ReadImageFileDirectories()
         {
             _reader.Stream.Position = 0;
 
@@ -143,14 +159,19 @@ namespace PlanetBuilder
             return ifdList.ToArray();
         }
 
-        public IEnumerable<T[]> ReadImageFileAs<T>(ImageFileDirectory ifd)
+        public EnumerableBitmap<T> ReadImageFile<T>()
         {
-            var rows = ReadImageFile(ifd);
-            foreach (var row in rows)
-                yield return (T[])ConvertRow(ifd, row);
+            return ReadImageFile<T>(_ifds[0]);
         }
 
-        private IEnumerable<byte[]> ReadImageFile(ImageFileDirectory ifd)
+        public EnumerableBitmap<T> ReadImageFile<T>(ImageFileDirectory ifd)
+        {
+            var rows = ReadImageFileInternal(ifd);
+
+            return new EnumerableBitmap<T>(ifd.ImageWidth, ifd.ImageHeight, rows.Select(row => (T[])ConvertRow(ifd, row)));
+        }
+
+        private IEnumerable<byte[]> ReadImageFileInternal(ImageFileDirectory ifd)
         {
             if (ifd.PhotometricInterpretation != 1)
                 throw new NotSupportedException($"PhotometricInterpretation must be BlackIsZero: {ifd.PhotometricInterpretation}");

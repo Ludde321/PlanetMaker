@@ -10,8 +10,8 @@ namespace PlanetBuilder.Planets
     public class Vesta : Planet
     {
         public int RecursionLevel;
-        private Texture<float> _elevationTextureSmall;
-        private Texture<float> _elevationTextureBlur;
+        private Bitmap<float> _elevationTextureSmall;
+        private Bitmap<float> _elevationTextureBlur;
 
         public Vesta()
         {

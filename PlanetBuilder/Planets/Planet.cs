@@ -34,7 +34,7 @@ namespace PlanetBuilder.Planets
             return v;
         }
 
-        protected byte ReadBilinearPixel(Texture<byte> texture, double tx, double ty)
+        protected byte ReadBilinearPixel(Bitmap<byte> texture, double tx, double ty)
         {
             uint width = (uint)texture.Width;
             uint height = (uint)texture.Height;
@@ -63,7 +63,7 @@ namespace PlanetBuilder.Planets
             return (byte)(p00p01 + (p10p11 - p00p01) * fy);
         }
 
-        protected short ReadBilinearPixel(Texture<short> texture, double tx, double ty)
+        protected short ReadBilinearPixel(Bitmap<short> texture, double tx, double ty)
         {
             uint width = (uint)texture.Width;
             uint height = (uint)texture.Height;
@@ -92,7 +92,7 @@ namespace PlanetBuilder.Planets
             return (short)(p00p01 + (p10p11 - p00p01) * fy);
         }
 
-        protected float ReadBilinearPixel(Texture<float> texture, double tx, double ty)
+        protected float ReadBilinearPixel(Bitmap<float> texture, double tx, double ty)
         {
             uint width = (uint)texture.Width;
             uint height = (uint)texture.Height;

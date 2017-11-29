@@ -10,8 +10,8 @@ namespace PlanetBuilder.Planets
     public class Earth : Planet
     {
         public int RecursionLevel;
-        private Texture<short> _elevationTextureSmall;
-        private Texture<byte> _landcoverTextureSmall;
+        private Bitmap<short> _elevationTextureSmall;
+        private Bitmap<byte> _landcoverTextureSmall;
         //private Texture<short> _elevationTextureBlur;
 
         public Earth()

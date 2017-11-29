@@ -10,8 +10,8 @@ namespace PlanetBuilder.Planets
     public class Moon : Planet
     {
         public int RecursionLevel;
-        private Texture<short> _elevationTextureSmall;
-        private Texture<short> _elevationTextureBlur;
+        private Bitmap<short> _elevationTextureSmall;
+        private Bitmap<short> _elevationTextureBlur;
 
         public Moon()
         {
@@ -31,9 +31,11 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                using(var elevationTextureLarge = new TiffTexture<short>(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif"))
+                using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif")))
                 {
-                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
+                    var elevationTextureLarge = tiffFile.ReadImageFile<short>();
+                    
+                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 

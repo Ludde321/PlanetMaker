@@ -30,9 +30,9 @@ namespace PlanetBuilder
             Console.WriteLine($"y = {y}");
         }
 
-        public static Texture<byte> Resample(Texture<byte> inputTexture, int width, int height)
+        public static Bitmap<byte> Resample(Bitmap<byte> inputTexture, int width, int height)
         {
-            var outputTexture = new Texture<byte>(width, height);
+            var outputTexture = new Bitmap<byte>(width, height);
 
             var accumLine = new long[width];
             var countLine = new int[width];
@@ -97,9 +97,9 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public static Texture<short> Resample(Texture<short> inputTexture, int width, int height)
+        public static Bitmap<short> Resample(Bitmap<short> inputTexture, int width, int height)
         {
-            var outputTexture = new Texture<short>(width, height);
+            var outputTexture = new Bitmap<short>(width, height);
 
             var accumLine = new long[width];
             var countLine = new int[width];
@@ -164,9 +164,9 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public static Texture<float> Resample(Texture<float> inputTexture, int width, int height)
+        public static Bitmap<float> Resample(Bitmap<float> inputTexture, int width, int height)
         {
-            var outputTexture = new Texture<float>(width, height);
+            var outputTexture = new Bitmap<float>(width, height);
 
             var accumLine = new float[width];
             var countLine = new int[width];
@@ -231,7 +231,7 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public static TiffTexture<T> Resample<T>(TiffTexture<T> inputTexture, int outputWidth, int outputHeight)
+        public static EnumerableBitmap<T> Resample<T>(EnumerableBitmap<T> inputTexture, int outputWidth, int outputHeight)
         {
             int inputWidth = inputTexture.Width;
 
@@ -242,7 +242,7 @@ namespace PlanetBuilder
             ResampleXTask(blockingQueue, inputRowGroups, inputWidth, outputWidth);
 
             var rows = EnumerateQueue(blockingQueue);
-            return new TiffTexture<T>(outputWidth, outputHeight, rows);
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, rows);
         }
 
         private static Task ResampleXTask<T>(BlockingCollection<Task<T[]>> blockingQueue, IEnumerable<T[][]> inputRowGroups, int inputWidth, int outputWidth)
@@ -261,7 +261,7 @@ namespace PlanetBuilder
                 yield return blockingQueue.Take().Result;
         }
 
-        private static IEnumerable<T[][]> ResampleY<T>(TiffTexture<T> inputTexture, int outputHeight)
+        private static IEnumerable<T[][]> ResampleY<T>(EnumerableBitmap<T> inputTexture, int outputHeight)
         {
             var outputRows = new List<T[]>();
 

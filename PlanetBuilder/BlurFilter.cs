@@ -17,9 +17,9 @@ namespace PlanetBuilder
             _projection = projection;
         }
 
-        private Texture<Vector3d> CreateVectorMap(int width, int height)
+        private Bitmap<Vector3d> CreateVectorMap(int width, int height)
         {
-            var vmap = new Texture<Vector3d>(width, height);
+            var vmap = new Bitmap<Vector3d>(width, height);
 
             switch (_projection)
             {
@@ -66,7 +66,7 @@ namespace PlanetBuilder
             return vmap;
         }
 
-        private Vector2us[] CreateLookup(Texture<Vector3d> vectorMap, int y, double blurAngle)
+        private Vector2us[] CreateLookup(Bitmap<Vector3d> vectorMap, int y, double blurAngle)
         {
             int width = vectorMap.Width;
             int height = vectorMap.Height;
@@ -93,14 +93,14 @@ namespace PlanetBuilder
             return lookup.ToArray();
         }
 
-        public Texture<short> Blur(Texture<short> inputTexture, double blurAngle)
+        public Bitmap<short> Blur(Bitmap<short> inputTexture, double blurAngle)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;
 
             var vectorMap = CreateVectorMap(width, height);
 
-            var outputTexture = new Texture<short>(width, height);
+            var outputTexture = new Bitmap<short>(width, height);
 
             var cosBlurAngle = Math.Cos(blurAngle);
 
@@ -138,14 +138,14 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public Texture<short> Blur2(Texture<short> inputTexture, double blurAngle)
+        public Bitmap<short> Blur2(Bitmap<short> inputTexture, double blurAngle)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;
 
             var vectorMap = CreateVectorMap(width, height);
 
-            var outputTexture = new Texture<short>(width, height);
+            var outputTexture = new Bitmap<short>(width, height);
 
             //for (short y = 0; y < Height; y++)
             Parallel.For(0, height, y =>
@@ -171,14 +171,14 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public Texture<short> Blur2(Texture<short> inputTexture, double blurAngle, Func<short, short?> func)
+        public Bitmap<short> Blur2(Bitmap<short> inputTexture, double blurAngle, Func<short, short?> func)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;
 
             var vectorMap = CreateVectorMap(width, height);
 
-            var outputTexture = new Texture<short>(width, height);
+            var outputTexture = new Bitmap<short>(width, height);
 
             //for (short y = 0; y < Height; y++)
             Parallel.For(0, height, y =>
@@ -215,14 +215,14 @@ namespace PlanetBuilder
             return outputTexture;
         }
 
-        public Texture<float> Blur2(Texture<float> inputTexture, double blurAngle)
+        public Bitmap<float> Blur2(Bitmap<float> inputTexture, double blurAngle)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;
 
             var vectorMap = CreateVectorMap(width, height);
 
-            var outputTexture = new Texture<float>(width, height);
+            var outputTexture = new Bitmap<float>(width, height);
 
             Parallel.For(0, height, y =>
             {
@@ -247,14 +247,14 @@ namespace PlanetBuilder
 
 
 
-        public Texture<short> Blur3(Texture<short> inputTexture, double blurAngle)
+        public Bitmap<short> Blur3(Bitmap<short> inputTexture, double blurAngle)
         {
             int width = inputTexture.Width;
             int height = inputTexture.Height;
 
             var vectorMap = CreateVectorMap(width, height);
 
-            var outputTexture = new Texture<short>(width, height);
+            var outputTexture = new Bitmap<short>(width, height);
 
             //for (short y = 0; y < Height; y++)
             Parallel.For(0, height, y =>

@@ -10,8 +10,8 @@ namespace PlanetBuilder.Planets
     public class MarsSector : Planet
     {
         public int NumSegments;
-        private Texture<short> _elevationTexture;
-        private Texture<short> _elevationTextureBlur;
+        private Bitmap<short> _elevationTexture;
+        private Bitmap<short> _elevationTextureBlur;
 
         public MarsSector()
         {
@@ -31,11 +31,13 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureFilename))
             {
                 sw = Stopwatch.StartNew();
-                using(var elevationTextureLarge = new TiffTexture<short>(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif"))
+                using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
                 {
+                    var elevationTextureLarge = tiffFile.ReadImageFile<short>();
+
                     elevationTextureLarge.Width--; // Right-most pixel column in the Mars dataset is broken. This trick will skip it.
 
-                    _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToTexture();
+                    _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 

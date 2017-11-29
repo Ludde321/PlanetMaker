@@ -10,8 +10,8 @@ namespace PlanetBuilder.Planets
     public class Mercury : Planet
     {
         public int RecursionLevel;
-        private Texture<short> _elevationTextureSmall;
-        private Texture<short> _elevationTextureBlur;
+        private Bitmap<short> _elevationTextureSmall;
+        private Bitmap<short> _elevationTextureBlur;
 
         public Mercury()
         {

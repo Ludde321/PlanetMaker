@@ -10,7 +10,7 @@ namespace PlanetBuilder.Planets
     public class Phobos : Planet
     {
         public int RecursionLevel;
-        private Texture<short> _elevationTexture;
+        private Bitmap<short> _elevationTexture;
 
         public Phobos()
         {
