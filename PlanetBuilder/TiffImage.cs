@@ -38,6 +38,11 @@ namespace PlanetBuilder
             stream.Dispose();
         }
 
+        public ImageFileDirectory[] GetImageFileDirectories()
+        {
+            return _ifds;
+        }
+
         private ImageFileDirectory[] ReadImageFileDirectories()
         {
             _reader.Stream.Position = 0;
