@@ -18,38 +18,42 @@ namespace PlanetBuilder.Planets
         public MarsSector()
         {
             PlanetRadius = 3396190;
-            ElevationScale = 4;
+            ElevationScale = 3;
             NumSegments = 1200;
             PlanetProjection = Projection.Equirectangular;
         }
 
         public void Create()
         {
+            // Gale crater 5.4°S 137.8°E
+            double lat0 = MathHelper.ToRadians(-5.4 - 3.0);
+            double lon0 = MathHelper.ToRadians(137.8 - 3.0);
+            double lat1 = MathHelper.ToRadians(-5.4 + 3.0);
+            double lon1 = MathHelper.ToRadians(137.8 + 3.0);
+
              Stopwatch sw;
 
-            int width = 11520*2;
-            int height = 5760*2;
-            string elevationTextureFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
-            if (!File.Exists(elevationTextureFilename))
-            {
+            int width = 53346;
+            int height = 26673;
+            // string elevationTextureFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
+            // if (!File.Exists(elevationTextureFilename))
+            // {
                 sw = Stopwatch.StartNew();
                 using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
                 {
-                    // Right-most pixel column in the Mars dataset is broken. This trick will skip it.
-                    var ifd = tiffFile.ImageFileDirectories[0];
-                    var elevationTextureLarge = tiffFile.ReadImageFile<short>(0, 0, ifd.ImageWidth - 1, ifd.ImageHeight);
+                    var elevationTextureLarge = tiffFile.ReadImageFile<short>();
 
                     _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 
 //                TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
-            }
-            else
-            {
-                _elevationTexture = TextureHelper.LoadRaw16(elevationTextureFilename, width, height);
-            }
-            TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            // }
+            // else
+            // {
+            //     _elevationTexture = TextureHelper.LoadRaw16(elevationTextureFilename, width, height);
+            // }
+//            TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
 
             width = 2880;
@@ -79,7 +83,7 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(MathHelper.ToRadians(-6), MathHelper.ToRadians(135), MathHelper.ToRadians(-1), MathHelper.ToRadians(140), NumSegments, NumSegments);
+            sphericalSector.Create(lat0, lon0, lat1, lon1, NumSegments, NumSegments);
 
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;
@@ -108,7 +112,7 @@ namespace PlanetBuilder.Planets
 
             short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
 
-            double r = PlanetRadius - 100000 + hAvg;
+            double r = PlanetRadius - 50000 + hAvg;
 
             return r * 0.00001;
         }

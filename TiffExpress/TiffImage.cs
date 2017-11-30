@@ -227,10 +227,10 @@ namespace TiffExpress
                 {
                     if (y >= offsetY && y < offsetY + outputHeight)
                     {
-                        _stream.Position = position;
+                        _stream.Position = position + offsetX * bytesPerPixel;
 
                         var buffer = new byte[outputBufferSize];
-                        _stream.Read(buffer, offsetX * bytesPerPixel, outputBufferSize);
+                        _stream.Read(buffer, 0, buffer.Length);
                         yield return buffer;
                     }
                     position += bytesPerRow;
