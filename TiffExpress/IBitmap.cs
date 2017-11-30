@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PlanetBuilder
+namespace TiffExpress
 {
     public interface IBitmap<T>
     {

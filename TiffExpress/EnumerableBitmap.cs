@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace PlanetBuilder
+namespace TiffExpress
 {
     public class EnumerableBitmap<T> : IBitmap<T>
     {
-        public int Width {get;set;}
-        public int Height {get;set;}
+        public int Width {get;}
+        public int Height {get;}
 
         private IEnumerable<T[]> _rows;
 

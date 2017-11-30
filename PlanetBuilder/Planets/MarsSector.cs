@@ -3,7 +3,9 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using ImageMagick;
+using TiffExpress;
 
 namespace PlanetBuilder.Planets
 {
@@ -25,17 +27,17 @@ namespace PlanetBuilder.Planets
         {
              Stopwatch sw;
 
-            int width = 11520;
-            int height = 5760;
+            int width = 11520*2;
+            int height = 5760*2;
             string elevationTextureFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
             if (!File.Exists(elevationTextureFilename))
             {
                 sw = Stopwatch.StartNew();
                 using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
                 {
-                    var elevationTextureLarge = tiffFile.ReadImageFile<short>();
-
-                    elevationTextureLarge.Width--; // Right-most pixel column in the Mars dataset is broken. This trick will skip it.
+                    // Right-most pixel column in the Mars dataset is broken. This trick will skip it.
+                    var ifd = tiffFile.ImageFileDirectories[0];
+                    var elevationTextureLarge = tiffFile.ReadImageFile<short>(0, 0, ifd.ImageWidth - 1, ifd.ImageHeight);
 
                     _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
@@ -47,7 +49,7 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTexture = TextureHelper.LoadRaw16(elevationTextureFilename, width, height);
             }
-//            TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
 
             width = 2880;
@@ -77,7 +79,7 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(MathHelper.ToRadians(-10), MathHelper.ToRadians(133), MathHelper.ToRadians(0), MathHelper.ToRadians(142), NumSegments, NumSegments);
+            sphericalSector.Create(MathHelper.ToRadians(-6), MathHelper.ToRadians(135), MathHelper.ToRadians(-1), MathHelper.ToRadians(140), NumSegments, NumSegments);
 
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;

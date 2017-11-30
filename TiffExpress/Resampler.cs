@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PlanetBuilder
+namespace TiffExpress
 {
     public static class Resampler
     {
@@ -251,14 +252,19 @@ namespace PlanetBuilder
             {
                 foreach(var inputRows in inputRowGroups)
                     blockingQueue.Add(Task<T[]>.Run(() => ResampleX(inputRows, inputWidth, outputWidth)));
-                blockingQueue.CompleteAdding();
+                blockingQueue.Add(null); // EOF mark
             });
         }
 
         private static IEnumerable<T[]> EnumerateQueue<T>(BlockingCollection<Task<T[]>> blockingQueue)
         {
-            while(!blockingQueue.IsCompleted)
-                yield return blockingQueue.Take().Result;
+            while(true)
+            {
+                var task = blockingQueue.Take();
+                if(task == null)
+                    break;
+                yield return task.Result;
+            }
         }
 
         private static IEnumerable<T[][]> ResampleY<T>(IBitmap<T> inputTexture, int outputHeight)

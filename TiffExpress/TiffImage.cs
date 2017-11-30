@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace PlanetBuilder
+namespace TiffExpress
 {
     // https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf
     // https://www.awaresystems.be/imaging/tiff/bigtiff.html
@@ -17,13 +17,13 @@ namespace PlanetBuilder
 
         private bool _bigTiff = false;
 
-        private readonly ImageFileDirectory[] _ifds;
+        public ImageFileDirectory[] ImageFileDirectories { get; private set; }
 
         public TiffFile(Stream stream)
         {
             _stream = stream;
             _reader = new BinaryReader2(_stream, true);
-            _ifds = ReadImageFileDirectories();
+            ImageFileDirectories = ReadImageFileDirectories();
         }
 
         public void Close()
@@ -38,10 +38,6 @@ namespace PlanetBuilder
             stream.Dispose();
         }
 
-        public ImageFileDirectory[] GetImageFileDirectories()
-        {
-            return _ifds;
-        }
 
         private ImageFileDirectory[] ReadImageFileDirectories()
         {
@@ -63,7 +59,7 @@ namespace PlanetBuilder
             else
                 throw new Exception($"Not a TIFF file. Life: {meaningOfLife}");
 
-            if(_bigTiff)
+            if (_bigTiff)
             {
                 _reader.ReadUInt16(); // always 8
                 _reader.ReadUInt16(); // always 0
@@ -85,8 +81,8 @@ namespace PlanetBuilder
                 {
                     ushort tag = _reader.ReadUInt16();
                     ushort type = _reader.ReadUInt16();
-                    long numValues = _bigTiff ? _reader.ReadInt64() :_reader.ReadUInt32();
-                    long valueOffset = _bigTiff ? _reader.ReadInt64() :_reader.ReadUInt32();
+                    long numValues = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
+                    long valueOffset = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
 
                     switch ((IfdTag)tag)
                     {
@@ -166,17 +162,39 @@ namespace PlanetBuilder
 
         public EnumerableBitmap<T> ReadImageFile<T>()
         {
-            return ReadImageFile<T>(_ifds[0]);
+            return ReadImageFile<T>(ImageFileDirectories[0]);
         }
 
+        public EnumerableBitmap<T> ReadImageFile<T>(int offsetX, int offsetY, int outputWidth, int outputHeight)
+        {
+            return ReadImageFile<T>(ImageFileDirectories[0], offsetX, offsetY, outputWidth, outputHeight);
+        }
         public EnumerableBitmap<T> ReadImageFile<T>(ImageFileDirectory ifd)
         {
-            var rows = ReadImageFileInternal(ifd);
-
-            return new EnumerableBitmap<T>(ifd.ImageWidth, ifd.ImageHeight, rows.Select(row => (T[])ConvertRow(ifd, row)));
+            return ReadImageFile<T>(ifd, 0, 0, ifd.ImageWidth, ifd.ImageHeight);
         }
 
-        private IEnumerable<byte[]> ReadImageFileInternal(ImageFileDirectory ifd)
+        public EnumerableBitmap<T> ReadImageFile<T>(ImageFileDirectory ifd, int offsetX, int offsetY, int outputWidth, int outputHeight)
+        {
+            if(offsetX < 0 || offsetX >= ifd.ImageWidth)
+                throw new ArgumentOutOfRangeException("offsetX");
+            if(offsetY < 0 || offsetY >= ifd.ImageHeight)
+                throw new ArgumentOutOfRangeException("offsetY");
+            if(outputWidth <= 0)
+                throw new ArgumentOutOfRangeException("outputWidth");
+            if(outputHeight <= 0)
+                throw new ArgumentOutOfRangeException("outputHeight");
+            
+            outputWidth = Math.Min(outputWidth, ifd.ImageWidth - offsetX);
+            outputHeight = Math.Min(outputHeight, ifd.ImageHeight - offsetY);
+
+            var rows = ReadImageFileInternal(ifd, offsetX, offsetY, outputWidth, outputHeight);
+
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, rows.Select(row => (T[])ConvertRow(ifd, row)));
+        }
+
+
+        private IEnumerable<byte[]> ReadImageFileInternal(ImageFileDirectory ifd, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
             if (ifd.PhotometricInterpretation != 1)
                 throw new NotSupportedException($"PhotometricInterpretation must be BlackIsZero: {ifd.PhotometricInterpretation}");
@@ -197,17 +215,26 @@ namespace PlanetBuilder
             for (int i = 0; i < ifd.NumStripByteCounts; i++)
                 stripByteCounts[i] = ifd.StripOffsetsType == 16 ? _reader.ReadInt64() : _reader.ReadUInt32();
 
+            int bytesPerPixel = ifd.SamplesPerPixel * (ifd.BitsPerSample >> 3);
+            int outputBufferSize = bytesPerPixel * outputWidth;
+
+            int y = 0;
             for (uint i = 0; i < ifd.NumStripOffsets; i++)
             {
-                _stream.Position = stripOffsets[i];
-
                 long bytesPerRow = stripByteCounts[i] / ifd.RowsPerStrip;
-
+                long position = stripOffsets[i];
                 for (uint j = 0; j < ifd.RowsPerStrip; j++)
                 {
-                    var buffer = new byte[bytesPerRow];
-                    _stream.Read(buffer, 0, (int)bytesPerRow);
-                    yield return buffer;
+                    if (y >= offsetY && y < offsetY + outputHeight)
+                    {
+                        _stream.Position = position;
+
+                        var buffer = new byte[outputBufferSize];
+                        _stream.Read(buffer, offsetX * bytesPerPixel, outputBufferSize);
+                        yield return buffer;
+                    }
+                    position += bytesPerRow;
+                    y++;
                 }
             }
         }
@@ -249,7 +276,6 @@ namespace PlanetBuilder
 
         private Array ConvertRow(ImageFileDirectory ifd, byte[] row)
         {
-            int width = ifd.ImageWidth;
             if (ifd.SamplesPerPixel == 1)
             {
                 if (ifd.BitsPerSample == 8)
@@ -266,10 +292,10 @@ namespace PlanetBuilder
                 {
                     if (ifd.SampleFormat == 1 || ifd.SampleFormat == 2)
                     {
-                        var output = new short[width];
+                        var output = new short[row.Length / 2];
                         if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
                         {
-                            int w2 = width + width;
+                            int w2 = row.Length;
                             for (int i = 0; i < w2; i += 2)
                             {
                                 byte b = row[i];
@@ -277,7 +303,7 @@ namespace PlanetBuilder
                                 row[i + 1] = b;
                             }
                         }
-                        Buffer.BlockCopy(row, 0, output, 0, width + width);
+                        Buffer.BlockCopy(row, 0, output, 0, row.Length);
                         return output;
                     }
                 }
@@ -285,10 +311,10 @@ namespace PlanetBuilder
                 {
                     if (ifd.SampleFormat == 3)
                     {
-                        var output = new float[width];
+                        var output = new float[row.Length / 4];
                         if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
                         {
-                            int w4 = 4 * width;
+                            int w4 = row.Length;
                             for (int i = 0; i < w4; i += 4)
                             {
                                 byte b = row[i];
@@ -300,72 +326,13 @@ namespace PlanetBuilder
                                 row[i + 2] = b;
                             }
                         }
-                        Buffer.BlockCopy(row, 0, output, 0, width + width);
+                        Buffer.BlockCopy(row, 0, output, 0, row.Length);
                         return output;
                     }
-                }                
+                }
             }
             return null;
         }
 
-        // private short[] ConvertRowToInt16(ImageFileDirectory ifd, byte[] row)
-        // {
-        //     int width = ifd.ImageWidth;
-        //     if (ifd.SamplesPerPixel == 1)
-        //     {
-        //         if (ifd.BitsPerSample == 16)
-        //         {
-        //             if (ifd.SampleFormat == 1 || ifd.SampleFormat == 2)
-        //             {
-        //                 var output = new short[width];
-        //                 if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
-        //                 {
-        //                     int w2 = width + width;
-        //                     for (int i = 0; i < w2; i += 2)
-        //                     {
-        //                         byte b = row[i];
-        //                         row[i] = row[i + 1];
-        //                         row[i + 1] = b;
-        //                     }
-        //                 }
-        //                 Buffer.BlockCopy(row, 0, output, 0, width + width);
-        //                 return output;
-        //             }
-        //         }
-        //     }
-        //     return null;
-        // }
-
-        // private float[] ConvertRowToFloat(ImageFileDirectory ifd, byte[] row)
-        // {
-        //     int width = ifd.ImageWidth;
-        //     if (ifd.SamplesPerPixel == 1)
-        //     {
-        //         if (ifd.BitsPerSample == 32)
-        //         {
-        //             if (ifd.SampleFormat == 3)
-        //             {
-        //                 var output = new float[width];
-        //                 if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
-        //                 {
-        //                     int w4 = 4 * width;
-        //                     for (int i = 0; i < w4; i += 4)
-        //                     {
-        //                         byte b = row[i];
-        //                         row[i] = row[i + 3];
-        //                         row[i + 3] = b;
-
-        //                         b = row[i + 1];
-        //                         row[i + 1] = row[i + 2];
-        //                         row[i + 2] = b;
-        //                     }
-        //                 }
-        //                 Buffer.BlockCopy(row, 0, output, 0, width + width);
-        //                 return output;
-        //             }
-        //         }
-        //     }
-        //     return null;
-        // }
     }
 }

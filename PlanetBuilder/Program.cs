@@ -27,8 +27,8 @@ namespace PlanetBuilder
             // var charon = new Charon();
             // charon.Create();
 
-            var moon = new Moon();
-            moon.Create();
+            // var moon = new Moon();
+            // moon.Create();
 
             // var mercury = new Mercury();
             // mercury.Create();
@@ -36,8 +36,8 @@ namespace PlanetBuilder
             // var mars = new Mars();
             // mars.Create();
 
-            // var marsSector = new MarsSector();
-            // marsSector.Create();
+            var marsSector = new MarsSector();
+            marsSector.Create();
 
             // var phobos = new Phobos();
             // phobos.Create();

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace PlanetBuilder
+namespace TiffExpress
 {
     public class BinaryReader2 : IDisposable
     {
