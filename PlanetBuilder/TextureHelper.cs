@@ -13,7 +13,7 @@ namespace PlanetBuilder
             using (var stream = File.OpenRead(String.Format(inputFilename, width, height)))
             {
                 for (int y = 0; y < height; y++)
-                    stream.Read(texture.Data[y], 0, width);
+                    stream.Read(texture.Rows[y], 0, width);
             }
             return texture;
         }
@@ -27,7 +27,7 @@ namespace PlanetBuilder
                 for (int y = 0; y < height; y++)
                 {
                     stream.Read(buffer, 0, buffer.Length);
-                    Buffer.BlockCopy(buffer, 0, texture.Data[y], 0, buffer.Length);
+                    Buffer.BlockCopy(buffer, 0, texture.Rows[y], 0, buffer.Length);
                 }
             }
             return texture;
@@ -44,7 +44,7 @@ namespace PlanetBuilder
                 {
                     stream.Read(buffer, 0, buffer.Length);
 
-                    Buffer.BlockCopy(buffer, 0, texture.Data[y], 0, buffer.Length);
+                    Buffer.BlockCopy(buffer, 0, texture.Rows[y], 0, buffer.Length);
                 }
             }
             return texture;
@@ -70,7 +70,7 @@ namespace PlanetBuilder
             int idx = 0;
             for (int y = 0; y < height; y++)
             {
-                Buffer.BlockCopy(buffer, idx, texture.Data[y], 0, width * 2);
+                Buffer.BlockCopy(buffer, idx, texture.Rows[y], 0, width * 2);
                 idx += width * 2;
             }
 
@@ -98,7 +98,7 @@ namespace PlanetBuilder
             int idx = 0;
             for (int y = 0; y < height; y++)
             {
-                Buffer.BlockCopy(buffer, idx, texture.Data[y], 0, width);
+                Buffer.BlockCopy(buffer, idx, texture.Rows[y], 0, width);
                 idx += width;
             }
 
@@ -116,7 +116,7 @@ namespace PlanetBuilder
         public static void SaveRaw8(Stream outputStream, Bitmap<byte> texture)
         {
             for (int y = 0; y < texture.Height; y++)
-                outputStream.Write(texture.Data[y], 0, texture.Width);
+                outputStream.Write(texture.Rows[y], 0, texture.Width);
         }
 
         public static void SaveRaw16(string outputFilename, Bitmap<short> texture)
@@ -133,7 +133,7 @@ namespace PlanetBuilder
 
             for (int y = 0; y < texture.Height; y++)
             {
-                Buffer.BlockCopy(texture.Data[y], 0, buffer, 0, buffer.Length);
+                Buffer.BlockCopy(texture.Rows[y], 0, buffer, 0, buffer.Length);
                 outputStream.Write(buffer, 0, buffer.Length);
             }
         }
@@ -145,7 +145,7 @@ namespace PlanetBuilder
             int idx = 0;
             for (int y = 0; y < texture.Height; y++)
             {
-                Buffer.BlockCopy(texture.Data[y], 0, buffer, idx, texture.Width);
+                Buffer.BlockCopy(texture.Rows[y], 0, buffer, idx, texture.Width);
                 idx += texture.Width;
             }
 
@@ -162,7 +162,7 @@ namespace PlanetBuilder
             int idx = 0;
             for (int y = 0; y < texture.Height; y++)
             {
-                var line = texture.Data[y];
+                var line = texture.Rows[y];
                 for (int x = 0; x < texture.Width; x++)
                 {
                     short h = line[x];
@@ -185,8 +185,8 @@ namespace PlanetBuilder
             var outputTexture = new Bitmap<B>(width, height);
             for(int y =0;y<height;y++)
             {
-                var inputLine = inputTexture.Data[y];
-                var outputLine = outputTexture.Data[y];
+                var inputLine = inputTexture.Rows[y];
+                var outputLine = outputTexture.Rows[y];
                 for(int x =0;x<width;x++)
                     outputLine[x] = func(inputLine[x]);
             }
@@ -199,7 +199,7 @@ namespace PlanetBuilder
             int height = inputTexture.Height;
             for(int y =0;y<height;y++)
             {
-                var line = inputTexture.Data[y];
+                var line = inputTexture.Rows[y];
                 for(int x =0;x<width;x++)
                     line[x] = func(line[x]);
             }

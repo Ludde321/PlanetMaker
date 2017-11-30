@@ -47,7 +47,7 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTexture = TextureHelper.LoadRaw16(elevationTextureFilename, width, height);
             }
-  //          TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+//            TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
 
             width = 2880;
@@ -55,7 +55,7 @@ namespace PlanetBuilder.Planets
             string elevationTextureBlurFilename = $@"Generated\Planets\MarsSector\MarsBlur{width}x{height}.raw";
             if (!File.Exists(elevationTextureBlurFilename))
             {
-                var elevationTextureSmall = Resampler.Resample(_elevationTexture, width, height);
+                var elevationTextureSmall = Resampler.Resample(_elevationTexture, width, height).ToBitmap();
 
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);

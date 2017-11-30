@@ -28,7 +28,7 @@ namespace PlanetBuilder.Planets
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
-            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600);
+            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
             TextureHelper.SaveRaw16($@"Generated\Planets\Pluto\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);

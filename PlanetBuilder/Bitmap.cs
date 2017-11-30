@@ -4,25 +4,32 @@ using System.Linq;
 
 namespace PlanetBuilder
 {
-    public class Bitmap<T> : BitmapBase<T>
+    public class Bitmap<T> : IBitmap<T>
     {
-        public T[][] Data;
+        public int Width {get;}
+        public int Height {get;}
 
-        public Bitmap(int width, int height) : base(width, height)
+        public T[][] Rows;
+
+        public Bitmap(int width, int height)
         {
-            Data = new T[height][];
+            Width = width;
+            Height = height;
+            Rows = new T[height][];
             for (int y = 0; y < height; y++)
-                Data[y] = new T[width];
+                Rows[y] = new T[width];
         }
 
-        public Bitmap(int width, int height, IEnumerable<T[]> data) : base(width, height)
+        public Bitmap(int width, int height, T[][] rows)
         {
-            Data = data.ToArray();
+            Width = width;
+            Height = height;
+            Rows = rows;
         }
 
-        public override IEnumerable<T[]> GetRows()
+        public IEnumerable<T[]> GetRows()
         {
-            return Data;
+            return Rows;
         }
     }
 }

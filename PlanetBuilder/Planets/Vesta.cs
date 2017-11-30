@@ -28,7 +28,7 @@ namespace PlanetBuilder.Planets
             Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
             sw = Stopwatch.StartNew();
-            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600);
+            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
             Console.WriteLine($"Resampling used {sw.Elapsed}");
 
             var textureSmall = TextureHelper.Convert(_elevationTextureSmall, (h) => {return (short)(h-PlanetRadius);});

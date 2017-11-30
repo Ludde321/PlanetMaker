@@ -36,7 +36,7 @@ namespace PlanetBuilder
                             {
                                 double lon = Math.PI * 2 * x / width;
 
-                                vmap.Data[y][x] = new Vector3d(
+                                vmap.Rows[y][x] = new Vector3d(
                                     Math.Cos(lon) * sinLat,
                                     cosLat,
                                     Math.Sin(lon) * sinLat);
@@ -54,7 +54,7 @@ namespace PlanetBuilder
                             {
                                 double lon = Math.PI * 2 * x / width;
 
-                                vmap.Data[y][x] = Vector3d.Normalize(new Vector3d(
+                                vmap.Rows[y][x] = Vector3d.Normalize(new Vector3d(
                                     Math.Cos(lon),
                                     z,
                                     Math.Sin(lon)));
@@ -75,13 +75,13 @@ namespace PlanetBuilder
 
             var lookup = new List<Vector2us>();
 
-            var v0 = vectorMap.Data[y][0];
+            var v0 = vectorMap.Rows[y][0];
 
             for (ushort y1 = 0; y1 < height; y1++)
             {
                 for (ushort x1 = 0; x1 < width; x1++)
                 {
-                    var v1 = vectorMap.Data[y1][x1];
+                    var v1 = vectorMap.Rows[y1][x1];
 
                     var cosAngle = Vector3d.Dot(v0, v1);
 
@@ -108,7 +108,7 @@ namespace PlanetBuilder
             {
                 for (int x0 = 0; x0 < width; x0++)
                 {
-                    var v0 = vectorMap.Data[y0][x0];
+                    var v0 = vectorMap.Rows[y0][x0];
                     long avgElevation = 0;
                     int countElevation = 0;
 
@@ -116,13 +116,13 @@ namespace PlanetBuilder
                     {
                         for (int x1 = 0; x1 < width; x1++)
                         {
-                            var v1 = vectorMap.Data[y1][x1];
+                            var v1 = vectorMap.Rows[y1][x1];
 
                             var cosAngle = Vector3d.Dot(v0, v1);
 
                             if (cosAngle >= cosBlurAngle)
                             {
-                                avgElevation += inputTexture.Data[y1][x1];
+                                avgElevation += inputTexture.Rows[y1][x1];
                                 countElevation++;
                             }
 
@@ -131,7 +131,7 @@ namespace PlanetBuilder
                     if (countElevation == 0)
                         throw new Exception("This should never happen. Count = 0");
 
-                    outputTexture.Data[y0][x0] = (short)(avgElevation / countElevation);
+                    outputTexture.Rows[y0][x0] = (short)(avgElevation / countElevation);
                 }
             });
 
@@ -161,10 +161,10 @@ namespace PlanetBuilder
                     foreach (var v in lookup)
                     {
                         int x0 = (x + v.x) % width;
-                        avgElevation += inputTexture.Data[v.y][x0];
+                        avgElevation += inputTexture.Rows[v.y][x0];
                     }
 
-                    outputTexture.Data[y][x] = (short)(avgElevation / lookup.Length);
+                    outputTexture.Rows[y][x] = (short)(avgElevation / lookup.Length);
                 }
             });
 
@@ -189,7 +189,7 @@ namespace PlanetBuilder
 
                 for (short x = 0; x < width; x++)
                 {
-                    short? oh = func(inputTexture.Data[y][x]);
+                    short? oh = func(inputTexture.Rows[y][x]);
                     if (oh != null)
                     {
                         long avgElevation = 0;
@@ -198,17 +198,17 @@ namespace PlanetBuilder
                         foreach (var v in lookup)
                         {
                             int x0 = (x + v.x) % width;
-                            short? h = func(inputTexture.Data[v.y][x0]);
+                            short? h = func(inputTexture.Rows[v.y][x0]);
                             if (h != null)
                             {
                                 avgElevation += (short)h;
                                 avgCount++;
                             }
                         }
-                        outputTexture.Data[y][x] = (short)(avgElevation / avgCount);
+                        outputTexture.Rows[y][x] = (short)(avgElevation / avgCount);
                     }
                     else
-                        outputTexture.Data[y][x] = inputTexture.Data[y][x];
+                        outputTexture.Rows[y][x] = inputTexture.Rows[y][x];
                 }
             });
 
@@ -235,10 +235,10 @@ namespace PlanetBuilder
                     foreach (var v in lookup)
                     {
                         int x0 = (x + v.x) % width;
-                        avgElevation += inputTexture.Data[v.y][x0];
+                        avgElevation += inputTexture.Rows[v.y][x0];
                     }
 
-                    outputTexture.Data[y][x] = avgElevation / lookup.Length;
+                    outputTexture.Rows[y][x] = avgElevation / lookup.Length;
                 }
             });
 
@@ -268,24 +268,24 @@ namespace PlanetBuilder
                                         long avgElevation = 0;
 
                                         foreach (var v in lookup1)
-                                            avgElevation += inputTexture.Data[v.y][v.x];
+                                            avgElevation += inputTexture.Rows[v.y][v.x];
 
-                                        outputTexture.Data[y][0] = (short)(avgElevation / lookup1.Length);
+                                        outputTexture.Rows[y][0] = (short)(avgElevation / lookup1.Length);
 
                                         for (short x = 1; x < width; x++)
                                         {
                                             foreach (var v in adds)
                                             {
                                                 int x0 = (x + v.x - 1) % width;
-                                                avgElevation += inputTexture.Data[v.y][x0];
+                                                avgElevation += inputTexture.Rows[v.y][x0];
                                             }
                                             foreach (var v in subs)
                                             {
                                                 int x0 = (x + v.x - 1) % width;
-                                                avgElevation -= inputTexture.Data[v.y][x0];
+                                                avgElevation -= inputTexture.Rows[v.y][x0];
                                             }
 
-                                            outputTexture.Data[y][x] = (short)(avgElevation / lookup1.Length);
+                                            outputTexture.Rows[y][x] = (short)(avgElevation / lookup1.Length);
                                         }
                                     });
 

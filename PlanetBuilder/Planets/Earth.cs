@@ -40,7 +40,7 @@ namespace PlanetBuilder.Planets
                 TextureHelper.Process(elevationTextureLarge, (p) => { return (short)(p - 32768); });
 
                 sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
+                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
@@ -64,7 +64,7 @@ namespace PlanetBuilder.Planets
                 TextureHelper.Process(landcoverTextureLarge, (p) => { histo[p]++; return p != 0 ? (byte)0xff : (byte)0x00; });
 
                 sw = Stopwatch.StartNew();
-                _landcoverTextureSmall = Resampler.Resample(landcoverTextureLarge, width, height);
+                _landcoverTextureSmall = Resampler.Resample(landcoverTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw8($@"Generated\Planets\Earth\landcover.{width}x{height}.raw", _landcoverTextureSmall);

@@ -1,30 +1,38 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PlanetBuilder
 {
-    public class EnumerableBitmap<T> : BitmapBase<T>
+    public class EnumerableBitmap<T> : IBitmap<T>
     {
-        public IEnumerable<T[]> Data;
+        public int Width {get;set;}
+        public int Height {get;set;}
 
-        protected EnumerableBitmap(int width, int height) : base(width, height)
+        private IEnumerable<T[]> _rows;
+
+        protected EnumerableBitmap(int width, int height)
         {
+            Width = width;
+            Height = height;
         }
 
-        public EnumerableBitmap(int width, int height, IEnumerable<T[]> data) : base(width, height)
+        public EnumerableBitmap(int width, int height, IEnumerable<T[]> rows)
         {
-            Data = data;
+            Width = width;
+            Height = height;
+            _rows = rows;
         }
 
-        public override IEnumerable<T[]> GetRows()
+        public IEnumerable<T[]> GetRows()
         {
-            return Data;
+            return _rows;
         }
 
         public Bitmap<T> ToBitmap()
         {
-            return new Bitmap<T>(Width, Height, Data);
+            return new Bitmap<T>(Width, Height, _rows.ToArray());
         }
 
 

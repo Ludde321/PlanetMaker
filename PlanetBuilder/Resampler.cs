@@ -29,7 +29,7 @@ namespace PlanetBuilder
             }
             Console.WriteLine($"y = {y}");
         }
-
+/*
         public static Bitmap<byte> Resample(Bitmap<byte> inputTexture, int width, int height)
         {
             var outputTexture = new Bitmap<byte>(width, height);
@@ -53,7 +53,7 @@ namespace PlanetBuilder
                 int dx1 = outputTexture.Width - 1;
                 int x1 = 0;
 
-                var inputLine = inputTexture.Data[offsetY0];
+                var inputLine = inputTexture.Rows[offsetY0];
 
                 for (int x0 = 0; x0 <= dx0; x0++)
                 {
@@ -74,7 +74,7 @@ namespace PlanetBuilder
 
                 if (2 * epsy >= dy0)
                 {
-                    var outputLine = outputTexture.Data[offsetY1];
+                    var outputLine = outputTexture.Rows[offsetY1];
                     for (int x = 0; x < outputTexture.Width; x++)
                     {
                         outputLine[x] = (byte)(accumLine[x] / countLine[x]);
@@ -90,7 +90,7 @@ namespace PlanetBuilder
 
             if (y1 == dy1)
             {
-                var outputLine = outputTexture.Data[offsetY1];
+                var outputLine = outputTexture.Rows[offsetY1];
                 for (int x = 0; x < outputTexture.Width; x++)
                     outputLine[x] = (byte)(accumLine[x] / countLine[x]);
             }
@@ -120,7 +120,7 @@ namespace PlanetBuilder
                 int dx1 = outputTexture.Width - 1;
                 int x1 = 0;
 
-                var inputLine = inputTexture.Data[offsetY0];
+                var inputLine = inputTexture.Rows[offsetY0];
 
                 for (int x0 = 0; x0 <= dx0; x0++)
                 {
@@ -141,7 +141,7 @@ namespace PlanetBuilder
 
                 if (2 * epsy >= dy0)
                 {
-                    var outputLine = outputTexture.Data[offsetY1];
+                    var outputLine = outputTexture.Rows[offsetY1];
                     for (int x = 0; x < outputTexture.Width; x++)
                     {
                         outputLine[x] = (short)(accumLine[x] / countLine[x]);
@@ -157,7 +157,7 @@ namespace PlanetBuilder
 
             if (y1 == dy1)
             {
-                var outputLine = outputTexture.Data[offsetY1];
+                var outputLine = outputTexture.Rows[offsetY1];
                 for (int x = 0; x < outputTexture.Width; x++)
                     outputLine[x] = (short)(accumLine[x] / countLine[x]);
             }
@@ -187,7 +187,7 @@ namespace PlanetBuilder
                 int dx1 = outputTexture.Width - 1;
                 int x1 = 0;
 
-                var inputLine = inputTexture.Data[offsetY0];
+                var inputLine = inputTexture.Rows[offsetY0];
 
                 for (int x0 = 0; x0 <= dx0; x0++)
                 {
@@ -208,7 +208,7 @@ namespace PlanetBuilder
 
                 if (2 * epsy >= dy0)
                 {
-                    var outputLine = outputTexture.Data[offsetY1];
+                    var outputLine = outputTexture.Rows[offsetY1];
                     for (int x = 0; x < outputTexture.Width; x++)
                     {
                         outputLine[x] = (float)(accumLine[x] / countLine[x]);
@@ -224,14 +224,14 @@ namespace PlanetBuilder
 
             if (y1 == dy1)
             {
-                var outputLine = outputTexture.Data[offsetY1];
+                var outputLine = outputTexture.Rows[offsetY1];
                 for (int x = 0; x < outputTexture.Width; x++)
                     outputLine[x] = (float)(accumLine[x] / countLine[x]);
             }
             return outputTexture;
         }
-
-        public static EnumerableBitmap<T> Resample<T>(EnumerableBitmap<T> inputTexture, int outputWidth, int outputHeight)
+*/
+        public static EnumerableBitmap<T> Resample<T>(IBitmap<T> inputTexture, int outputWidth, int outputHeight)
         {
             int inputWidth = inputTexture.Width;
 
@@ -261,7 +261,7 @@ namespace PlanetBuilder
                 yield return blockingQueue.Take().Result;
         }
 
-        private static IEnumerable<T[][]> ResampleY<T>(EnumerableBitmap<T> inputTexture, int outputHeight)
+        private static IEnumerable<T[][]> ResampleY<T>(IBitmap<T> inputTexture, int outputHeight)
         {
             var outputRows = new List<T[]>();
 
@@ -270,7 +270,7 @@ namespace PlanetBuilder
             int dy0 = inputTexture.Height - 1;
             int dy1 = outputHeight - 1;
             int y1 = 0;
-            foreach (var inputRow in inputTexture.Data)
+            foreach (var inputRow in inputTexture.GetRows())
             {
                 outputRows.Add(inputRow);
 

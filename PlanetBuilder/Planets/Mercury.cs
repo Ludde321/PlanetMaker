@@ -35,7 +35,7 @@ namespace PlanetBuilder.Planets
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
                 
                 sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height);
+                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
                 TextureHelper.SaveRaw16($@"Generated\Planets\Mercury\Mercury{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);

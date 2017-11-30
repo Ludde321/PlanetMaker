@@ -52,10 +52,10 @@ namespace PlanetBuilder.Planets
             uint iy1 = iy0 + 1;
             if (iy1 >= height) iy1 = height - 1; // clamp height
 
-            byte p00 = texture.Data[iy0][ix0];  // p00......p01
-            byte p10 = texture.Data[iy1][ix0];  // .        .
-            byte p01 = texture.Data[iy0][ix1];  // .        .
-            byte p11 = texture.Data[iy1][ix1];  // p10......p11
+            byte p00 = texture.Rows[iy0][ix0];  // p00......p01
+            byte p10 = texture.Rows[iy1][ix0];  // .        .
+            byte p01 = texture.Rows[iy0][ix1];  // .        .
+            byte p11 = texture.Rows[iy1][ix1];  // p10......p11
 
             double p00p01 = p00 + (p01 - p00) * fx;
             double p10p11 = p10 + (p11 - p10) * fx;
@@ -81,10 +81,10 @@ namespace PlanetBuilder.Planets
             uint iy1 = iy0 + 1;
             if (iy1 >= height) iy1 = height - 1; // clamp height
 
-            short p00 = texture.Data[iy0][ix0];  // p00......p01
-            short p10 = texture.Data[iy1][ix0];  // .        .
-            short p01 = texture.Data[iy0][ix1];  // .        .
-            short p11 = texture.Data[iy1][ix1];  // p10......p11
+            short p00 = texture.Rows[iy0][ix0];  // p00......p01
+            short p10 = texture.Rows[iy1][ix0];  // .        .
+            short p01 = texture.Rows[iy0][ix1];  // .        .
+            short p11 = texture.Rows[iy1][ix1];  // p10......p11
 
             double p00p01 = p00 + (p01 - p00) * fx;
             double p10p11 = p10 + (p11 - p10) * fx;
@@ -110,10 +110,10 @@ namespace PlanetBuilder.Planets
             uint iy1 = iy0 + 1;
             if (iy1 >= height) iy1 = height - 1; // clamp height
 
-            float p00 = texture.Data[iy0][ix0];  // p00......p01
-            float p10 = texture.Data[iy1][ix0];  // .        .
-            float p01 = texture.Data[iy0][ix1];  // .        .
-            float p11 = texture.Data[iy1][ix1];  // p10......p11
+            float p00 = texture.Rows[iy0][ix0];  // p00......p01
+            float p10 = texture.Rows[iy1][ix0];  // .        .
+            float p01 = texture.Rows[iy0][ix1];  // .        .
+            float p11 = texture.Rows[iy1][ix1];  // p10......p11
 
             double p00p01 = p00 + (p01 - p00) * fx;
             double p10p11 = p10 + (p11 - p10) * fx;

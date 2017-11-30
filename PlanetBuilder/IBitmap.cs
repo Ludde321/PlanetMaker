@@ -3,17 +3,11 @@ using System.Linq;
 
 namespace PlanetBuilder
 {
-    public abstract class BitmapBase<T>
+    public interface IBitmap<T>
     {
-        public int Width;
-        public int Height;
+        int Width {get;}
+        int Height { get;}
 
-        protected BitmapBase(int width, int height)
-        {
-            Width = width;
-            Height = height;
-        }
-
-        public abstract IEnumerable<T[]> GetRows();
+        IEnumerable<T[]> GetRows();
     }
 }
