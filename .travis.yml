@@ -3,4 +3,5 @@ mono: none
 dotnet: 2.0.2
 dist: trusty
 script:
- - dotnet restore
+ - dotnet restore ./PlanetBuilder
+ - dotnet build ./PlanetBuilder
