@@ -222,12 +222,12 @@ namespace TiffExpress
             for (uint i = 0; i < ifd.NumStripOffsets; i++)
             {
                 long bytesPerRow = stripByteCounts[i] / ifd.RowsPerStrip;
-                long position = stripOffsets[i];
+                long position = stripOffsets[i] + offsetX * bytesPerPixel;
                 for (uint j = 0; j < ifd.RowsPerStrip; j++)
                 {
                     if (y >= offsetY && y < offsetY + outputHeight)
                     {
-                        _stream.Position = position + offsetX * bytesPerPixel;
+                        _stream.Position = position;
 
                         var buffer = new byte[outputBufferSize];
                         _stream.Read(buffer, 0, buffer.Length);
