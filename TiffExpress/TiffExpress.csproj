@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-      <PackageId>tiffexpress.ludde.no</PackageId>
+      <PackageId>TiffExpress</PackageId>
       <VersionPrefix>0.0.1</VersionPrefix>
       <Authors>Ludvig Pedersen</Authors>
-      <Title>Tiff Express</Title>
+      <Title>TiffExpress</Title>
       <Description>Awesome TIFF Library</Description>
       <Summary>Awesome TIFF Library</Summary>
       <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
