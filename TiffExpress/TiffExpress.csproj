@@ -4,4 +4,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+      <PackageId>tiffexpress.ludde.no</PackageId>
+      <VersionPrefix>0.0.1</VersionPrefix>
+      <Authors>Ludvig Pedersen</Authors>
+      <Description>Awesome TIFF Library</Description>
+      <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+      <PackageReleaseNotes>Alpha release</PackageReleaseNotes>
+      <Copyright>Copyright 2017 (c) Ludvig Pedersen. All rights reserved.</Copyright>
+      <PackageTags>tiff image</PackageTags>
+  </PropertyGroup>
+
 </Project>

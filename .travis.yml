@@ -3,5 +3,9 @@ mono: none
 dotnet: 2.0.2
 dist: trusty
 script:
- - dotnet restore ./PlanetBuilder
- - dotnet build ./PlanetBuilder
+ - dotnet restore PlanetBuilder
+ - dotnet build TiffExpress -c Release
+ - dotnet build PlanetBuilder -c Release
+install:
+ - dotnet pack TiffExpress -c Release --version-suffix "alpha-build$TRAVIS_BUILD_NUMBER" --include-symbols
+ - dotnet nuget push TiffExpress/bin/Release/*.nupkg -k $API_KEY_NUGET -s https://www.nuget.org/api/v2/package
