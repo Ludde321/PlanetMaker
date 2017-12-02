@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TiffExpress
 {
@@ -218,8 +220,18 @@ namespace TiffExpress
             var rows = ReadImageFileInternal(ifd, offsetX, offsetY, outputWidth, outputHeight);
 
             return new EnumerableBitmap<T>(outputWidth, outputHeight, rows.Select(row => (T[])ConvertRow(ifd, row)));
-        }
 
+            // var blockingQueue = new BlockingCollection<byte[]>(8);
+            // Task.Run(() => 
+            // {
+            //     var rows = ReadImageFileInternal(ifd, offsetX, offsetY, outputWidth, outputHeight);
+            //     foreach(var row in rows)
+            //        blockingQueue.Add(row);
+            //     blockingQueue.CompleteAdding(); 
+            // });
+
+            // return new EnumerableBitmap<T>(outputWidth, outputHeight, blockingQueue.GetConsumingEnumerable().Select(row => (T[])ConvertRow(ifd, row)));
+        }
 
         private IEnumerable<byte[]> ReadImageFileInternal(ImageFileDirectory ifd, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {

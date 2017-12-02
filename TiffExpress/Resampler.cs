@@ -242,8 +242,7 @@ namespace TiffExpress
             
             ResampleXTask(blockingQueue, inputRowGroups, inputWidth, outputWidth);
 
-            var rows = EnumerateQueue(blockingQueue);
-            return new EnumerableBitmap<T>(outputWidth, outputHeight, rows);
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, blockingQueue.GetConsumingEnumerable().Select(task => task.Result));
         }
 
         private static Task ResampleXTask<T>(BlockingCollection<Task<T[]>> blockingQueue, IEnumerable<T[][]> inputRowGroups, int inputWidth, int outputWidth)
@@ -252,7 +251,7 @@ namespace TiffExpress
             {
                 foreach(var inputRows in inputRowGroups)
                     blockingQueue.Add(Task<T[]>.Run(() => ResampleX(inputRows, inputWidth, outputWidth)));
-                blockingQueue.Add(null); // EOF mark
+                blockingQueue.CompleteAdding();
             });
         }
 
