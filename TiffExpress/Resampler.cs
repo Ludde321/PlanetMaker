@@ -240,30 +240,14 @@ namespace TiffExpress
 
             var blockingQueue = new BlockingCollection<Task<T[]>>(16);
             
-            ResampleXTask(blockingQueue, inputRowGroups, inputWidth, outputWidth);
-
-            return new EnumerableBitmap<T>(outputWidth, outputHeight, blockingQueue.GetConsumingEnumerable().Select(task => task.Result));
-        }
-
-        private static Task ResampleXTask<T>(BlockingCollection<Task<T[]>> blockingQueue, IEnumerable<T[][]> inputRowGroups, int inputWidth, int outputWidth)
-        {
-            return Task.Run(() => 
+            Task.Run(() => 
             {
                 foreach(var inputRows in inputRowGroups)
                     blockingQueue.Add(Task<T[]>.Run(() => ResampleX(inputRows, inputWidth, outputWidth)));
                 blockingQueue.CompleteAdding();
             });
-        }
 
-        private static IEnumerable<T[]> EnumerateQueue<T>(BlockingCollection<Task<T[]>> blockingQueue)
-        {
-            while(true)
-            {
-                var task = blockingQueue.Take();
-                if(task == null)
-                    break;
-                yield return task.Result;
-            }
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, blockingQueue.GetConsumingEnumerable().Select(task => task.Result));
         }
 
         private static IEnumerable<T[][]> ResampleY<T>(IBitmap<T> inputTexture, int outputHeight)
