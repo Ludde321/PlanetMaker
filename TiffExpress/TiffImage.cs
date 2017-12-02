@@ -23,6 +23,7 @@ namespace TiffExpress
         {
             _stream = stream;
             _reader = new BinaryReader2(_stream, true);
+            ReadImageFileHeader();
             ImageFileDirectories = ReadImageFileDirectories();
         }
 
@@ -38,8 +39,7 @@ namespace TiffExpress
             stream.Dispose();
         }
 
-
-        private ImageFileDirectory[] ReadImageFileDirectories()
+        private void ReadImageFileHeader()
         {
             _reader.Stream.Position = 0;
 
@@ -61,11 +61,14 @@ namespace TiffExpress
 
             if (_bigTiff)
             {
-                _reader.ReadUInt16(); // always 8
+                if (_reader.ReadUInt16() != 8)
+                    throw new Exception("Offset should be size 8 in BigTIFF");
                 _reader.ReadUInt16(); // always 0
             }
+        }
 
-            // Read Image File Directories
+        private ImageFileDirectory[] ReadImageFileDirectories()
+        {
             var ifdList = new List<ImageFileDirectory>();
 
             long ifdOffset = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
@@ -79,71 +82,62 @@ namespace TiffExpress
 
                 for (int i = 0; i < numFields; i++)
                 {
-                    ushort tag = _reader.ReadUInt16();
-                    ushort type = _reader.ReadUInt16();
+                    Tag tag = (Tag)_reader.ReadUInt16();
+                    FieldType type = (FieldType)_reader.ReadUInt16();
                     long numValues = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
                     long valueOffset = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
 
-                    switch ((IfdTag)tag)
+                    ifd.Entries.Add(tag, new IfdEntry { Tag = tag, FieldType = type, NumValues = numValues, ValueOffset = valueOffset });
+
+                    switch (tag)
                     {
-                        case IfdTag.ImageWidth:
+                        case Tag.ImageWidth:
                             {
                                 ifd.ImageWidth = (int)valueOffset;
                             }
                             break;
-                        case IfdTag.ImageHeight:
+                        case Tag.ImageHeight:
                             {
                                 ifd.ImageHeight = (int)valueOffset;
                             }
                             break;
-                        case IfdTag.BitsPerSample:
+                        case Tag.BitsPerSample:
                             {
                                 ifd.BitsPerSample = (ushort)valueOffset;
                             }
                             break;
-                        case IfdTag.PhotometricInterpretation:
+                        case Tag.PhotometricInterpretation:
                             {
-                                ifd.PhotometricInterpretation = (ushort)valueOffset;
+                                ifd.PhotometricInterpretation = (PhotometricInterpretation)valueOffset;
                             }
                             break;
-                        case IfdTag.Compression:
+                        case Tag.Compression:
                             {
-                                ifd.Compression = (ushort)valueOffset;
+                                ifd.Compression = (Compression)valueOffset;
                             }
                             break;
-                        case IfdTag.StripOffsets:
-                            {
-                                ifd.StripOffsetsType = type;
-                                ifd.NumStripOffsets = (uint)numValues;
-                                ifd.StripOffsets = valueOffset;
-                            }
-                            break;
-                        case IfdTag.SamplesPerPixel:
+                        case Tag.SamplesPerPixel:
                             {
                                 ifd.SamplesPerPixel = (ushort)valueOffset;
                             }
                             break;
-                        case IfdTag.RowsPerStrip:
+                        case Tag.RowsPerStrip:
                             {
                                 ifd.RowsPerStrip = (uint)valueOffset;
                             }
                             break;
-                        case IfdTag.StripByteCounts:
-                            {
-                                ifd.StripByteCountsType = type;
-                                ifd.NumStripByteCounts = (uint)numValues;
-                                ifd.StripByteCounts = valueOffset;
-                            }
-                            break;
-                        case IfdTag.PlanarConfiguration:
+                        case Tag.PlanarConfiguration:
                             {
                                 ifd.PlanarConfiguration = (ushort)valueOffset;
                             }
                             break;
-                        case IfdTag.SampleFormat:
+                        case Tag.SampleFormat:
                             {
                                 ifd.SampleFormat = (ushort)valueOffset;
                             }
+                            break;
+                        case Tag.StripOffsets:
+                        case Tag.StripByteCounts:
                             break;
                         default:
                             {
@@ -155,9 +149,42 @@ namespace TiffExpress
                 ifdList.Add(ifd);
 
                 ifdOffset = _reader.ReadUInt32();
+
+                IfdEntry entry;
+                if (ifd.Entries.TryGetValue(Tag.StripOffsets, out entry))
+                    ifd.StripOffsets = ReadArrayField(entry);
+
+                if (ifd.Entries.TryGetValue(Tag.StripByteCounts, out entry))
+                    ifd.StripByteCounts = ReadArrayField(entry);
             }
 
             return ifdList.ToArray();
+        }
+
+        private long[] ReadArrayField(IfdEntry entry)
+        {
+            _reader.Stream.Position = entry.ValueOffset;
+            var array = new long[entry.NumValues];
+
+            if (entry.FieldType == FieldType.UInt64)
+            {
+                for (int i = 0; i < entry.NumValues; i++)
+                    array[i] = _reader.ReadInt64();
+            }
+            else if (entry.FieldType == FieldType.UInt32)
+            {
+                for (int i = 0; i < entry.NumValues; i++)
+                    array[i] = _reader.ReadUInt32();
+            }
+            else if (entry.FieldType == FieldType.UInt16)
+            {
+                for (int i = 0; i < entry.NumValues; i++)
+                    array[i] = _reader.ReadUInt16();
+            }
+            else
+                throw new Exception($"Unknown field type {entry.FieldType} for tag {entry.Tag}");
+
+            return array;
         }
 
         public EnumerableBitmap<T> ReadImageFile<T>()
@@ -176,15 +203,15 @@ namespace TiffExpress
 
         public EnumerableBitmap<T> ReadImageFile<T>(ImageFileDirectory ifd, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
-            if(offsetX < 0 || offsetX >= ifd.ImageWidth)
+            if (offsetX < 0 || offsetX >= ifd.ImageWidth)
                 throw new ArgumentOutOfRangeException("offsetX");
-            if(offsetY < 0 || offsetY >= ifd.ImageHeight)
+            if (offsetY < 0 || offsetY >= ifd.ImageHeight)
                 throw new ArgumentOutOfRangeException("offsetY");
-            if(outputWidth <= 0)
+            if (outputWidth <= 0)
                 throw new ArgumentOutOfRangeException("outputWidth");
-            if(outputHeight <= 0)
+            if (outputHeight <= 0)
                 throw new ArgumentOutOfRangeException("outputHeight");
-            
+
             outputWidth = Math.Min(outputWidth, ifd.ImageWidth - offsetX);
             outputHeight = Math.Min(outputHeight, ifd.ImageHeight - offsetY);
 
@@ -196,33 +223,23 @@ namespace TiffExpress
 
         private IEnumerable<byte[]> ReadImageFileInternal(ImageFileDirectory ifd, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
-            if (ifd.PhotometricInterpretation != 1)
+            if (ifd.PhotometricInterpretation != PhotometricInterpretation.BlackIsZero)
                 throw new NotSupportedException($"PhotometricInterpretation must be BlackIsZero: {ifd.PhotometricInterpretation}");
-            if (ifd.Compression != 1)
+            if (ifd.Compression != Compression.NoCompression)
                 throw new NotSupportedException($"Compression not supported: {ifd.Compression}");
             if (ifd.SamplesPerPixel != 1)
                 throw new NotSupportedException($"SamplesPerPixel must be 1: {ifd.SamplesPerPixel}");
             if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != 1)
                 throw new NotSupportedException($"PlanarConfiguration must be ChunkyFormat: {ifd.PlanarConfiguration}");
 
-            _reader.Stream.Position = ifd.StripOffsets;
-            var stripOffsets = new long[ifd.NumStripOffsets];
-            for (int i = 0; i < ifd.NumStripOffsets; i++)
-                stripOffsets[i] = ifd.StripOffsetsType == 16 ? _reader.ReadInt64() : _reader.ReadUInt32();
-
-            _reader.Stream.Position = ifd.StripByteCounts;
-            var stripByteCounts = new long[ifd.NumStripByteCounts];
-            for (int i = 0; i < ifd.NumStripByteCounts; i++)
-                stripByteCounts[i] = ifd.StripOffsetsType == 16 ? _reader.ReadInt64() : _reader.ReadUInt32();
-
             int bytesPerPixel = ifd.SamplesPerPixel * (ifd.BitsPerSample >> 3);
             int outputBufferSize = bytesPerPixel * outputWidth;
 
             int y = 0;
-            for (uint i = 0; i < ifd.NumStripOffsets; i++)
+            for (uint i = 0; i < ifd.StripOffsets.Length; i++)
             {
-                long bytesPerRow = stripByteCounts[i] / ifd.RowsPerStrip;
-                long position = stripOffsets[i] + offsetX * bytesPerPixel;
+                long bytesPerRow = ifd.StripByteCounts[i] / ifd.RowsPerStrip;
+                long position = ifd.StripOffsets[i] + offsetX * bytesPerPixel;
                 for (uint j = 0; j < ifd.RowsPerStrip; j++)
                 {
                     if (y >= offsetY && y < offsetY + outputHeight)
@@ -239,27 +256,25 @@ namespace TiffExpress
             }
         }
 
-
         public class ImageFileDirectory
         {
+            public readonly Dictionary<Tag, IfdEntry> Entries = new Dictionary<Tag, IfdEntry>();
+
             public int ImageWidth;
             public int ImageHeight;
             public ushort BitsPerSample;
-            public ushort PhotometricInterpretation; // 0 = WhiteIsZero, 1 = BlackIsZero
-            public ushort Compression;
-            public ushort StripOffsetsType;
-            public uint NumStripOffsets;
-            public long StripOffsets;
+            public PhotometricInterpretation PhotometricInterpretation;
+            public Compression Compression;
             public ushort SamplesPerPixel;
             public uint RowsPerStrip;
-            public ushort StripByteCountsType;
-            public uint NumStripByteCounts;
-            public long StripByteCounts;
             public ushort PlanarConfiguration; // 1 = Chunky format, 2 = Planar format
             public ushort SampleFormat; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
+
+            public long[] StripOffsets;
+            public long[] StripByteCounts;
         }
 
-        private enum IfdTag
+        public enum Tag
         {
             ImageWidth = 256,
             ImageHeight = 257,
@@ -272,6 +287,79 @@ namespace TiffExpress
             StripByteCounts = 279,
             PlanarConfiguration = 284,
             SampleFormat = 339,
+
+            // Unused
+            ResolutionUnit = 296,
+            XResolution = 282,
+            YResolution = 283,
+            Artist = 315,
+            CellLength = 265,
+            CellWidth = 264,
+            ColorMap = 320,
+            Copyright = 33432,
+            DateTime = 306,
+            ExtraSamples = 338,
+            FillOrder = 266,
+            FreeByteCounts = 289,
+            FreeOffsets = 288,
+            GrayResponseCurve = 291,
+            GrayResponseUnit = 290,
+            HostComputer = 316,
+            ImageDescription = 270,
+            Make = 271,
+            MaxSampleValue = 281,
+            MinSampleValue = 280,
+            Model = 272,
+            NewSubfileType = 254,
+            Orientation = 274,
+            Software = 305,
+            SubfileType = 255,
+            Threshholding = 263,
+
+        }
+
+        public enum Compression
+        {
+            NoCompression = 1,
+            ModifiedHuffman = 2,
+            PackBits = 32773,
+        }
+
+        public enum PhotometricInterpretation
+        {
+            WhiteIsZero = 0,
+            BlackIsZero = 1,
+            RGB = 2,
+            PaletteColor = 3,
+            TransparencyMask = 4,
+        }
+
+        public enum FieldType
+        {
+            Byte = 1,
+            Ascii = 2,
+            UInt16 = 3,
+            UInt32 = 4,
+            Rational = 5, // Two LONGs: the first represents the numerator of a fraction; the second, the denominator
+            SByte = 6,
+            Undefined8 = 7,
+            Int16 = 8,
+            Int32 = 9,
+            SRational = 10,
+            Float = 11,
+            Double = 12,
+
+            UInt64 = 16,
+            Int64 = 17,
+            IFD8 = 18, // being a new unsigned 8byte IFD offset.
+        }
+
+        public class IfdEntry
+        {
+            public Tag Tag;
+            public FieldType FieldType;
+            public long NumValues;
+            public long ValueOffset;
         }
 
         private Array ConvertRow(ImageFileDirectory ifd, byte[] row)
