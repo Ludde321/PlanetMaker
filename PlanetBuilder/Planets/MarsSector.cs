@@ -12,8 +12,22 @@ namespace PlanetBuilder.Planets
     public class MarsSector : Planet
     {
         public int NumSegments;
-        private Bitmap<short> _elevationTexture;
-        private Bitmap<short> _elevationTextureBlur;
+        private Bitmap<short> _elevationSectorBitmap;
+        private Bitmap<short> _elevationBitmapBlur;
+
+        private int _elevationWidth;
+        private int _elevationHeight;
+
+        private int _sectorOffsetX;
+        private int _sectorWidth;
+        private int _sectorHeight;
+        private int _sectorOffsetY;
+        public double Lat0;
+        public double Lon0;
+        public double Lat1;
+        public double Lon1;
+
+        private double _sx,_sy,_sx0,_sy0;
 
         public MarsSector()
         {
@@ -21,61 +35,75 @@ namespace PlanetBuilder.Planets
             ElevationScale = 3;
             NumSegments = 1200;
             PlanetProjection = Projection.Equirectangular;
+
+            // Gale crater 5.4°S 137.8°E
+            Lat0 = MathHelper.ToRadians(-5.4 + 3.0);
+            Lon0 = MathHelper.ToRadians(137.8 - 3.0);
+            Lat1 = MathHelper.ToRadians(-5.4 - 3.0);
+            Lon1 = MathHelper.ToRadians(137.8 + 3.0);
+
+            // Orcus Patera
+            // Lat0 = MathHelper.ToRadians(18);
+            // Lon0 = MathHelper.ToRadians(170);
+            // Lat1 = MathHelper.ToRadians(8);
+            // Lon1 = MathHelper.ToRadians(180);
         }
 
         public void Create()
         {
-            // Gale crater 5.4°S 137.8°E
-            double lat0 = MathHelper.ToRadians(-5.4 - 3.0);
-            double lon0 = MathHelper.ToRadians(137.8 - 3.0);
-            double lat1 = MathHelper.ToRadians(-5.4 + 3.0);
-            double lon1 = MathHelper.ToRadians(137.8 + 3.0);
+            double dLat = Lat0 - Lat1;
+            double dLon = Lon1 - Lon0;
 
-             Stopwatch sw;
+            // Calculate sector transform
+            _sx = Math.PI * 2 / dLon;
+            _sy = Math.PI / dLat;
+            _sx0 = (Math.PI + Lon0) / (Math.PI * 2) * _sx;
+            _sy0 = (Math.PI / 2 - Lat0) / Math.PI * _sy;
 
-            int width = 53346;
-            int height = 26673;
-            // string elevationTextureFilename = $@"Generated\Planets\MarsSector\Mars{width}x{height}.raw";
-            // if (!File.Exists(elevationTextureFilename))
-            // {
-                sw = Stopwatch.StartNew();
-                using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
+            Stopwatch sw;
+
+            sw = Stopwatch.StartNew();
+            using (var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
+            {
+                var ifd = tiffFile.ImageFileDirectories[0];
+
+                _elevationWidth = ifd.ImageWidth;
+                _elevationHeight = ifd.ImageHeight;
+
+                _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0) / Math.PI);
+                _sectorOffsetX = (int)(_elevationWidth * (Math.PI + Lon0) / (Math.PI * 2));
+
+                _sectorWidth = (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
+                _sectorHeight = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
+
+                _elevationSectorBitmap = tiffFile.ReadImageFile<short>(ifd, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
+                Console.WriteLine($"Loading image sector used {sw.Elapsed}");
+
+                // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();
+                // Console.WriteLine($"Resampling used {sw.Elapsed}");
+
+                TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.png", _elevationSectorBitmap);
+
+                int width = 2880;
+                int height = 1440;
+                string elevationTextureBlurFilename = $@"Generated\Planets\MarsSector\MarsBlur{width}x{height}.raw";
+                if (!File.Exists(elevationTextureBlurFilename))
                 {
-                    var elevationTextureLarge = tiffFile.ReadImageFile<short>();
+                    var elevationTextureSmall = Resampler.Resample(_elevationSectorBitmap, width, height).ToBitmap();
 
-                    _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
-                    Console.WriteLine($"Resampling used {sw.Elapsed}");
+                    sw = Stopwatch.StartNew();
+                    var blurFilter = new BlurFilter(PlanetProjection);
+                    _elevationBitmapBlur = blurFilter.Blur3(elevationTextureSmall, MathHelper.ToRadians(10));
+                    Console.WriteLine($"Blur used {sw.Elapsed}");
+
+                    TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.raw", _elevationBitmapBlur);
+                    TextureHelper.SavePng8($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.png", _elevationBitmapBlur);
                 }
-
-//                TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
-            // }
-            // else
-            // {
-            //     _elevationTexture = TextureHelper.LoadRaw16(elevationTextureFilename, width, height);
-            // }
-//            TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
-
-
-            width = 2880;
-            height = 1440;
-            string elevationTextureBlurFilename = $@"Generated\Planets\MarsSector\MarsBlur{width}x{height}.raw";
-            if (!File.Exists(elevationTextureBlurFilename))
-            {
-                var elevationTextureSmall = Resampler.Resample(_elevationTexture, width, height).ToBitmap();
-
-                sw = Stopwatch.StartNew();
-                var blurFilter = new BlurFilter(PlanetProjection);
-                _elevationTextureBlur = blurFilter.Blur3(elevationTextureSmall, MathHelper.ToRadians(10));
-                Console.WriteLine($"Blur used {sw.Elapsed}");
-
-                TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-                TextureHelper.SavePng8($@"Generated\Planets\MarsSector\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+                else
+                {
+                    _elevationBitmapBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
+                }
             }
-            else
-            {
-                _elevationTextureBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
-            }
-
 
             sw = Stopwatch.StartNew();
 
@@ -83,7 +111,7 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(lat0, lon0, lat1, lon1, NumSegments, NumSegments);
+            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegments, NumSegments);
 
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;
@@ -93,13 +121,18 @@ namespace PlanetBuilder.Planets
             SaveSTL($@"Generated\Planets\MarsSector\MarsSector{NumSegments}.stl");
         }
 
+
+
+
         private double ComputeModelElevationTop(Vector3d v, double lat, double lon)
         {
-            double ty = (Math.PI / 2 - lat) / Math.PI;
-            double tx = (Math.PI + lon) / (Math.PI * 2);
+            var t = MathHelper.SphericalToTextureCoords(lat, lon);
 
-            short h = ReadBilinearPixel(_elevationTexture, tx, ty);
-            short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
+            double sy = t.y * _sy - _sy0;
+            double sx = t.x * _sx - _sx0;
+
+            short h = ReadBilinearPixel(_elevationSectorBitmap, sx, sy);
+            short hAvg = ReadBilinearPixel(_elevationBitmapBlur, t.x, t.y);
 
             double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
@@ -107,10 +140,9 @@ namespace PlanetBuilder.Planets
         }
         private double ComputeModelElevationBottom(Vector3d v, double lat, double lon)
         {
-            double ty = (Math.PI / 2 - lat) / Math.PI;
-            double tx = (Math.PI + lon) / (Math.PI * 2);
+            var t = MathHelper.SphericalToTextureCoords(lat, lon);
 
-            short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
+            short hAvg = ReadBilinearPixel(_elevationBitmapBlur, t.x, t.y);
 
             double r = PlanetRadius - 50000 + hAvg;
 

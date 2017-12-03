@@ -122,6 +122,7 @@ namespace PlanetBuilder.Planets
             return (float)(p00p01 + (p10p11 - p00p01) * fy);
         }
 
+
         protected void SaveSTL(string outputFilename)
         {
             var sw = Stopwatch.StartNew();

@@ -103,15 +103,11 @@ namespace PlanetBuilder.Planets
 
         protected override Vector3d ComputeModelElevation(Vector3d v)
         {
-            double lat = Math.PI / 2 - Math.Acos(v.y);
-            double lon = Math.Atan2(v.x, v.z);
+            var t = MathHelper.SphericalToTextureCoords(v);
 
-            double ty = (Math.PI / 2 - lat) / Math.PI;
-            double tx = (Math.PI + lon) / (Math.PI * 2);
-
-            short h = ReadBilinearPixel(_elevationTextureSmall, tx, ty);
-            byte landcover = ReadBilinearPixel(_landcoverTextureSmall, tx, ty);
-//            short hAvg = ReadBilinearPixel(_elevationTextureBlur, tx, ty);
+            short h = ReadBilinearPixel(_elevationTextureSmall, t.x, t.y);
+            byte landcover = ReadBilinearPixel(_landcoverTextureSmall, t.x, t.y);
+//            short hAvg = ReadBilinearPixel(_elevationTextureBlur, t.x, t.y);
 
             double r = PlanetRadius + h * ElevationScale;//(h - hAvg) * ElevationScale + hAvg;
             if(h < 0)
