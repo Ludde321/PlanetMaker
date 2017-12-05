@@ -32,11 +32,11 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
+                using(var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
                 {
                     // Right-most pixel column in the Mars dataset is broken. This trick will skip it.
-                    var ifd = tiffFile.ImageFileDirectories[0];
-                    var elevationTextureLarge = tiffFile.ReadImageFile<short>(0, 0, ifd.ImageWidth - 1, ifd.ImageHeight);
+                    var ifd = tiffReader.ImageFileDirectories[0];
+                    var elevationTextureLarge = tiffReader.ReadImageFile<short>(0, 0, ifd.ImageWidth - 1, ifd.ImageHeight);
 
                     _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");

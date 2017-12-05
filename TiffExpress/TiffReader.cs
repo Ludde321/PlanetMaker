@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using TiffExpress.Tiff;
 
 namespace TiffExpress
 {
@@ -12,7 +13,7 @@ namespace TiffExpress
     // https://www.awaresystems.be/imaging/tiff/bigtiff.html
 
 
-    public class TiffFile : IDisposable
+    public partial class TiffReader : IDisposable
     {
         private Stream _stream;
         private BinaryReader2 _reader;
@@ -21,7 +22,7 @@ namespace TiffExpress
 
         public ImageFileDirectory[] ImageFileDirectories { get; private set; }
 
-        public TiffFile(Stream stream)
+        public TiffReader(Stream stream)
         {
             _stream = stream;
             _reader = new BinaryReader2(_stream, true);
@@ -84,7 +85,7 @@ namespace TiffExpress
 
                 for (int i = 0; i < numFields; i++)
                 {
-                    Tag tag = (Tag)_reader.ReadUInt16();
+                    IfdTag tag = (IfdTag)_reader.ReadUInt16();
                     FieldType type = (FieldType)_reader.ReadUInt16();
                     long numValues = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
                     long valueOffset = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
@@ -93,53 +94,53 @@ namespace TiffExpress
 
                     switch (tag)
                     {
-                        case Tag.ImageWidth:
+                        case IfdTag.ImageWidth:
                             {
                                 ifd.ImageWidth = (int)valueOffset;
                             }
                             break;
-                        case Tag.ImageHeight:
+                        case IfdTag.ImageHeight:
                             {
                                 ifd.ImageHeight = (int)valueOffset;
                             }
                             break;
-                        case Tag.BitsPerSample:
+                        case IfdTag.BitsPerSample:
                             {
                                 ifd.BitsPerSample = (ushort)valueOffset;
                             }
                             break;
-                        case Tag.PhotometricInterpretation:
+                        case IfdTag.PhotometricInterpretation:
                             {
                                 ifd.PhotometricInterpretation = (PhotometricInterpretation)valueOffset;
                             }
                             break;
-                        case Tag.Compression:
+                        case IfdTag.Compression:
                             {
                                 ifd.Compression = (Compression)valueOffset;
                             }
                             break;
-                        case Tag.SamplesPerPixel:
+                        case IfdTag.SamplesPerPixel:
                             {
                                 ifd.SamplesPerPixel = (ushort)valueOffset;
                             }
                             break;
-                        case Tag.RowsPerStrip:
+                        case IfdTag.RowsPerStrip:
                             {
                                 ifd.RowsPerStrip = (uint)valueOffset;
                             }
                             break;
-                        case Tag.PlanarConfiguration:
+                        case IfdTag.PlanarConfiguration:
                             {
                                 ifd.PlanarConfiguration = (ushort)valueOffset;
                             }
                             break;
-                        case Tag.SampleFormat:
+                        case IfdTag.SampleFormat:
                             {
                                 ifd.SampleFormat = (ushort)valueOffset;
                             }
                             break;
-                        case Tag.StripOffsets:
-                        case Tag.StripByteCounts:
+                        case IfdTag.StripOffsets:
+                        case IfdTag.StripByteCounts:
                             break;
                         default:
                             {
@@ -153,10 +154,10 @@ namespace TiffExpress
                 ifdOffset = _reader.ReadUInt32();
 
                 IfdEntry entry;
-                if (ifd.Entries.TryGetValue(Tag.StripOffsets, out entry))
+                if (ifd.Entries.TryGetValue(IfdTag.StripOffsets, out entry))
                     ifd.StripOffsets = ReadArrayField(entry);
 
-                if (ifd.Entries.TryGetValue(Tag.StripByteCounts, out entry))
+                if (ifd.Entries.TryGetValue(IfdTag.StripByteCounts, out entry))
                     ifd.StripByteCounts = ReadArrayField(entry);
             }
 
@@ -268,111 +269,6 @@ namespace TiffExpress
             }
         }
 
-        public class ImageFileDirectory
-        {
-            public readonly Dictionary<Tag, IfdEntry> Entries = new Dictionary<Tag, IfdEntry>();
-
-            public int ImageWidth;
-            public int ImageHeight;
-            public ushort BitsPerSample;
-            public PhotometricInterpretation PhotometricInterpretation;
-            public Compression Compression;
-            public ushort SamplesPerPixel;
-            public uint RowsPerStrip;
-            public ushort PlanarConfiguration; // 1 = Chunky format, 2 = Planar format
-            public ushort SampleFormat; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
-
-            public long[] StripOffsets;
-            public long[] StripByteCounts;
-        }
-
-        public enum Tag
-        {
-            ImageWidth = 256,
-            ImageHeight = 257,
-            BitsPerSample = 258,
-            Compression = 259,
-            PhotometricInterpretation = 262,
-            StripOffsets = 273,
-            SamplesPerPixel = 277,
-            RowsPerStrip = 278,
-            StripByteCounts = 279,
-            PlanarConfiguration = 284,
-            SampleFormat = 339,
-
-            // Unused
-            ResolutionUnit = 296,
-            XResolution = 282,
-            YResolution = 283,
-            Artist = 315,
-            CellLength = 265,
-            CellWidth = 264,
-            ColorMap = 320,
-            Copyright = 33432,
-            DateTime = 306,
-            ExtraSamples = 338,
-            FillOrder = 266,
-            FreeByteCounts = 289,
-            FreeOffsets = 288,
-            GrayResponseCurve = 291,
-            GrayResponseUnit = 290,
-            HostComputer = 316,
-            ImageDescription = 270,
-            Make = 271,
-            MaxSampleValue = 281,
-            MinSampleValue = 280,
-            Model = 272,
-            NewSubfileType = 254,
-            Orientation = 274,
-            Software = 305,
-            SubfileType = 255,
-            Threshholding = 263,
-
-        }
-
-        public enum Compression
-        {
-            NoCompression = 1,
-            ModifiedHuffman = 2,
-            PackBits = 32773,
-        }
-
-        public enum PhotometricInterpretation
-        {
-            WhiteIsZero = 0,
-            BlackIsZero = 1,
-            RGB = 2,
-            PaletteColor = 3,
-            TransparencyMask = 4,
-        }
-
-        public enum FieldType
-        {
-            Byte = 1,
-            Ascii = 2,
-            UInt16 = 3,
-            UInt32 = 4,
-            Rational = 5, // Two LONGs: the first represents the numerator of a fraction; the second, the denominator
-            SByte = 6,
-            Undefined8 = 7,
-            Int16 = 8,
-            Int32 = 9,
-            SRational = 10,
-            Float = 11,
-            Double = 12,
-
-            UInt64 = 16,
-            Int64 = 17,
-            IFD8 = 18, // being a new unsigned 8byte IFD offset.
-        }
-
-        public class IfdEntry
-        {
-            public Tag Tag;
-            public FieldType FieldType;
-            public long NumValues;
-            public long ValueOffset;
-        }
 
         private Array ConvertRow(ImageFileDirectory ifd, byte[] row)
         {

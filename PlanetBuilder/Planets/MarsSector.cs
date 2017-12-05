@@ -63,9 +63,9 @@ namespace PlanetBuilder.Planets
             Stopwatch sw;
 
             sw = Stopwatch.StartNew();
-            using (var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
+            using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
             {
-                var ifd = tiffFile.ImageFileDirectories[0];
+                var ifd = tiffReader.ImageFileDirectories[0];
 
                 _elevationWidth = ifd.ImageWidth;
                 _elevationHeight = ifd.ImageHeight;
@@ -76,7 +76,7 @@ namespace PlanetBuilder.Planets
                 _sectorWidth = (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
                 _sectorHeight = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
 
-                _elevationSectorBitmap = tiffFile.ReadImageFile<short>(ifd, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
+                _elevationSectorBitmap = tiffReader.ReadImageFile<short>(ifd, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
                 Console.WriteLine($"Loading image sector used {sw.Elapsed}");
 
                 // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();

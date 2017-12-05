@@ -32,9 +32,9 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                using(var tiffFile = new TiffFile(File.OpenRead(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif")))
+                using(var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Moon\Lunar_LRO_LOLA_Global_LDEM_118m_Mar2014.tif")))
                 {
-                    var elevationTextureLarge = tiffFile.ReadImageFile<short>();
+                    var elevationTextureLarge = tiffReader.ReadImageFile<short>();
                     
                     _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
