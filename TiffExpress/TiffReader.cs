@@ -151,7 +151,11 @@ namespace TiffExpress
                 }
                 ifdList.Add(ifd);
 
-                ifdOffset = _reader.ReadUInt32();
+                if (_bigTiff)
+                    ifdOffset = _reader.ReadInt64();
+                else
+                    ifdOffset = _reader.ReadUInt32();
+
 
                 IfdEntry entry;
                 if (ifd.Entries.TryGetValue(IfdTag.StripOffsets, out entry))
