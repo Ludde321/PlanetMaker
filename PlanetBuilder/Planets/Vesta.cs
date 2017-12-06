@@ -25,25 +25,34 @@ namespace PlanetBuilder.Planets
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadRaw32f(@"Datasets\Planets\Vesta\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.raw", 17280, 8640);
-            Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
-            sw = Stopwatch.StartNew();
-            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
-            Console.WriteLine($"Resampling used {sw.Elapsed}");
+            using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Vesta\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.tif")))
+            {
+                var elevationTextureLarge = tiffReader.ReadImageFile<float>();
 
-            var textureSmall = TextureHelper.Convert(_elevationTextureSmall, (h) => {return (short)(h-PlanetRadius);});
+                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+                Console.WriteLine($"Resampling used {sw.Elapsed}");
+            }
+
+            // var elevationTextureLarge = BitmapHelper.LoadRaw32f(@"Datasets\Planets\Vesta\Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.raw", 17280, 8640);
+            // Console.WriteLine($"Loading texture used {sw.Elapsed}");
+
+            // sw = Stopwatch.StartNew();
+            // _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+            // Console.WriteLine($"Resampling used {sw.Elapsed}");
+
+            var textureSmall = _elevationTextureSmall.Convert((h) => {return (short)(h-PlanetRadius);});
             // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\Vesta{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Generated\Planets\Vesta\Vesta{textureSmall.Width}x{textureSmall.Height}.png", textureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Vesta\Vesta{textureSmall.Width}x{textureSmall.Height}.png", textureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
             _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, MathHelper.ToRadians(10));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            var textureBlur = TextureHelper.Convert(_elevationTextureBlur, (h) => {return (short)(h-PlanetRadius);});
+            var textureBlur = _elevationTextureBlur.Convert((h) => {return (short)(h-PlanetRadius);});
             // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\VestaBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Generated\Planets\Vesta\VestaBlur{textureBlur.Width}x{textureBlur.Height}.png", textureBlur);
+            BitmapHelper.SavePng8($@"Generated\Planets\Vesta\VestaBlur{textureBlur.Width}x{textureBlur.Height}.png", textureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

@@ -25,23 +25,24 @@ namespace PlanetBuilder.Planets
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Ceres\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.tif");
-            Console.WriteLine($"Loading texture used {sw.Elapsed}");
-            
-            sw = Stopwatch.StartNew();
-            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
-            Console.WriteLine($"Resampling used {sw.Elapsed}");
+            using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Ceres\Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016.tif")))
+            {
+                var elevationTextureLarge = tiffReader.ReadImageFile<short>();
 
-            TextureHelper.SaveRaw16($@"Generated\Planets\Ceres\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Generated\Planets\Ceres\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+                Console.WriteLine($"Resampling used {sw.Elapsed}");
+            }
+
+            BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Ceres\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
             _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveRaw16($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            BitmapHelper.SavePng8($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

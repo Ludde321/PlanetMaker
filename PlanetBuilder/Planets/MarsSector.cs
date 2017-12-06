@@ -88,7 +88,7 @@ namespace PlanetBuilder.Planets
                     tiffWriter.WriteImageFile(bitmap);
                 }
 
-                TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.png", _elevationSectorBitmap);
+                BitmapHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.png", _elevationSectorBitmap);
 
                 int width = 2880;
                 int height = 1440;
@@ -102,12 +102,12 @@ namespace PlanetBuilder.Planets
                     _elevationBitmapBlur = blurFilter.Blur3(elevationTextureSmall, MathHelper.ToRadians(10));
                     Console.WriteLine($"Blur used {sw.Elapsed}");
 
-                    TextureHelper.SaveRaw16($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.raw", _elevationBitmapBlur);
-                    TextureHelper.SavePng8($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.png", _elevationBitmapBlur);
+                    BitmapHelper.SaveRaw16($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.raw", _elevationBitmapBlur);
+                    BitmapHelper.SavePng8($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.png", _elevationBitmapBlur);
                 }
                 else
                 {
-                    _elevationBitmapBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
+                    _elevationBitmapBlur = BitmapHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
                 }
             }
 

@@ -26,23 +26,24 @@ namespace PlanetBuilder.Planets
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Charon\Charon_NewHorizons_Global_DEM_300m_Jul2017_16bit.tif");
-            Console.WriteLine($"Loading texture used {sw.Elapsed}");
+            using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Charon\Charon_NewHorizons_Global_DEM_300m_Jul2017_16bit.tif")))
+            {
+                var elevationTextureLarge = tiffReader.ReadImageFile<short>();
 
-            sw = Stopwatch.StartNew();
-            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
-            Console.WriteLine($"Resampling used {sw.Elapsed}");
+                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+                Console.WriteLine($"Resampling used {sw.Elapsed}");
+            }
 
-            TextureHelper.SaveRaw16($@"Generated\Planets\Charon\Charon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Generated\Planets\Charon\Charon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            BitmapHelper.SaveRaw16($@"Generated\Planets\Charon\Charon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Charon\Charon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
-            _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, MathHelper.ToRadians(10), (h) => { return h != -32640 ? (short?)h : null;});
+            _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, MathHelper.ToRadians(10), (h) => { return h != -32640 ? (short?)h : null; });
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveRaw16($@"Generated\Planets\Charon\CharonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Generated\Planets\Charon\CharonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SaveRaw16($@"Generated\Planets\Charon\CharonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+            BitmapHelper.SavePng8($@"Generated\Planets\Charon\CharonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
@@ -59,7 +60,7 @@ namespace PlanetBuilder.Planets
             short hAvg = ReadBilinearPixel(_elevationTextureBlur, t.x, t.y);
 
             double r = PlanetRadius;
-            if(h != -32640)
+            if (h != -32640)
                 r += (h - hAvg) * ElevationScale + hAvg;
 
             return Vector3d.Multiply(v, r * 0.00001);

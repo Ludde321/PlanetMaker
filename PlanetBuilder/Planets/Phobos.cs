@@ -26,10 +26,13 @@ namespace PlanetBuilder.Planets
             Stopwatch sw;
 
             sw = Stopwatch.StartNew();
-            _elevationTexture = TextureHelper.LoadTiff16(@"Datasets\Planets\Phobos\Phobos_ME_HRSC_DEM_Global_2ppd.tif");
-            Console.WriteLine($"Loading texture used {sw.Elapsed}");
+           using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Phobos\Phobos_ME_HRSC_DEM_Global_2ppd.tif")))
+           {
+                _elevationTexture = tiffReader.ReadImageFile<short>().ToBitmap();
+                Console.WriteLine($"Loading texture used {sw.Elapsed}");
+           }
 
-            TextureHelper.SavePng8($@"Generated\Planets\Phobos\Phobos{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            BitmapHelper.SavePng8($@"Generated\Planets\Phobos\Phobos{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
             sw = Stopwatch.StartNew();
             var blurFilter = new BlurFilter(PlanetProjection);

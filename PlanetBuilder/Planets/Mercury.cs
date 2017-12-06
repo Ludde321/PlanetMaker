@@ -29,39 +29,39 @@ namespace PlanetBuilder.Planets
             int width = 2880;
             int height = 1440;
             string elevationTextureSmallFilename = $@"Generated\Planets\Mercury\Mercury{width}x{height}.raw";
-            if(!File.Exists(elevationTextureSmallFilename))
+            if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Mercury\Mercury_Messenger_USGS_DEM_Global_665m_v2.tif");
-                Console.WriteLine($"Loading texture used {sw.Elapsed}");
-                
-                sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
-                Console.WriteLine($"Resampling used {sw.Elapsed}");
-
-                TextureHelper.SaveRaw16($@"Generated\Planets\Mercury\Mercury{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Mercury\Mercury_Messenger_USGS_DEM_Global_665m_v2.tif")))
+                {
+                    var elevationTextureLarge = tiffReader.ReadImageFile<short>();
+                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
+                    Console.WriteLine($"Resampling used {sw.Elapsed}");
+                }
+    
+                BitmapHelper.SaveRaw16($@"Generated\Planets\Mercury\Mercury{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             }
             else
             {
-                _elevationTextureSmall = TextureHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+                _elevationTextureSmall = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-                TextureHelper.SavePng8($@"Generated\Planets\Mercury\Mercury{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Mercury\Mercury{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             string elevationTextureBlurFilename = $@"Generated\Planets\Mercury\MercuryBlur{width}x{height}.raw";
-            if(!File.Exists(elevationTextureBlurFilename))
+            if (!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
                 _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
-                TextureHelper.SaveRaw16($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+                BitmapHelper.SaveRaw16($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
             }
             else
             {
-                _elevationTextureBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
+                _elevationTextureBlur = BitmapHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
             }
-                TextureHelper.SavePng8($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SavePng8($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

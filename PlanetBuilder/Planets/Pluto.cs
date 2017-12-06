@@ -25,23 +25,25 @@ namespace PlanetBuilder.Planets
         public void Create()
         {
             var sw = Stopwatch.StartNew();
-            var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Pluto\Pluto_NewHorizons_Global_DEM_300m_Jul2017_16bit.tif");
-            Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
-            sw = Stopwatch.StartNew();
-            _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
-            Console.WriteLine($"Resampling used {sw.Elapsed}");
+            using (var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Pluto\Pluto_NewHorizons_Global_DEM_300m_Jul2017_16bit.tif")))
+            {
+                var elevationTextureLarge = tiffReader.ReadImageFile<short>();
 
-            TextureHelper.SaveRaw16($@"Generated\Planets\Pluto\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            TextureHelper.SavePng8($@"Generated\Planets\Pluto\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+                Console.WriteLine($"Resampling used {sw.Elapsed}");
+            }
+
+            BitmapHelper.SaveTiff16($@"Generated\Planets\Pluto\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.tif", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Pluto\Pluto{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
             _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
-            TextureHelper.SaveRaw16($@"Generated\Planets\Pluto\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            TextureHelper.SavePng8($@"Generated\Planets\Pluto\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SaveTiff16($@"Generated\Planets\Pluto\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
+            BitmapHelper.SavePng8($@"Generated\Planets\Pluto\PlutoBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

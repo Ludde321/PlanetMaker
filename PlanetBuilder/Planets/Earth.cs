@@ -35,46 +35,46 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = TextureHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.43200x21600.raw", 43200, 21600);
+                var elevationTextureLarge = BitmapHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.43200x21600.raw", 43200, 21600);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
-                TextureHelper.Process(elevationTextureLarge, (p) => { return (short)(p - 32768); });
+                elevationTextureLarge.Process((p) => { return (short)(p - 32768); });
 
                 sw = Stopwatch.StartNew();
                 _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                TextureHelper.SaveRaw16($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                BitmapHelper.SaveRaw16($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             }
             else
             {
-                _elevationTextureSmall = TextureHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+                _elevationTextureSmall = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-            TextureHelper.SavePng8($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
             // Landcover
             string landcoverTextureSmallFilename = $@"Generated\Planets\Earth\landcover.{width}x{height}.raw";
             if (!File.Exists(landcoverTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var landcoverTextureLarge = TextureHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.43200x21600.raw", 43200, 21600);
+                var landcoverTextureLarge = BitmapHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.43200x21600.raw", 43200, 21600);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
                 var histo = new long[256];
 
-                TextureHelper.Process(landcoverTextureLarge, (p) => { histo[p]++; return p != 0 ? (byte)0xff : (byte)0x00; });
+                landcoverTextureLarge.Process((p) => { histo[p]++; return p != 0 ? (byte)0xff : (byte)0x00; });
 
                 sw = Stopwatch.StartNew();
                 _landcoverTextureSmall = Resampler.Resample(landcoverTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                TextureHelper.SaveRaw8($@"Generated\Planets\Earth\landcover.{width}x{height}.raw", _landcoverTextureSmall);
+                BitmapHelper.SaveRaw8($@"Generated\Planets\Earth\landcover.{width}x{height}.raw", _landcoverTextureSmall);
             }
             else
             {
-                _landcoverTextureSmall = TextureHelper.LoadRaw8(landcoverTextureSmallFilename, width, height);
+                _landcoverTextureSmall = BitmapHelper.LoadRaw8(landcoverTextureSmallFilename, width, height);
             }
-            TextureHelper.SavePng8($@"Generated\Planets\Earth\landcover.{width}x{height}.png", _landcoverTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Earth\landcover.{width}x{height}.png", _landcoverTextureSmall);
 
 
 

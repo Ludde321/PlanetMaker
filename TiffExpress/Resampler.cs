@@ -30,208 +30,208 @@ namespace TiffExpress
             }
             Console.WriteLine($"y = {y}");
         }
-/*
-        public static Bitmap<byte> Resample(Bitmap<byte> inputTexture, int width, int height)
-        {
-            var outputTexture = new Bitmap<byte>(width, height);
-
-            var accumLine = new long[width];
-            var countLine = new int[width];
-
-            int offsetY0 = 0;
-            int offsetY1 = 0;
-
-            int epsy = 0;
-
-            int dy0 = inputTexture.Height - 1;
-            int dy1 = outputTexture.Height - 1;
-            int y1 = 0;
-            for (int y0 = 0; y0 <= dy0; y0++)
-            {
-                int epsx = 0;
-
-                int dx0 = inputTexture.Width - 1;
-                int dx1 = outputTexture.Width - 1;
-                int x1 = 0;
-
-                var inputLine = inputTexture.Rows[offsetY0];
-
-                for (int x0 = 0; x0 <= dx0; x0++)
+        /*
+                public static Bitmap<byte> Resample(Bitmap<byte> inputTexture, int width, int height)
                 {
-                    accumLine[x1] += inputLine[x0];
-                    countLine[x1]++;
+                    var outputTexture = new Bitmap<byte>(width, height);
 
-                    epsx += dx1;
+                    var accumLine = new long[width];
+                    var countLine = new int[width];
 
-                    if (2 * epsx >= dx0)
+                    int offsetY0 = 0;
+                    int offsetY1 = 0;
+
+                    int epsy = 0;
+
+                    int dy0 = inputTexture.Height - 1;
+                    int dy1 = outputTexture.Height - 1;
+                    int y1 = 0;
+                    for (int y0 = 0; y0 <= dy0; y0++)
                     {
-                        x1++;
-                        epsx -= dx0;
+                        int epsx = 0;
+
+                        int dx0 = inputTexture.Width - 1;
+                        int dx1 = outputTexture.Width - 1;
+                        int x1 = 0;
+
+                        var inputLine = inputTexture.Rows[offsetY0];
+
+                        for (int x0 = 0; x0 <= dx0; x0++)
+                        {
+                            accumLine[x1] += inputLine[x0];
+                            countLine[x1]++;
+
+                            epsx += dx1;
+
+                            if (2 * epsx >= dx0)
+                            {
+                                x1++;
+                                epsx -= dx0;
+                            }
+                        }
+                        offsetY0++;
+
+                        epsy += dy1;
+
+                        if (2 * epsy >= dy0)
+                        {
+                            var outputLine = outputTexture.Rows[offsetY1];
+                            for (int x = 0; x < outputTexture.Width; x++)
+                            {
+                                outputLine[x] = (byte)(accumLine[x] / countLine[x]);
+                                accumLine[x] = 0;
+                                countLine[x] = 0;
+                            }
+                            offsetY1++;
+
+                            y1++;
+                            epsy -= dy0;
+                        }
                     }
+
+                    if (y1 == dy1)
+                    {
+                        var outputLine = outputTexture.Rows[offsetY1];
+                        for (int x = 0; x < outputTexture.Width; x++)
+                            outputLine[x] = (byte)(accumLine[x] / countLine[x]);
+                    }
+                    return outputTexture;
                 }
-                offsetY0++;
 
-                epsy += dy1;
-
-                if (2 * epsy >= dy0)
+                public static Bitmap<short> Resample(Bitmap<short> inputTexture, int width, int height)
                 {
-                    var outputLine = outputTexture.Rows[offsetY1];
-                    for (int x = 0; x < outputTexture.Width; x++)
+                    var outputTexture = new Bitmap<short>(width, height);
+
+                    var accumLine = new long[width];
+                    var countLine = new int[width];
+
+                    int offsetY0 = 0;
+                    int offsetY1 = 0;
+
+                    int epsy = 0;
+
+                    int dy0 = inputTexture.Height - 1;
+                    int dy1 = outputTexture.Height - 1;
+                    int y1 = 0;
+                    for (int y0 = 0; y0 <= dy0; y0++)
                     {
-                        outputLine[x] = (byte)(accumLine[x] / countLine[x]);
-                        accumLine[x] = 0;
-                        countLine[x] = 0;
+                        int epsx = 0;
+
+                        int dx0 = inputTexture.Width - 1;
+                        int dx1 = outputTexture.Width - 1;
+                        int x1 = 0;
+
+                        var inputLine = inputTexture.Rows[offsetY0];
+
+                        for (int x0 = 0; x0 <= dx0; x0++)
+                        {
+                            accumLine[x1] += inputLine[x0];
+                            countLine[x1]++;
+
+                            epsx += dx1;
+
+                            if (2 * epsx >= dx0)
+                            {
+                                x1++;
+                                epsx -= dx0;
+                            }
+                        }
+                        offsetY0++;
+
+                        epsy += dy1;
+
+                        if (2 * epsy >= dy0)
+                        {
+                            var outputLine = outputTexture.Rows[offsetY1];
+                            for (int x = 0; x < outputTexture.Width; x++)
+                            {
+                                outputLine[x] = (short)(accumLine[x] / countLine[x]);
+                                accumLine[x] = 0;
+                                countLine[x] = 0;
+                            }
+                            offsetY1++;
+
+                            y1++;
+                            epsy -= dy0;
+                        }
                     }
-                    offsetY1++;
 
-                    y1++;
-                    epsy -= dy0;
+                    if (y1 == dy1)
+                    {
+                        var outputLine = outputTexture.Rows[offsetY1];
+                        for (int x = 0; x < outputTexture.Width; x++)
+                            outputLine[x] = (short)(accumLine[x] / countLine[x]);
+                    }
+                    return outputTexture;
                 }
-            }
 
-            if (y1 == dy1)
-            {
-                var outputLine = outputTexture.Rows[offsetY1];
-                for (int x = 0; x < outputTexture.Width; x++)
-                    outputLine[x] = (byte)(accumLine[x] / countLine[x]);
-            }
-            return outputTexture;
-        }
-
-        public static Bitmap<short> Resample(Bitmap<short> inputTexture, int width, int height)
-        {
-            var outputTexture = new Bitmap<short>(width, height);
-
-            var accumLine = new long[width];
-            var countLine = new int[width];
-
-            int offsetY0 = 0;
-            int offsetY1 = 0;
-
-            int epsy = 0;
-
-            int dy0 = inputTexture.Height - 1;
-            int dy1 = outputTexture.Height - 1;
-            int y1 = 0;
-            for (int y0 = 0; y0 <= dy0; y0++)
-            {
-                int epsx = 0;
-
-                int dx0 = inputTexture.Width - 1;
-                int dx1 = outputTexture.Width - 1;
-                int x1 = 0;
-
-                var inputLine = inputTexture.Rows[offsetY0];
-
-                for (int x0 = 0; x0 <= dx0; x0++)
+                public static Bitmap<float> Resample(Bitmap<float> inputTexture, int width, int height)
                 {
-                    accumLine[x1] += inputLine[x0];
-                    countLine[x1]++;
+                    var outputTexture = new Bitmap<float>(width, height);
 
-                    epsx += dx1;
+                    var accumLine = new float[width];
+                    var countLine = new int[width];
 
-                    if (2 * epsx >= dx0)
+                    int offsetY0 = 0;
+                    int offsetY1 = 0;
+
+                    int epsy = 0;
+
+                    int dy0 = inputTexture.Height - 1;
+                    int dy1 = outputTexture.Height - 1;
+                    int y1 = 0;
+                    for (int y0 = 0; y0 <= dy0; y0++)
                     {
-                        x1++;
-                        epsx -= dx0;
+                        int epsx = 0;
+
+                        int dx0 = inputTexture.Width - 1;
+                        int dx1 = outputTexture.Width - 1;
+                        int x1 = 0;
+
+                        var inputLine = inputTexture.Rows[offsetY0];
+
+                        for (int x0 = 0; x0 <= dx0; x0++)
+                        {
+                            accumLine[x1] += inputLine[x0];
+                            countLine[x1]++;
+
+                            epsx += dx1;
+
+                            if (2 * epsx >= dx0)
+                            {
+                                x1++;
+                                epsx -= dx0;
+                            }
+                        }
+                        offsetY0++;
+
+                        epsy += dy1;
+
+                        if (2 * epsy >= dy0)
+                        {
+                            var outputLine = outputTexture.Rows[offsetY1];
+                            for (int x = 0; x < outputTexture.Width; x++)
+                            {
+                                outputLine[x] = (float)(accumLine[x] / countLine[x]);
+                                accumLine[x] = 0;
+                                countLine[x] = 0;
+                            }
+                            offsetY1++;
+
+                            y1++;
+                            epsy -= dy0;
+                        }
                     }
-                }
-                offsetY0++;
 
-                epsy += dy1;
-
-                if (2 * epsy >= dy0)
-                {
-                    var outputLine = outputTexture.Rows[offsetY1];
-                    for (int x = 0; x < outputTexture.Width; x++)
+                    if (y1 == dy1)
                     {
-                        outputLine[x] = (short)(accumLine[x] / countLine[x]);
-                        accumLine[x] = 0;
-                        countLine[x] = 0;
+                        var outputLine = outputTexture.Rows[offsetY1];
+                        for (int x = 0; x < outputTexture.Width; x++)
+                            outputLine[x] = (float)(accumLine[x] / countLine[x]);
                     }
-                    offsetY1++;
-
-                    y1++;
-                    epsy -= dy0;
+                    return outputTexture;
                 }
-            }
-
-            if (y1 == dy1)
-            {
-                var outputLine = outputTexture.Rows[offsetY1];
-                for (int x = 0; x < outputTexture.Width; x++)
-                    outputLine[x] = (short)(accumLine[x] / countLine[x]);
-            }
-            return outputTexture;
-        }
-
-        public static Bitmap<float> Resample(Bitmap<float> inputTexture, int width, int height)
-        {
-            var outputTexture = new Bitmap<float>(width, height);
-
-            var accumLine = new float[width];
-            var countLine = new int[width];
-
-            int offsetY0 = 0;
-            int offsetY1 = 0;
-
-            int epsy = 0;
-
-            int dy0 = inputTexture.Height - 1;
-            int dy1 = outputTexture.Height - 1;
-            int y1 = 0;
-            for (int y0 = 0; y0 <= dy0; y0++)
-            {
-                int epsx = 0;
-
-                int dx0 = inputTexture.Width - 1;
-                int dx1 = outputTexture.Width - 1;
-                int x1 = 0;
-
-                var inputLine = inputTexture.Rows[offsetY0];
-
-                for (int x0 = 0; x0 <= dx0; x0++)
-                {
-                    accumLine[x1] += inputLine[x0];
-                    countLine[x1]++;
-
-                    epsx += dx1;
-
-                    if (2 * epsx >= dx0)
-                    {
-                        x1++;
-                        epsx -= dx0;
-                    }
-                }
-                offsetY0++;
-
-                epsy += dy1;
-
-                if (2 * epsy >= dy0)
-                {
-                    var outputLine = outputTexture.Rows[offsetY1];
-                    for (int x = 0; x < outputTexture.Width; x++)
-                    {
-                        outputLine[x] = (float)(accumLine[x] / countLine[x]);
-                        accumLine[x] = 0;
-                        countLine[x] = 0;
-                    }
-                    offsetY1++;
-
-                    y1++;
-                    epsy -= dy0;
-                }
-            }
-
-            if (y1 == dy1)
-            {
-                var outputLine = outputTexture.Rows[offsetY1];
-                for (int x = 0; x < outputTexture.Width; x++)
-                    outputLine[x] = (float)(accumLine[x] / countLine[x]);
-            }
-            return outputTexture;
-        }
-*/
+        */
         public static EnumerableBitmap<T> Resample<T>(IBitmap<T> inputTexture, int outputWidth, int outputHeight)
         {
             int inputWidth = inputTexture.Width;
@@ -239,10 +239,10 @@ namespace TiffExpress
             var inputRowGroups = ResampleY(inputTexture, outputHeight);
 
             var blockingQueue = new BlockingCollection<Task<T[]>>(16);
-            
-            Task.Run(() => 
+
+            Task.Run(() =>
             {
-                foreach(var inputRows in inputRowGroups)
+                foreach (var inputRows in inputRowGroups)
                     blockingQueue.Add(Task<T[]>.Run(() => ResampleX(inputRows, inputWidth, outputWidth)));
                 blockingQueue.CompleteAdding();
             });
@@ -283,9 +283,12 @@ namespace TiffExpress
 
         private static T[] ResampleX<T>(T[][] inputRows, int inputWidth, int outputWidth)
         {
-            if(typeof(T) == typeof(short))
+            if (typeof(T) == typeof(short))
                 return (T[])(object)ResampleXAsInt16((short[][])(object)inputRows, inputWidth, outputWidth);
-            return null;
+            else if (typeof(T) == typeof(float))
+                return (T[])(object)ResampleXAsFloat((float[][])(object)inputRows, inputWidth, outputWidth);
+            
+            throw new NotSupportedException($"ResampleX does not support {typeof(T)}");
         }
         private static short[] ResampleXAsInt16(short[][] inputRows, int inputWidth, int outputWidth)
         {
@@ -324,6 +327,45 @@ namespace TiffExpress
 
             return outputRow;
         }
+
+        private static float[] ResampleXAsFloat(float[][] inputRows, int inputWidth, int outputWidth)
+        {
+            var outputRow = new float[outputWidth];
+
+            float accum = 0;
+            int count = 0;
+
+            int epsx = 0;
+
+            int dx0 = inputWidth - 1;
+            int dx1 = outputWidth - 1;
+            int x1 = 0;
+
+            for (int x0 = 0; x0 <= dx0; x0++)
+            {
+                foreach (var inputRow in inputRows)
+                    accum += inputRow[x0];
+                count += inputRows.Length;
+
+                epsx += dx1;
+
+                if (2 * epsx >= dx0)
+                {
+                    outputRow[x1] = accum / count;
+                    accum = 0;
+                    count = 0;
+
+                    x1++;
+                    epsx -= dx0;
+                }
+            }
+
+            if (x1 == dx1)
+                outputRow[x1] = accum / count;
+
+            return outputRow;
+        }
+
 
     }
 }
