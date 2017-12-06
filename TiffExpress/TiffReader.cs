@@ -131,12 +131,12 @@ namespace TiffExpress
                             break;
                         case IfdTag.PlanarConfiguration:
                             {
-                                ifd.PlanarConfiguration = (ushort)valueOffset;
+                                ifd.PlanarConfiguration = (PlanarConfiguration)valueOffset;
                             }
                             break;
                         case IfdTag.SampleFormat:
                             {
-                                ifd.SampleFormat = (ushort)valueOffset;
+                                ifd.SampleFormat = (SampleFormat)valueOffset;
                             }
                             break;
                         case IfdTag.StripOffsets:
@@ -246,7 +246,7 @@ namespace TiffExpress
                 throw new NotSupportedException($"Compression not supported: {ifd.Compression}");
             if (ifd.SamplesPerPixel != 1)
                 throw new NotSupportedException($"SamplesPerPixel must be 1: {ifd.SamplesPerPixel}");
-            if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != 1)
+            if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != PlanarConfiguration.Chunky)
                 throw new NotSupportedException($"PlanarConfiguration must be ChunkyFormat: {ifd.PlanarConfiguration}");
 
             int bytesPerPixel = ifd.SamplesPerPixel * (ifd.BitsPerSample >> 3);
@@ -280,7 +280,7 @@ namespace TiffExpress
             {
                 if (ifd.BitsPerSample == 8)
                 {
-                    if (ifd.SampleFormat == 1) // 1 unsigned, 2 signed, 3 float
+                    if (ifd.SampleFormat == SampleFormat.Unsigned || ifd.SampleFormat == SampleFormat.Signed)
                     {
                         // var output = new byte[width];
                         // Buffer.BlockCopy(row, 0, output, 0, width + width);
@@ -290,7 +290,7 @@ namespace TiffExpress
                 }
                 else if (ifd.BitsPerSample == 16)
                 {
-                    if (ifd.SampleFormat == 1 || ifd.SampleFormat == 2)
+                    if (ifd.SampleFormat == SampleFormat.Unsigned || ifd.SampleFormat == SampleFormat.Signed)
                     {
                         var output = new short[row.Length / 2];
                         if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)
@@ -309,7 +309,7 @@ namespace TiffExpress
                 }
                 else if (ifd.BitsPerSample == 32)
                 {
-                    if (ifd.SampleFormat == 3)
+                    if (ifd.SampleFormat == SampleFormat.FloatingPoint)
                     {
                         var output = new float[row.Length / 4];
                         if (_reader.StreamIsLittleEndian != BitConverter.IsLittleEndian)

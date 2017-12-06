@@ -82,6 +82,17 @@ namespace PlanetBuilder.Planets
                 // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();
                 // Console.WriteLine($"Resampling used {sw.Elapsed}");
 
+                using(var tiffWriter = new TiffWriter(File.OpenWrite($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif")))
+                {
+                    var bitmap = _elevationSectorBitmap.Convert((p) => {return (ushort)(p - short.MinValue);});
+                    tiffWriter.WriteImageFile(bitmap);
+                }
+                using(var tiffReader2 = new TiffReader(File.OpenRead($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif")))
+                {
+                    var bitmap = tiffReader2.ReadImageFile<short>().ToBitmap();
+                }
+
+
                 TextureHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.png", _elevationSectorBitmap);
 
                 int width = 2880;

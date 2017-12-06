@@ -66,6 +66,12 @@ namespace TiffExpress
 
         private ImageFileDirectory WriteImageFileDirectory(ImageFileDirectory ifd)
         {
+            if(ifd.Entries.TryGetValue(IfdTag.StripOffsets, out var stripOffsetsEntry))
+                WriteArrayField(stripOffsetsEntry, ifd.StripOffsets);
+
+            if(ifd.Entries.TryGetValue(IfdTag.StripByteCounts, out var stripByteCountsEntry))
+                WriteArrayField(stripByteCountsEntry, ifd.StripByteCounts);
+
             UpdateLastReference();
 
             if (_bigTiff)
@@ -90,10 +96,28 @@ namespace TiffExpress
                 }
             }
 
+            _lastReferencePosition = _writer.BaseStream.Position;
             WriteReference(0);
 
             return ifd;
         }
+
+        private void PrepareImageFileDirectory(ImageFileDirectory ifd)
+        {
+            ifd.Entries[IfdTag.ImageWidth] = new IfdEntry { Tag = IfdTag.ImageWidth, FieldType = FieldType.UInt32, NumValues = 1, ValueOffset = ifd.ImageWidth };
+            ifd.Entries[IfdTag.ImageHeight] = new IfdEntry { Tag = IfdTag.ImageHeight, FieldType = FieldType.UInt32, NumValues = 1, ValueOffset = ifd.ImageHeight };
+            ifd.Entries[IfdTag.BitsPerSample] = new IfdEntry { Tag = IfdTag.BitsPerSample, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = ifd.BitsPerSample };
+            ifd.Entries[IfdTag.PhotometricInterpretation] = new IfdEntry { Tag = IfdTag.PhotometricInterpretation, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (ushort)ifd.PhotometricInterpretation };
+            ifd.Entries[IfdTag.Compression] = new IfdEntry { Tag = IfdTag.Compression, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (ushort)ifd.Compression };
+            ifd.Entries[IfdTag.SamplesPerPixel] = new IfdEntry { Tag = IfdTag.SamplesPerPixel, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (ushort)ifd.SamplesPerPixel };
+            ifd.Entries[IfdTag.RowsPerStrip] = new IfdEntry { Tag = IfdTag.RowsPerStrip, FieldType = FieldType.UInt32, NumValues = 1, ValueOffset = (uint)ifd.RowsPerStrip };
+            ifd.Entries[IfdTag.PlanarConfiguration] = new IfdEntry { Tag = IfdTag.PlanarConfiguration, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (uint)ifd.PlanarConfiguration };
+            ifd.Entries[IfdTag.SampleFormat] = new IfdEntry { Tag = IfdTag.SampleFormat, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (uint)ifd.SampleFormat };
+
+            ifd.Entries[IfdTag.StripOffsets] = new IfdEntry { Tag = IfdTag.StripOffsets, FieldType = _bigTiff ? FieldType.UInt64 : FieldType.UInt32 };
+            ifd.Entries[IfdTag.StripByteCounts] = new IfdEntry { Tag = IfdTag.StripByteCounts, FieldType = _bigTiff ? FieldType.UInt64 : FieldType.UInt32 };
+        }
+
 
         private void WriteReference(long position)
         {
@@ -143,16 +167,9 @@ namespace TiffExpress
 
         public void WriteImageFile<T>(ImageFileDirectory ifd, IBitmap<T> bitmap)
         {
-            ifd.ImageWidth = bitmap.Width;
-            ifd.ImageHeight = bitmap.Height;
-            WriteImageFileInternal(ifd, bitmap, 0, 0, bitmap.Width, bitmap.Height);
+            WriteImageFile(ifd, bitmap, 0, 0, bitmap.Width, bitmap.Height);
         }
         public void WriteImageFile<T>(ImageFileDirectory ifd, IBitmap<T> bitmap, int offsetX, int offsetY, int imageWidth, int imageHeight)
-        {
-            WriteImageFileInternal(ifd, bitmap, offsetX, offsetY, imageWidth, imageHeight);
-        }
-
-        private void WriteImageFileInternal<T>(ImageFileDirectory ifd, IBitmap<T> bitmap, int offsetX, int offsetY, int imageWidth, int imageHeight)
         {
             if (ifd.PhotometricInterpretation != PhotometricInterpretation.BlackIsZero)
                 throw new NotSupportedException($"PhotometricInterpretation must be BlackIsZero: {ifd.PhotometricInterpretation}");
@@ -160,16 +177,56 @@ namespace TiffExpress
                 throw new NotSupportedException($"Compression not supported: {ifd.Compression}");
             if (ifd.SamplesPerPixel != 1)
                 throw new NotSupportedException($"SamplesPerPixel must be 1: {ifd.SamplesPerPixel}");
-            if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != 1)
+            if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != PlanarConfiguration.Chunky)
                 throw new NotSupportedException($"PlanarConfiguration must be ChunkyFormat: {ifd.PlanarConfiguration}");
 
+            ifd.ImageWidth = imageWidth;
+            ifd.ImageHeight = imageHeight;
+            // ifd.PhotometricInterpretation = PhotometricInterpretation.BlackIsZero;
+            // ifd.Compression = Compression.NoCompression;
+            // ifd.SamplesPerPixel = 1;
+
+            if (typeof(T) == typeof(byte))
+            {
+                ifd.BitsPerSample = 8;
+                ifd.SampleFormat = SampleFormat.Unsigned;
+            }
+            else if (typeof(T) == typeof(sbyte))
+            {
+                ifd.BitsPerSample = 8;
+                ifd.SampleFormat = SampleFormat.Signed;
+            }
+            if (typeof(T) == typeof(ushort))
+            {
+                ifd.BitsPerSample = 16;
+                ifd.SampleFormat = SampleFormat.Unsigned;
+            }
+            else if (typeof(T) == typeof(short))
+            {
+                ifd.BitsPerSample = 16;
+                ifd.SampleFormat = SampleFormat.Signed;
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                ifd.BitsPerSample = 32;
+                ifd.SampleFormat = SampleFormat.FloatingPoint;
+            }
+            WriteBitmap(ifd, bitmap, offsetX, offsetY, imageWidth, imageHeight);
+
+            PrepareImageFileDirectory(ifd);
+
+            WriteImageFileDirectory(ifd);
+        }
+
+        private void WriteBitmap<T>(ImageFileDirectory ifd, IBitmap<T> bitmap, int offsetX, int offsetY, int imageWidth, int imageHeight)
+        {
             int bytesPerPixel = ifd.SamplesPerPixel * (ifd.BitsPerSample >> 3);
 
             var buffer = new byte[bytesPerPixel * imageWidth];
 
             var stripOffsets = new List<long>();
             var stripByteCounts = new List<long>();
-            foreach(var row in bitmap.GetRows())
+            foreach (var row in bitmap.GetRows())
             {
                 stripOffsets.Add(_writer.BaseStream.Position);
                 stripByteCounts.Add(buffer.Length);
@@ -178,6 +235,7 @@ namespace TiffExpress
                 _writer.BaseStream.Write(buffer, 0, buffer.Length);
             }
 
+            ifd.RowsPerStrip = 1;
             ifd.StripOffsets = stripOffsets.ToArray();
             ifd.StripByteCounts = stripByteCounts.ToArray();
         }

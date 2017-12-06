@@ -9,12 +9,12 @@ namespace TiffExpress.Tiff
         public int ImageWidth;
         public int ImageHeight;
         public ushort BitsPerSample;
-        public PhotometricInterpretation PhotometricInterpretation;
-        public Compression Compression;
-        public ushort SamplesPerPixel;
+        public PhotometricInterpretation PhotometricInterpretation = PhotometricInterpretation.BlackIsZero;
+        public Compression Compression = Compression.NoCompression;
+        public ushort SamplesPerPixel = 1;
         public uint RowsPerStrip;
-        public ushort PlanarConfiguration; // 1 = Chunky format, 2 = Planar format
-        public ushort SampleFormat; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
+        public PlanarConfiguration PlanarConfiguration = PlanarConfiguration.Chunky;
+        public SampleFormat SampleFormat = SampleFormat.Unsigned; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
 
         public long[] StripOffsets;
         public long[] StripByteCounts;

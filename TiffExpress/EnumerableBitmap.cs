@@ -12,11 +12,11 @@ namespace TiffExpress
 
         private IEnumerable<T[]> _rows;
 
-        protected EnumerableBitmap(int width, int height)
-        {
-            Width = width;
-            Height = height;
-        }
+        // protected EnumerableBitmap(int width, int height)
+        // {
+        //     Width = width;
+        //     Height = height;
+        // }
 
         public EnumerableBitmap(int width, int height, IEnumerable<T[]> rows)
         {
