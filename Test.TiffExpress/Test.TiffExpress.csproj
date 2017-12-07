@@ -16,4 +16,9 @@
     <ProjectReference Include="..\TiffExpress\TiffExpress.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="TestData\gray8.tif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
