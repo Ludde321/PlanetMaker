@@ -83,113 +83,256 @@ namespace TiffExpress
 
                 long numFields = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt16();
 
-                for (int i = 0; i < numFields; i++)
+                int sizeInBytes = (int)numFields * (2 + 2 + 2 * (_bigTiff ? 8 : 4)) + (_bigTiff ? 8 : 4);
+                using (var ifdReader = new BinaryReader2(new MemoryStream(_reader.ReadBytes(sizeInBytes))))
                 {
-                    IfdTag tag = (IfdTag)_reader.ReadUInt16();
-                    FieldType type = (FieldType)_reader.ReadUInt16();
-                    long numValues = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
-                    long valueOffset = _bigTiff ? _reader.ReadInt64() : _reader.ReadUInt32();
+                    ifdReader.StreamIsLittleEndian = _reader.StreamIsLittleEndian;
 
-                    ifd.Entries.Add(tag, new IfdEntry { Tag = tag, FieldType = type, NumValues = numValues, ValueOffset = valueOffset });
-
-                    switch (tag)
+                    for (int i = 0; i < numFields; i++)
                     {
-                        case IfdTag.ImageWidth:
-                            {
-                                ifd.ImageWidth = (int)valueOffset;
-                            }
-                            break;
-                        case IfdTag.ImageHeight:
-                            {
-                                ifd.ImageHeight = (int)valueOffset;
-                            }
-                            break;
-                        case IfdTag.BitsPerSample:
-                            {
-                                ifd.BitsPerSample = (ushort)valueOffset;
-                            }
-                            break;
-                        case IfdTag.PhotometricInterpretation:
-                            {
-                                ifd.PhotometricInterpretation = (PhotometricInterpretation)valueOffset;
-                            }
-                            break;
-                        case IfdTag.Compression:
-                            {
-                                ifd.Compression = (Compression)valueOffset;
-                            }
-                            break;
-                        case IfdTag.SamplesPerPixel:
-                            {
-                                ifd.SamplesPerPixel = (ushort)valueOffset;
-                            }
-                            break;
-                        case IfdTag.RowsPerStrip:
-                            {
-                                ifd.RowsPerStrip = (uint)valueOffset;
-                            }
-                            break;
-                        case IfdTag.PlanarConfiguration:
-                            {
-                                ifd.PlanarConfiguration = (PlanarConfiguration)valueOffset;
-                            }
-                            break;
-                        case IfdTag.SampleFormat:
-                            {
-                                ifd.SampleFormat = (SampleFormat)valueOffset;
-                            }
-                            break;
-                        case IfdTag.StripOffsets:
-                        case IfdTag.StripByteCounts:
-                            break;
-                        default:
-                            {
-                                Console.WriteLine($"Tag: {tag} Type: {type} NumValues: {numValues} Value/Offset: {valueOffset}");
-                            }
-                            break;
+                        IfdTag tag = (IfdTag)ifdReader.ReadUInt16();
+                        FieldType fieldType = (FieldType)ifdReader.ReadUInt16();
+                        int numValues = _bigTiff ? (int)ifdReader.ReadInt64() : (int)ifdReader.ReadUInt32();
+
+                        long pos = ifdReader.Stream.Position;
+
+                        switch (tag)
+                        {
+                            case IfdTag.ImageWidth:
+                                {
+                                    ifd.ImageWidth = (int)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.ImageHeight:
+                                {
+                                    ifd.ImageHeight = (int)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.BitsPerSample:
+                                {
+                                    ifd.BitsPerSample = (ushort)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.PhotometricInterpretation:
+                                {
+                                    ifd.PhotometricInterpretation = (PhotometricInterpretation)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.Compression:
+                                {
+                                    ifd.Compression = (Compression)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.SamplesPerPixel:
+                                {
+                                    ifd.SamplesPerPixel = (ushort)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.RowsPerStrip:
+                                {
+                                    ifd.RowsPerStrip = (uint)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.PlanarConfiguration:
+                                {
+                                    ifd.PlanarConfiguration = (PlanarConfiguration)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.SampleFormat:
+                                {
+                                    ifd.SampleFormat = (SampleFormat)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.StripOffsets:
+                                {
+                                    _reader.Stream.Position = ReadFieldValue(ifdReader, fieldType);
+                                    ifd.StripOffsets = ReadFieldValues(_reader, fieldType, numValues);
+                                }
+                                break;
+                            case IfdTag.StripByteCounts:
+                                {
+                                    _reader.Stream.Position = ReadFieldValue(ifdReader, fieldType);
+                                    ifd.StripByteCounts = ReadFieldValues(_reader, fieldType, numValues);
+                                }
+                                break;
+                            default:
+                                {
+                                    long valueOffset = ReadFieldValue(ifdReader, fieldType);
+                                    ifd.Entries[tag] = new IfdEntry { Tag = tag, FieldType = fieldType, ValueOffset = valueOffset };
+                                    Console.WriteLine($"Tag: {tag} Type: {fieldType} NumValues: {numValues} ValueOffset: {valueOffset}");
+                                }
+                                break;
+                        }
+
+                        ifdReader.Stream.Position = pos + (_bigTiff ? 8 : 4);
+
                     }
+
+                    if (_bigTiff)
+                        ifdOffset = ifdReader.ReadInt64();
+                    else
+                        ifdOffset = ifdReader.ReadUInt32();
                 }
                 ifdList.Add(ifd);
-
-                if (_bigTiff)
-                    ifdOffset = _reader.ReadInt64();
-                else
-                    ifdOffset = _reader.ReadUInt32();
-
-
-                IfdEntry entry;
-                if (ifd.Entries.TryGetValue(IfdTag.StripOffsets, out entry))
-                    ifd.StripOffsets = ReadArrayField(entry);
-
-                if (ifd.Entries.TryGetValue(IfdTag.StripByteCounts, out entry))
-                    ifd.StripByteCounts = ReadArrayField(entry);
             }
 
             return ifdList.ToArray();
         }
 
-        private long[] ReadArrayField(IfdEntry entry)
-        {
-            _reader.Stream.Position = entry.ValueOffset;
-            var array = new long[entry.NumValues];
+        // private Array ReadArrayValues(BinaryReader2 reader, FieldType fieldType, int numValues)
+        // {
+        //     switch(fieldType)
+        //     {
+        //         case FieldType.Byte:
+        //         case FieldType.Ascii:
+        //             return reader.ReadBytes(numValues);
+        //         case FieldType.SByte:
+        //             return reader.ReadSBytes(numValues);
+        //         case FieldType.UInt16:
+        //         {
+        //             var array = new ushort[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadUInt16();
+        //             return array;
+        //         }
+        //         case FieldType.Int16:
+        //         {
+        //             var array = new short[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadInt16();
+        //             return array;
+        //         }
+        //         case FieldType.UInt32:
+        //         {
+        //             var array = new uint[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadUInt32();
+        //             return array;
+        //         }
+        //         case FieldType.Int32:
+        //         {
+        //             var array = new int[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadInt32();
+        //             return array;
+        //         }
+        //         case FieldType.Float:
+        //         {
+        //             var array = new float[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadSingle();
+        //             return array;
+        //         }
+        //         case FieldType.Double:
+        //         {
+        //             var array = new double[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadDouble();
+        //             return array;
+        //         }
+        //         case FieldType.UInt64:
+        //         {
+        //             var array = new ulong[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadUInt64();
+        //             return array;
+        //         }
+        //         case FieldType.Int64:
+        //         {
+        //             var array = new long[numValues];
+        //             for(int i=0;i<numValues;i++)
+        //                 array[i] = reader.ReadInt64();
+        //             return array;
+        //         }
+        //         default:
+        //             Console.WriteLine($"Unknown FieldType: {fieldType} NumValues: {numValues}");
+        //         break;
+        //     }
+        //     return null;
+        // }
 
-            if (entry.FieldType == FieldType.UInt64)
+        private long ReadFieldValue(BinaryReader2 reader, FieldType fieldType)
+        {
+            switch (fieldType)
             {
-                for (int i = 0; i < entry.NumValues; i++)
-                    array[i] = _reader.ReadInt64();
+                case FieldType.Int64:
+                    return reader.ReadInt64();
+                case FieldType.UInt64:
+                    return reader.ReadInt64();
+                case FieldType.Int32:
+                    return reader.ReadInt32();
+                case FieldType.UInt32:
+                    return reader.ReadUInt32();
+                case FieldType.Int16:
+                    return reader.ReadInt16();
+                case FieldType.UInt16:
+                    return reader.ReadUInt16();
+                case FieldType.Byte:
+                    return reader.ReadByte();
+                case FieldType.SByte:
+                    return reader.ReadSByte();
             }
-            else if (entry.FieldType == FieldType.UInt32)
+            Console.WriteLine($"Unknown field type {fieldType}");
+            return 0;
+        }
+
+        private long[] ReadFieldValues(BinaryReader2 reader, FieldType fieldType, int numValues)
+        {
+            var array = new long[numValues];
+
+            switch (fieldType)
             {
-                for (int i = 0; i < entry.NumValues; i++)
-                    array[i] = _reader.ReadUInt32();
+                case FieldType.Int64:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadInt64();
+                    }
+                    break;
+                case FieldType.UInt64:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadInt64();
+                    }
+                    break;
+                case FieldType.Int32:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadInt32();
+                    }
+                    break;
+                case FieldType.UInt32:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadUInt32();
+                    }
+                    break;
+                case FieldType.Int16:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadInt16();
+                    }
+                    break;
+                case FieldType.UInt16:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadUInt16();
+                    }
+                    break;
+                case FieldType.SByte:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadSByte();
+                    }
+                    break;
+                case FieldType.Byte:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = _reader.ReadByte();
+                    }
+                    break;
+                default:
+                    throw new Exception($"Unknown field type {fieldType}");
             }
-            else if (entry.FieldType == FieldType.UInt16)
-            {
-                for (int i = 0; i < entry.NumValues; i++)
-                    array[i] = _reader.ReadUInt16();
-            }
-            else
-                throw new Exception($"Unknown field type {entry.FieldType} for tag {entry.Tag}");
 
             return array;
         }

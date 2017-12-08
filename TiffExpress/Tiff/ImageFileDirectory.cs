@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace TiffExpress.Tiff
 {
@@ -18,6 +20,32 @@ namespace TiffExpress.Tiff
 
         public long[] StripOffsets;
         public long[] StripByteCounts;
-    }
+
+        // private T GetValue<T>(IfdTag tag, T defaultValue = default(T))
+        // {
+        //     if (Entries.TryGetValue(tag, out var entry))
+        //         if (entry.Values.Length == 1)
+        //             return (T)Convert.ChangeType(entry.Values.GetValue(0), typeof(T));
+        //     return defaultValue;
+        // }
+
+        // private void SetValue<T>(IfdTag tag, FieldType fieldType, T value)
+        // {
+        //     Entries[tag] = new IfdEntry { Tag = tag, FieldType = fieldType, Values = new T[] { value } };
+        // }
+
+        // private T[] GetValues<T>(IfdTag tag)
+        // {
+        //     if (Entries.TryGetValue(tag, out var entry))
+        //     {
+        //         var array = new T[entry.Values.Length];
+        //         for(int i=0;i<entry.Values.Length;i++)
+        //             array[i] = (T)Convert.ChangeType(entry.Values.GetValue(i), typeof(T));
+        //         return array;
+        //     }
+        //     return null;
+        // }
+
+   }
 
 }

@@ -64,7 +64,7 @@ namespace TiffExpress
             WriteReference(0);
         }
 
-        private ImageFileDirectory WriteImageFileDirectory(ImageFileDirectory ifd)
+        private void WriteImageFileDirectory(ImageFileDirectory ifd)
         {
             if(ifd.Entries.TryGetValue(IfdTag.StripOffsets, out var stripOffsetsEntry))
                 WriteArrayField(stripOffsetsEntry, ifd.StripOffsets);
@@ -98,8 +98,6 @@ namespace TiffExpress
 
             _lastReferencePosition = _writer.BaseStream.Position;
             WriteReference(0);
-
-            return ifd;
         }
 
         private void PrepareImageFileDirectory(ImageFileDirectory ifd)

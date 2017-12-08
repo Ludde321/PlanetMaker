@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 namespace TiffExpress
 {
@@ -85,6 +86,12 @@ namespace TiffExpress
             return result;
         }
 
+        public sbyte[] ReadSBytes(int count)
+        {
+            var bytes = ReadBytes(count);
+            return bytes.Cast<sbyte>().ToArray();
+        }
+
         public short ReadInt16()
         {
             FillBuffer(2);
@@ -119,7 +126,7 @@ namespace TiffExpress
         {
             FillBuffer(8);
             if (StreamIsLittleEndian != BitConverter.IsLittleEndian)
-                Array.Reverse(_buffer, 0, 4);
+                Array.Reverse(_buffer, 0, 8);
             return BitConverter.ToInt64(_buffer, 0);
         }
         public ulong ReadUInt64()

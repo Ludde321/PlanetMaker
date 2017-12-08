@@ -6,10 +6,6 @@ namespace TiffExpress.Tiff
         public FieldType FieldType;
         public long NumValues;
         public long ValueOffset;
-
-        public IfdEntry()
-        {
-        }
     }
 
 }
