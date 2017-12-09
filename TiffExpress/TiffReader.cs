@@ -337,6 +337,14 @@ namespace TiffExpress
             return array;
         }
 
+        public static Bitmap<T> LoadBitmap<T>(Stream stream)
+        {
+            using(var tiffReader = new TiffReader(stream))
+            {
+                return tiffReader.ReadImageFile<T>().ToBitmap();
+            }
+        }
+
         public EnumerableBitmap<T> ReadImageFile<T>()
         {
             return ReadImageFile<T>(ImageFileDirectories[0]);

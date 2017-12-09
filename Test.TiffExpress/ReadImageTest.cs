@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Test.TiffExpress
 {
-    public class UnitTest1
+    public class ReadImageTest
     {
         [Fact]
         public void TestReadGray8()

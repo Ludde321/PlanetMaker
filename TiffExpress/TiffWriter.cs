@@ -66,20 +66,21 @@ namespace TiffExpress
 
         private void WriteImageFileDirectory(ImageFileDirectory ifd)
         {
-            if(ifd.Entries.TryGetValue(IfdTag.StripOffsets, out var stripOffsetsEntry))
+            if (ifd.Entries.TryGetValue(IfdTag.StripOffsets, out var stripOffsetsEntry))
                 WriteArrayField(stripOffsetsEntry, ifd.StripOffsets);
 
-            if(ifd.Entries.TryGetValue(IfdTag.StripByteCounts, out var stripByteCountsEntry))
+            if (ifd.Entries.TryGetValue(IfdTag.StripByteCounts, out var stripByteCountsEntry))
                 WriteArrayField(stripByteCountsEntry, ifd.StripByteCounts);
 
             UpdateLastReference();
 
-            if (_bigTiff)
-                _writer.Write((long)ifd.Entries.Count);
-            else
-                _writer.Write((ushort)ifd.Entries.Count);
+            var entries = ifd.Entries.Values.OrderBy(v => v.Tag).ToArray();
 
-            var entries = ifd.Entries.Values.OrderBy(v => v.Tag);
+            if (_bigTiff)
+                _writer.Write((long)entries.Length);
+            else
+                _writer.Write((ushort)entries.Length);
+
             foreach (var entry in entries)
             {
                 _writer.Write((ushort)entry.Tag);
@@ -98,6 +99,49 @@ namespace TiffExpress
 
             _lastReferencePosition = _writer.BaseStream.Position;
             WriteReference(0);
+        }
+
+        private void WriteFieldValue(FieldType fieldType, long value)
+        {
+            int paddingBytes = (_bigTiff ? 8 : 4);
+            switch (fieldType)
+            {
+                case FieldType.Int64:
+                    _writer.Write((long)value);
+                    paddingBytes -= 8;
+                    break;
+                case FieldType.UInt64:
+                    _writer.Write((ulong)value);
+                    paddingBytes -= 8;
+                    break;
+                case FieldType.Int32:
+                    _writer.Write((int)value);
+                    paddingBytes -= 4;
+                    break;
+                case FieldType.UInt32:
+                    _writer.Write((uint)value);
+                    paddingBytes -= 4;
+                    break;
+                case FieldType.Int16:
+                    _writer.Write((short)value);
+                    paddingBytes -= 2;
+                    break;
+                case FieldType.UInt16:
+                    _writer.Write((ushort)value);
+                    paddingBytes -= 2;
+                    break;
+                case FieldType.Byte:
+                    _writer.Write((byte)value);
+                    paddingBytes -= 1;
+                    break;
+                case FieldType.SByte:
+                    _writer.Write((sbyte)value);
+                    paddingBytes -= 1;
+                    break;
+                default:
+                    throw new Exception($"Unknown field type {fieldType}");
+            }
+            _writer.Write(new byte[paddingBytes]);
         }
 
         private void PrepareImageFileDirectory(ImageFileDirectory ifd)
@@ -157,10 +201,11 @@ namespace TiffExpress
                 throw new Exception($"Unknown field type {entry.FieldType} for tag {entry.Tag}");
         }
 
-        public void WriteImageFile<T>(IBitmap<T> bitmap)
+        public ImageFileDirectory WriteImageFile<T>(IBitmap<T> bitmap)
         {
             var ifd = new ImageFileDirectory();
             WriteImageFile<T>(ifd, bitmap);
+            return ifd;
         }
 
         public void WriteImageFile<T>(ImageFileDirectory ifd, IBitmap<T> bitmap)
