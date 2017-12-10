@@ -27,26 +27,51 @@ namespace PlanetBuilder.Planets
         public double Lat1;
         public double Lon1;
 
-        private double _sx,_sy,_sx0,_sy0;
+        private double _sx, _sy, _sx0, _sy0;
 
         public MarsSector()
         {
             PlanetRadius = 3396190;
-            ElevationScale = 3;
-            NumSegments = 1200;
+            ElevationScale = 2.5;
+            NumSegments = 800;
             PlanetProjection = Projection.Equirectangular;
 
             // Gale crater 5.4°S 137.8°E
-            Lat0 = MathHelper.ToRadians(-5.4 + 3.0);
-            Lon0 = MathHelper.ToRadians(137.8 - 3.0);
-            Lat1 = MathHelper.ToRadians(-5.4 - 3.0);
-            Lon1 = MathHelper.ToRadians(137.8 + 3.0);
+            // Lat0 = MathHelper.ToRadians(-5.4 + 3.0);
+            // Lon0 = MathHelper.ToRadians(137.8 - 3.0);
+            // Lat1 = MathHelper.ToRadians(-5.4 - 3.0);
+            // Lon1 = MathHelper.ToRadians(137.8 + 3.0);
 
             // Orcus Patera
             // Lat0 = MathHelper.ToRadians(18);
             // Lon0 = MathHelper.ToRadians(170);
             // Lat1 = MathHelper.ToRadians(8);
             // Lon1 = MathHelper.ToRadians(180);
+
+            // Jezero crater 18.855°N 77.519°E 
+            // Lat0 = MathHelper.ToRadians(18.855 + 5.0);
+            // Lon0 = MathHelper.ToRadians(77.519 - 5.0);
+            // Lat1 = MathHelper.ToRadians(18.855 - 5.0);
+            // Lon1 = MathHelper.ToRadians(77.519 + 5.0);
+
+            // Jezero crater AREA 18.855°N 77.519°E 
+            // Lat0 = MathHelper.ToRadians(21.855 + 5.0);
+            // Lon0 = MathHelper.ToRadians(76.519 - 5.0);
+            // Lat1 = MathHelper.ToRadians(21.855 - 5.0);
+            // Lon1 = MathHelper.ToRadians(76.519 + 5.0);
+
+            // NE Syrtis 18°N 77°E 
+            Lat0 = MathHelper.ToRadians(18.0 + 3.0);
+            Lon0 = MathHelper.ToRadians(77.0 - 3.0);
+            Lat1 = MathHelper.ToRadians(18.0 - 3.0);
+            Lon1 = MathHelper.ToRadians(77.0 + 3.0);
+
+
+            // Gusev crater 14.5°S 175.4°E (blurry area)
+            // Lat0 = MathHelper.ToRadians(-14.5 + 2.5);
+            // Lon0 = MathHelper.ToRadians(175.4 - 2.5);
+            // Lat1 = MathHelper.ToRadians(-14.5 - 2.5);
+            // Lon1 = MathHelper.ToRadians(175.4 + 2.5);
         }
 
         public void Create()
@@ -82,9 +107,9 @@ namespace PlanetBuilder.Planets
                 // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();
                 // Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                using(var tiffWriter = new TiffWriter(File.OpenWrite($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif")))
+                using (var tiffWriter = new TiffWriter(File.OpenWrite($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif")))
                 {
-                    var bitmap = _elevationSectorBitmap.Convert((p) => {return (ushort)(p - short.MinValue);});
+                    var bitmap = _elevationSectorBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
                     tiffWriter.WriteImageFile(bitmap);
                 }
 
@@ -132,7 +157,7 @@ namespace PlanetBuilder.Planets
 
         private double ComputeModelElevationTop(Vector3d v, double lat, double lon)
         {
-            var t = MathHelper.SphericalToTextureCoords(lat, lon);
+            var t = MathHelper.SphericalToTextureCoords(v);//lat, lon);
 
             double sy = t.y * _sy - _sy0;
             double sx = t.x * _sx - _sx0;

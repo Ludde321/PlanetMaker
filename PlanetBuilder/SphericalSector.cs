@@ -40,9 +40,9 @@ namespace PlanetBuilder.Planets
                 {
                     double lon = longitudeOffset0 + dLon * x;
 
-                    double nx = Math.Cos(lon) * cosLat;
+                    double nx = Math.Sin(lon) * cosLat;
                     double ny = sinLat;
-                    double nz = Math.Sin(lon) * cosLat;
+                    double nz = Math.Cos(lon) * cosLat;
 
                     var v = new Vector3d(nx, ny, nz);
                     double rTop = ComputeRadiusTop(v, lat, lon);
@@ -56,24 +56,24 @@ namespace PlanetBuilder.Planets
             int ofsY = 0;
             for (int y = 0; y < latitudeSegments - 1; y++)
             {
-                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2 + 1, ofsY + 1));
-                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2, ofsY + longitudeSegments2 + 1));
+                Triangles.Add(new Triangle(ofsY, ofsY + 1, ofsY + longitudeSegments2 + 1));
+                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2 + 1, ofsY + longitudeSegments2));
 
                 for (int x = 0; x < longitudeSegments - 1; x++)
                 {
                     int ofsY0 = ofsY;
                     int ofsY1 = ofsY0 + longitudeSegments2;
-                    Triangles.Add(new Triangle(ofsY0, ofsY1 + 2, ofsY1));
-                    Triangles.Add(new Triangle(ofsY1 + 2, ofsY0, ofsY0 + 2));
+                    Triangles.Add(new Triangle(ofsY0, ofsY1, ofsY1 + 2));
+                    Triangles.Add(new Triangle(ofsY1 + 2, ofsY0 + 2, ofsY0));
 
-                    Triangles.Add(new Triangle(ofsY0 + 1, ofsY1 + 1, ofsY1 + 3));
-                    Triangles.Add(new Triangle(ofsY1 + 3, ofsY0 + 3, ofsY0 + 1));
+                    Triangles.Add(new Triangle(ofsY0 + 1, ofsY1 + 3, ofsY1 + 1));
+                    Triangles.Add(new Triangle(ofsY1 + 3, ofsY0 + 1, ofsY0 + 3));
 
                     ofsY += 2;
                 }
 
-                Triangles.Add(new Triangle(ofsY, ofsY + 1, ofsY + longitudeSegments2 + 1));
-                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2 + 1, ofsY + longitudeSegments2));
+                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2 + 1, ofsY + 1));
+                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments2, ofsY + longitudeSegments2 + 1));
 
                 ofsY += 2;
             }
@@ -82,11 +82,11 @@ namespace PlanetBuilder.Planets
             int ofsYB = longitudeSegments2 * (latitudeSegments - 1);
             for (int x = 0; x < longitudeSegments - 1; x++)
             {
-                Triangles.Add(new Triangle(ofsYT, ofsYT + 1, ofsYT + 3));
-                Triangles.Add(new Triangle(ofsYT, ofsYT + 3, ofsYT + 2));
+                Triangles.Add(new Triangle(ofsYT, ofsYT + 3, ofsYT + 1));
+                Triangles.Add(new Triangle(ofsYT, ofsYT + 2, ofsYT + 3));
 
-                Triangles.Add(new Triangle(ofsYB, ofsYB + 3, ofsYB + 1));
-                Triangles.Add(new Triangle(ofsYB, ofsYB + 2, ofsYB + 3));
+                Triangles.Add(new Triangle(ofsYB, ofsYB + 1, ofsYB + 3));
+                Triangles.Add(new Triangle(ofsYB, ofsYB + 3, ofsYB + 2));
 
                 ofsYT += 2;
                 ofsYB += 2;
