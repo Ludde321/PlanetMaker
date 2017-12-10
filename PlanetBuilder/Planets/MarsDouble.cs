@@ -34,10 +34,10 @@ namespace PlanetBuilder.Planets
 
         public MarsDouble()
         {
-            PlanetRadius = 3396190;
-            ElevationScale = 2.5;
+            // PlanetRadius = 3396190;
+            // ElevationScale = 2.5;
             NumSegments = 1200;
-            PlanetProjection = Projection.Equirectangular;
+            // PlanetProjection = Projection.Equirectangular;
 
             // Gale crater 5.4°S 137.8°E
             LatT0 = MathHelper.ToRadians(-5.4 + 3.0);
