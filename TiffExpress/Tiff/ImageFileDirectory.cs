@@ -21,6 +21,19 @@ namespace TiffExpress.Tiff
         public long[] StripOffsets;
         public long[] StripByteCounts;
 
+        // --
+        public string Artist;
+        public string Copyright;
+        public DateTime DateTime;
+        public string Software;
+        public ushort ExtraSamples;
+        public string HostComputer;
+        public string ImageDescription;
+        public string Make;
+        public string Model;
+        public ushort Orientation;
+
+
         // private T GetValue<T>(IfdTag tag, T defaultValue = default(T))
         // {
         //     if (Entries.TryGetValue(tag, out var entry))
@@ -46,6 +59,6 @@ namespace TiffExpress.Tiff
         //     return null;
         // }
 
-   }
+    }
 
 }

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TiffExpress.Tiff;
@@ -110,7 +112,17 @@ namespace TiffExpress
                                 break;
                             case IfdTag.BitsPerSample:
                                 {
-                                    ifd.BitsPerSample = (ushort)ReadFieldValue(ifdReader, fieldType);
+                                    if (numValues == 1)
+                                        ifd.BitsPerSample = (ushort)ReadFieldValue(ifdReader, fieldType);
+                                    else
+                                    {
+                                        _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                        var bitsPerSamples = ReadFieldValues(_reader, fieldType, numValues);
+
+                                        ifd.BitsPerSample = (ushort)bitsPerSamples[0];
+                                        if (bitsPerSamples.Any(bps => bps != ifd.BitsPerSample))
+                                            throw new NotSupportedException($"BitsPerSample must be the same for all samples: {string.Join(", ", bitsPerSamples)}");
+                                    }
                                 }
                                 break;
                             case IfdTag.PhotometricInterpretation:
@@ -145,14 +157,87 @@ namespace TiffExpress
                                 break;
                             case IfdTag.StripOffsets:
                                 {
-                                    _reader.Stream.Position = ReadFieldValue(ifdReader, fieldType);
-                                    ifd.StripOffsets = ReadFieldValues(_reader, fieldType, numValues);
+                                    if (numValues == 1)
+                                    {
+                                        ifd.StripOffsets = new[] { ReadFieldValue(ifdReader, fieldType) };
+                                    }
+                                    else
+                                    {
+                                        _reader.Stream.Position = ReadFieldValue(ifdReader, fieldType);
+                                        ifd.StripOffsets = ReadFieldValues(_reader, fieldType, numValues);
+                                    }
                                 }
                                 break;
                             case IfdTag.StripByteCounts:
                                 {
-                                    _reader.Stream.Position = ReadFieldValue(ifdReader, fieldType);
-                                    ifd.StripByteCounts = ReadFieldValues(_reader, fieldType, numValues);
+                                    if (numValues == 1)
+                                    {
+                                        ifd.StripByteCounts = new[] { ReadFieldValue(ifdReader, fieldType) };
+                                    }
+                                    else
+                                    {
+                                        _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                        ifd.StripByteCounts = ReadFieldValues(_reader, fieldType, numValues);
+                                    }
+                                }
+                                break;
+                            case IfdTag.Artist:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.Artist = ReadAsciiField(_reader, numValues);
+                                }
+                                break;
+                            case IfdTag.Copyright:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.Copyright = ReadAsciiField(_reader, numValues);
+                                }
+                                break;
+                            case IfdTag.DateTime:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    string text = ReadAsciiField(_reader, numValues);
+                                    DateTime.TryParseExact(text, "yyyy:MM:dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out ifd.DateTime);
+                                }
+                                break;
+                            case IfdTag.ExtraSamples:
+                                {
+                                    ifd.ExtraSamples = (ushort)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.HostComputer:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.HostComputer = ReadAsciiField(_reader, numValues);
+                                }
+                                break;
+                            case IfdTag.ImageDescription:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.ImageDescription = ReadAsciiField(_reader, numValues);
+                                }
+                                break;
+                            case IfdTag.Make:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.Make = ReadAsciiField(_reader, numValues);
+                                }
+                                break;
+                            case IfdTag.Model:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.Model = ReadAsciiField(_reader, numValues);
+                                }
+                                break;
+                            case IfdTag.Orientation:
+                                {
+                                    ifd.Orientation = (ushort)ReadFieldValue(ifdReader, fieldType);
+                                }
+                                break;
+                            case IfdTag.Software:
+                                {
+                                    _reader.Stream.Position = ReadFieldOffset(ifdReader);
+                                    ifd.Software = ReadAsciiField(_reader, numValues);
                                 }
                                 break;
                             default:
@@ -251,6 +336,14 @@ namespace TiffExpress
         //     return null;
         // }
 
+        private long ReadFieldOffset(BinaryReader2 reader)
+        {
+            if (_bigTiff)
+                return reader.ReadInt64();
+            else
+                return reader.ReadUInt32();
+        }
+
         private long ReadFieldValue(BinaryReader2 reader, FieldType fieldType)
         {
             switch (fieldType)
@@ -276,6 +369,13 @@ namespace TiffExpress
             return 0;
         }
 
+        private string ReadAsciiField(BinaryReader2 reader, int numValues)
+        {
+            var array = reader.ReadBytes(numValues - 1);
+            string text = Encoding.ASCII.GetString(array);
+            return text.Replace("\0", Environment.NewLine);
+        }
+
         private long[] ReadFieldValues(BinaryReader2 reader, FieldType fieldType, int numValues)
         {
             var array = new long[numValues];
@@ -285,49 +385,49 @@ namespace TiffExpress
                 case FieldType.Int64:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadInt64();
+                            array[i] = reader.ReadInt64();
                     }
                     break;
                 case FieldType.UInt64:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadInt64();
+                            array[i] = reader.ReadInt64();
                     }
                     break;
                 case FieldType.Int32:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadInt32();
+                            array[i] = reader.ReadInt32();
                     }
                     break;
                 case FieldType.UInt32:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadUInt32();
+                            array[i] = reader.ReadUInt32();
                     }
                     break;
                 case FieldType.Int16:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadInt16();
+                            array[i] = reader.ReadInt16();
                     }
                     break;
                 case FieldType.UInt16:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadUInt16();
+                            array[i] = reader.ReadUInt16();
                     }
                     break;
                 case FieldType.SByte:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadSByte();
+                            array[i] = reader.ReadSByte();
                     }
                     break;
                 case FieldType.Byte:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = _reader.ReadByte();
+                            array[i] = reader.ReadByte();
                     }
                     break;
                 default:
@@ -339,7 +439,7 @@ namespace TiffExpress
 
         public static Bitmap<T> LoadBitmap<T>(Stream stream)
         {
-            using(var tiffReader = new TiffReader(stream))
+            using (var tiffReader = new TiffReader(stream))
             {
                 return tiffReader.ReadImageFile<T>().ToBitmap();
             }
@@ -375,7 +475,7 @@ namespace TiffExpress
 
             var rows = ReadImageFileInternal(ifd, offsetX, offsetY, outputWidth, outputHeight);
 
-            return new EnumerableBitmap<T>(outputWidth, outputHeight, rows.Select(row => (T[])ConvertRow(ifd, row)));
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, ifd.SamplesPerPixel, rows.Select(row => (T[])ConvertRow(ifd, row)));
 
             // var blockingQueue = new BlockingCollection<byte[]>(8);
             // Task.Run(() => 
@@ -391,12 +491,12 @@ namespace TiffExpress
 
         private IEnumerable<byte[]> ReadImageFileInternal(ImageFileDirectory ifd, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
-            if (ifd.PhotometricInterpretation != PhotometricInterpretation.BlackIsZero)
-                throw new NotSupportedException($"PhotometricInterpretation must be BlackIsZero: {ifd.PhotometricInterpretation}");
+            if (ifd.PhotometricInterpretation != PhotometricInterpretation.BlackIsZero && ifd.PhotometricInterpretation != PhotometricInterpretation.RGB)
+                throw new NotSupportedException($"PhotometricInterpretation not supported: {ifd.PhotometricInterpretation}");
             if (ifd.Compression != Compression.NoCompression)
                 throw new NotSupportedException($"Compression not supported: {ifd.Compression}");
-            if (ifd.SamplesPerPixel != 1)
-                throw new NotSupportedException($"SamplesPerPixel must be 1: {ifd.SamplesPerPixel}");
+            // if (ifd.SamplesPerPixel != 1)
+            //     throw new NotSupportedException($"SamplesPerPixel must be 1: {ifd.SamplesPerPixel}");
             if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != PlanarConfiguration.Chunky)
                 throw new NotSupportedException($"PlanarConfiguration must be ChunkyFormat: {ifd.PlanarConfiguration}");
 
@@ -406,7 +506,6 @@ namespace TiffExpress
             int y = 0;
             for (uint i = 0; i < ifd.StripOffsets.Length; i++)
             {
-                long bytesPerRow = ifd.StripByteCounts[i] / ifd.RowsPerStrip;
                 long position = ifd.StripOffsets[i] + offsetX * bytesPerPixel;
                 for (uint j = 0; j < ifd.RowsPerStrip; j++)
                 {
@@ -415,10 +514,10 @@ namespace TiffExpress
                         _stream.Position = position;
 
                         var buffer = new byte[outputBufferSize];
-                        _stream.Read(buffer, 0, buffer.Length);
+                        _stream.Read(buffer, 0, outputBufferSize);
                         yield return buffer;
                     }
-                    position += bytesPerRow;
+                    position += outputBufferSize;
                     y++;
                 }
             }

@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using TiffExpress;
 using System.IO;
+using TiffExpress.Tiff;
 
 namespace Test.TiffExpress
 {
@@ -17,6 +18,7 @@ namespace Test.TiffExpress
                 Assert.Equal(64, ifd.ImageHeight);
                 Assert.Equal(8, ifd.BitsPerSample);
                 Assert.Equal(1, ifd.SamplesPerPixel);
+                Assert.Equal(Compression.NoCompression, ifd.Compression);
                 var bitmap = tiffReader.ReadImageFile<byte>(ifd).ToBitmap();
             }
         }
@@ -31,6 +33,7 @@ namespace Test.TiffExpress
                 Assert.Equal(64, ifd.ImageHeight);
                 Assert.Equal(16, ifd.BitsPerSample);
                 Assert.Equal(1, ifd.SamplesPerPixel);
+                Assert.Equal(Compression.NoCompression, ifd.Compression);
                 var bitmap = tiffReader.ReadImageFile<short>(ifd).ToBitmap();
             }
         }
@@ -45,6 +48,7 @@ namespace Test.TiffExpress
                 Assert.Equal(64, ifd.ImageHeight);
                 Assert.Equal(16, ifd.BitsPerSample);
                 Assert.Equal(1, ifd.SamplesPerPixel);
+                Assert.Equal(Compression.NoCompression, ifd.Compression);
                 var bitmap = tiffReader.ReadImageFile<short>(ifd).ToBitmap();
             }
         }
@@ -59,6 +63,7 @@ namespace Test.TiffExpress
                 Assert.Equal(64, ifd.ImageHeight);
                 Assert.Equal(32, ifd.BitsPerSample);
                 Assert.Equal(1, ifd.SamplesPerPixel);
+                Assert.Equal(Compression.NoCompression, ifd.Compression);
                 var bitmap = tiffReader.ReadImageFile<float>(ifd).ToBitmap();
             }
         }
@@ -73,6 +78,7 @@ namespace Test.TiffExpress
                 Assert.Equal(64, ifd.ImageHeight);
                 Assert.Equal(8, ifd.BitsPerSample);
                 Assert.Equal(3, ifd.SamplesPerPixel);
+                Assert.Equal(Compression.NoCompression, ifd.Compression);
                 var bitmap = tiffReader.ReadImageFile<byte>(ifd).ToBitmap();
             }
         }

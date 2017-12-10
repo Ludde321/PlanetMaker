@@ -3,11 +3,12 @@ using System.Linq;
 
 namespace TiffExpress
 {
-    public interface IBitmap<T>
+    public abstract class IBitmap<T>
     {
-        int Width {get;}
-        int Height { get;}
+        public int Width;
+        public int Height;
+        public int SamplesPerPixel;
 
-        IEnumerable<T[]> GetRows();
+        public abstract IEnumerable<T[]> GetRows();
     }
 }

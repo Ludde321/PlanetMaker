@@ -247,7 +247,7 @@ namespace TiffExpress
                 blockingQueue.CompleteAdding();
             });
 
-            return new EnumerableBitmap<T>(outputWidth, outputHeight, blockingQueue.GetConsumingEnumerable().Select(task => task.Result));
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, inputTexture.SamplesPerPixel, blockingQueue.GetConsumingEnumerable().Select(task => task.Result));
         }
 
         private static IEnumerable<T[][]> ResampleY<T>(IBitmap<T> inputTexture, int outputHeight)

@@ -225,9 +225,12 @@ namespace TiffExpress
 
             ifd.ImageWidth = imageWidth;
             ifd.ImageHeight = imageHeight;
-            // ifd.PhotometricInterpretation = PhotometricInterpretation.BlackIsZero;
-            // ifd.Compression = Compression.NoCompression;
-            // ifd.SamplesPerPixel = 1;
+            ifd.SamplesPerPixel = (ushort)bitmap.SamplesPerPixel;
+            if(bitmap.SamplesPerPixel == 1)
+                ifd.PhotometricInterpretation = PhotometricInterpretation.BlackIsZero;
+            else if(bitmap.SamplesPerPixel == 3)
+                ifd.PhotometricInterpretation = PhotometricInterpretation.RGB;
+            ifd.Compression = Compression.NoCompression;
 
             if (typeof(T) == typeof(byte))
             {
