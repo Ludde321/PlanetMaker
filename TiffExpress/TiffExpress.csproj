@@ -6,10 +6,10 @@
 
   <PropertyGroup>
       <PackageId>TiffExpress</PackageId>
-      <VersionPrefix>0.0.1</VersionPrefix>
+      <VersionPrefix>0.0.2</VersionPrefix>
       <Authors>Ludvig Pedersen</Authors>
       <Title>TiffExpress</Title>
-      <Description>Awesome TIFF Library</Description>
+      <Description>Efficiently process large TIFF images</Description>
       <Summary>Awesome TIFF Library</Summary>
       <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
       <PackageReleaseNotes>Alpha release</PackageReleaseNotes>

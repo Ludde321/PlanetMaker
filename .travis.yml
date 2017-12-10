@@ -6,4 +6,4 @@ script:
 # - dotnet build TiffExpress -c Release
  - dotnet test Test.TiffExpress
  - dotnet pack TiffExpress -c Release --version-suffix "alpha-build$TRAVIS_BUILD_NUMBER" --include-symbols
-# - dotnet nuget push TiffExpress/bin/Release/*.nupkg -k $API_KEY_NUGET -s https://www.nuget.org/api/v2/package
+ - dotnet nuget push TiffExpress/bin/Release/*.nupkg -k $API_KEY_NUGET -s https://www.nuget.org/api/v2/package
