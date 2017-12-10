@@ -11,7 +11,7 @@ namespace Test.TiffExpress
         [Fact]
         public void TestReadGray8()
         {
-            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData\gray8.tif")))
+            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData/gray8.tif")))
             {
                 var ifd = tiffReader.ImageFileDirectories[0];
                 Assert.Equal(64, ifd.ImageWidth);
@@ -26,7 +26,7 @@ namespace Test.TiffExpress
         [Fact]
         public void TestReadGray16()
         {
-            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData\gray16.tif")))
+            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData/gray16.tif")))
             {
                 var ifd = tiffReader.ImageFileDirectories[0];
                 Assert.Equal(64, ifd.ImageWidth);
@@ -41,7 +41,7 @@ namespace Test.TiffExpress
         [Fact]
         public void TestReadGray16Msb()
         {
-            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData\gray16_msb.tif")))
+            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData/gray16_msb.tif")))
             {
                 var ifd = tiffReader.ImageFileDirectories[0];
                 Assert.Equal(64, ifd.ImageWidth);
@@ -56,7 +56,7 @@ namespace Test.TiffExpress
         [Fact]
         public void TestReadGray32()
         {
-            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData\gray32.tif")))
+            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData/gray32.tif")))
             {
                 var ifd = tiffReader.ImageFileDirectories[0];
                 Assert.Equal(64, ifd.ImageWidth);
@@ -71,7 +71,7 @@ namespace Test.TiffExpress
         [Fact]
         public void TestReadRgbChunky()
         {
-            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData\rgb_chunky.tif")))
+            using(var tiffReader = new TiffReader(File.OpenRead(@"TestData/rgb_chunky.tif")))
             {
                 var ifd = tiffReader.ImageFileDirectories[0];
                 Assert.Equal(64, ifd.ImageWidth);
