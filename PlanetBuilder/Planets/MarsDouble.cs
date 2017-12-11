@@ -36,7 +36,7 @@ namespace PlanetBuilder.Planets
         {
             // PlanetRadius = 3396190;
             // ElevationScale = 2.5;
-            NumSegments = 1200;
+            NumSegments = 1800;
             // PlanetProjection = Projection.Equirectangular;
 
             // Gale crater 5.4°S 137.8°E
@@ -68,7 +68,7 @@ namespace PlanetBuilder.Planets
                 _topSectorHeight = (int)Math.Ceiling(ifd.ImageWidth * (LonT1 - LonT0) / (Math.PI * 2));
 
                 _topElevationBitmap = tiffReader.ReadImageFile<short>(ifd, _topSectorOffsetX, _topSectorOffsetY, _topSectorWidth, _topSectorHeight).ToBitmap();
-                Console.WriteLine($"Loading image top sector used {sw.Elapsed}");
+                Console.WriteLine($"Loading image top {_topElevationBitmap.Width}x{_topElevationBitmap.Height} sector used {sw.Elapsed}");
 
                 using (var tiffWriter = new TiffWriter(File.OpenWrite($@"Generated\Planets\MarsDouble\MarsTop.tif")))
                 {
@@ -84,11 +84,11 @@ namespace PlanetBuilder.Planets
                 _bottomSectorHeight = (int)Math.Ceiling(ifd.ImageWidth * (LonB1 - LonB0) / (Math.PI * 2));
 
                 _bottomElevationBitmap = tiffReader.ReadImageFile<short>(ifd, _bottomSectorOffsetX, _bottomSectorOffsetY, _bottomSectorWidth, _bottomSectorHeight).ToBitmap();
-                Console.WriteLine($"Loading image bottom sector used {sw.Elapsed}");
+                Console.WriteLine($"Loading image bottom {_bottomElevationBitmap.Width}x{_bottomElevationBitmap.Height} sector used {sw.Elapsed}");
 
                 using (var tiffWriter = new TiffWriter(File.OpenWrite($@"Generated\Planets\MarsDouble\MarsBottom.tif")))
                 {
-                    var bitmap = _topElevationBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
+                    var bitmap = _bottomElevationBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
                     tiffWriter.WriteImageFile(bitmap);
                 }
 
