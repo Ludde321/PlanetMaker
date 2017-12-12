@@ -48,5 +48,14 @@ namespace PlanetBuilder.Roam
             NextNode = (T)this;
             PrevNode = (T)this;
         }
+
+        /// Count will not include the head node
+        public int Count()
+        {
+            int count = 0;
+            for (var node = NextNode; node != this; node = node.NextNode)
+                count++;
+            return count;
+        }
     }
 }

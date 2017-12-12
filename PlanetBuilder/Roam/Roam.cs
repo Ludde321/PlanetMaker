@@ -88,15 +88,20 @@ namespace PlanetBuilder.Roam
 
                     // allocVertex();
                     var vertex = new RoamVertex();
+                    vertex.InsertBefore(ActiveVertexes);
 
                     // Compute vertex
-                    ComputeVertexAltitude(vertex, triangle);
+                    triangle.Material.ComputeVertexAltitude(vertex, triangle);
 
                     // 4 x allocTriangle();
                     var tri0 = new RoamTriangle();
                     var tri1 = new RoamTriangle();
                     var tri2 = new RoamTriangle();
                     var tri3 = new RoamTriangle();
+                    tri0.InsertBefore(ActiveTriangles);
+                    tri1.InsertBefore(ActiveTriangles);
+                    tri2.InsertBefore(ActiveTriangles);
+                    tri3.InsertBefore(ActiveTriangles);
 
                     ushort nextLevel = (ushort)(triangle.Level + 1);
 
@@ -125,12 +130,14 @@ namespace PlanetBuilder.Roam
                     if (d0 != null)
                     {
                         d0.ReleaseTriangles();
+                        d0.Remove();
                         //d0.InsertAfter(&freeDiamonds, numActiveDiamonds, numFreeDiamonds);
                     }
                     var d1 = opposite.Diamond;
                     if (d1 != null)
                     {
                         d1.ReleaseTriangles();
+                        d1.Remove();
                         //d1.InsertAfter(&freeDiamonds, numActiveDiamonds, numFreeDiamonds);
                     }
 
@@ -144,6 +151,7 @@ namespace PlanetBuilder.Roam
                     // Create new diamond
                     //var diamond = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
                     var diamond = new RoamDiamond();
+                    diamond.InsertBefore(ActiveDiamonds);
                     diamond.SetTriangles(tri0, tri1, tri2, tri3);
                 }
                 triangle = next;
@@ -199,6 +207,7 @@ namespace PlanetBuilder.Roam
                             {
                                 //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
                                 var d = new RoamDiamond();
+                                d.InsertBefore(ActiveDiamonds);
                                 d.SetTriangles(t0, t1, t2, t3);
                             }
                             else
@@ -206,6 +215,7 @@ namespace PlanetBuilder.Roam
                             {
                                 //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
                                 var d = new RoamDiamond();
+                                d.InsertBefore(ActiveDiamonds);
                                 d.SetTriangles(t1, t2, t3, t0);
                             }
                         }
@@ -224,6 +234,7 @@ namespace PlanetBuilder.Roam
                             {
                                 //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
                                 var d = new RoamDiamond();
+                                d.InsertBefore(ActiveDiamonds);
                                 d.SetTriangles(t0, t1, t2, t3);
                             }
                             else
@@ -231,16 +242,18 @@ namespace PlanetBuilder.Roam
                             {
                                 //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
                                 var d = new RoamDiamond();
+                                d.InsertBefore(ActiveDiamonds);
                                 d.SetTriangles(t1, t2, t3, t0);
                             }
                         }
                     }
 
                     // Free vertex and triangles
-                    //var vertex = tri0.Vertexes[1];
+                    var vertex = tri0.Vertexes[1];
 
                     // freeVertex(vertex);
                     //vertex.insertAfter(&freeVertexes, numActiveVertexes, numFreeVertexes);
+                    vertex.Remove();
 
                     // 4 x freeTriangle();
                     // tri0.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
@@ -248,22 +261,21 @@ namespace PlanetBuilder.Roam
                     // tri2.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
                     // tri3.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
 
+                    tri0.Remove();
+                    tri1.Remove();
+                    tri2.Remove();
+                    tri3.Remove();
+
                     next = diamond.NextNode;
 
                     // freeDiamond(diamond);
                     //diamond.insertAfter(&freeDiamonds, numActiveDiamonds, numFreeDiamonds);
+                    diamond.Remove();
                 }
                 diamond = next;
             }
         }
 
-        protected virtual void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
-        {
-            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes[0].Position, triangle.Vertexes[2].Position);
-            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
-
-            vertex.Position = vertex.LinearPosition;//vertex.Normal * (groundRadius + vertex.altitude);
-        }
 
         private void InitTriangles()
         {

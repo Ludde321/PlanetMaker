@@ -27,7 +27,7 @@ namespace PlanetBuilder.Roam
         public readonly Vector2d[] TextureCoords = new Vector2d[3];
 
         public RoamMaterial Material;
-        public RoamTriangleFlags Flags;
+        public RoamTriangleFlags Flags = RoamTriangleFlags.Modified;
         public ushort Level;
 
         public Vector3d Center;
