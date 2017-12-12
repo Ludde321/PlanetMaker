@@ -2,8 +2,7 @@ using PlanetBuilder;
 
 namespace PlanetBuilder.Roam
 {
-
-    public class RoamVertex
+    public class RoamVertex : SimpleList<RoamVertex>
     {
         public Vector3d Position;
         public Vector3d LinearPosition;

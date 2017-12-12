@@ -2,7 +2,7 @@ using System;
 
 namespace PlanetBuilder.Roam
 {
-    public class RoamDiamond
+    public class RoamDiamond : SimpleList<RoamDiamond>
     {
         public readonly RoamTriangle[] Triangles = new RoamTriangle[4];
 

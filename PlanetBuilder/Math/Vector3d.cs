@@ -21,7 +21,7 @@ namespace PlanetBuilder
 
         public double Abs()
         {
-            return Math.Sqrt(x*x + y*y + z*z);
+            return Math.Sqrt(x * x + y * y + z * z);
         }
 
         public double Abs2()
@@ -31,7 +31,12 @@ namespace PlanetBuilder
 
         public static Vector3d MiddlePoint(Vector3d v1, Vector3d v2)
         {
-            return new Vector3d((v1.x + v2.x)*0.5, (v1.y + v2.y)*0.5, (v1.z + v2.z)*0.5);
+            return new Vector3d((v1.x + v2.x) * 0.5, (v1.y + v2.y) * 0.5, (v1.z + v2.z) * 0.5);
+        }
+        public static Vector3d Center(Vector3d v1, Vector3d v2, Vector3d v3)
+        {
+            const double div3 = 1.0 / 3;
+            return new Vector3d((v1.x + v2.x + v3.x) * div3, (v1.y + v2.y + v3.y) * div3, (v1.z + v2.z + v3.z) * div3);
         }
 
         public static Vector3d Normalize(Vector3d v)
@@ -39,11 +44,11 @@ namespace PlanetBuilder
             double length2 = v.x * v.x + v.y * v.y + v.z * v.z;
             if (length2 > 0)
             {
-                double _length = 1/Math.Sqrt(length2);
+                double _length = 1 / Math.Sqrt(length2);
 
                 return new Vector3d(v.x * _length, v.y * _length, v.z * _length);
             }
-    
+
             return new Vector3d();
         }
 
@@ -57,12 +62,12 @@ namespace PlanetBuilder
             return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
         }
 
-        public static Vector3d operator+(Vector3d a, Vector3d b)
+        public static Vector3d operator +(Vector3d a, Vector3d b)
         {
             return new Vector3d(a.x + b.x, a.y + b.y, a.z + b.z);
         }
 
-        public static Vector3d operator-(Vector3d a, Vector3d b)
+        public static Vector3d operator -(Vector3d a, Vector3d b)
         {
             return new Vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
         }
