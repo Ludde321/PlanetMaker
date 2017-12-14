@@ -11,9 +11,17 @@ namespace PlanetBuilder.Roam
         public override bool SubdivideTriangle(RoamTriangle triangle, bool split)
         {
             if(split)
-                return triangle.Level < 3;
+                return triangle.Level < 4;
             else
                 return false;
+        }
+
+        public override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
+        {
+            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes[0].LinearPosition, triangle.Vertexes[2].LinearPosition);
+            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
+
+            vertex.Position = Vector3d.Multiply(vertex.Normal, 1);//vertex.Normal * (groundRadius + vertex.altitude);
         }
     }
 

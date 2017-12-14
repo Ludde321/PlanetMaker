@@ -55,11 +55,20 @@ namespace PlanetBuilder
             var roamCube = new RoamCube();
             roamCube.Init();
             roamCube.Split();
-            roamCube.Merge();
+            //roamCube.Merge();
 
             Console.WriteLine($"NumVertexes: {roamCube.ActiveVertexes.Count()}");
             Console.WriteLine($"NumTriangles: {roamCube.ActiveTriangles.Count()}");
             Console.WriteLine($"NumDiamonds: {roamCube.ActiveDiamonds.Count()}");
+
+            using(var stlWriter = new StlWriter(File.OpenWrite("Generated/Roam.stl")))
+            {
+                var triangle = roamCube.ActiveTriangles.NextNode;
+                for (; triangle != roamCube.ActiveTriangles;triangle = triangle.NextNode)
+                {
+                    stlWriter.AddTriangle(triangle.Vertexes[0].Position, triangle.Vertexes[1].Position, triangle.Vertexes[2].Position, new Vector3d(0,0,0));
+                }
+            }
 
 
             Console.WriteLine("Done");
