@@ -127,7 +127,7 @@ namespace PlanetBuilder.Planets
         {
             var sw = Stopwatch.StartNew();
 
-            using (var binaryWriter = new BinaryWriter(File.OpenWrite(outputFilename)))
+            using (var binaryWriter = new BinaryWriter(File.Create(outputFilename)))
             {
                 binaryWriter.Write(new byte[80]); // Header 80 bytes
                 binaryWriter.Write(PlanetTriangles.Count);

@@ -20,29 +20,39 @@ namespace PlanetBuilder.Roam
         // public SimpleList<RoamDiamond> InactiveDiamonds;
         public readonly SimpleList<RoamTriangle> InactiveTriangles = new RoamTriangle();
 
-        // private RoamDiamond AllocDiamond()
-        // {
-        //     var diamond = FreeDiamonds.First;
-        //     FreeDiamonds.RemoveFirst();
-        //     ActiveDiamonds.AddFirst(diamond);
-        //     return diamond.Value;
-        // }
+        protected RoamVertex AllocVertex()
+        {
+            var vertex = new RoamVertex();
+            vertex.InsertBefore(ActiveVertexes);
+            return vertex;
+        }
+        protected RoamTriangle AllocTriangle()
+        {
+            var triangle = new RoamTriangle();
+            triangle.InsertBefore(ActiveTriangles);
+            return triangle;
+        }
+        protected RoamDiamond AllocDiamond()
+        {
+            var diamond = new RoamDiamond();
+            diamond.InsertBefore(ActiveDiamonds);
+            return diamond;
+        }
 
-        // private RoamTriangle AllocTriangle()
-        // {
-        //     var triangle = FreeTriangles.First;
-        //     FreeTriangles.RemoveFirst();
-        //     ActiveTriangles.AddFirst(triangle);
-        //     return triangle.Value;
-        // }
+        protected void FreeVertex(RoamVertex vertex)
+        {
+            vertex.Remove();
+        }
 
-        // private RoamVertex AllocVertex()
-        // {
-        //     var vertex = FreeVertexes.First;
-        //     FreeVertexes.RemoveFirst();
-        //     ActiveVertexes.AddFirst(vertex);
-        //     return vertex.Value;
-        // }
+        protected void FreeTriangle(RoamTriangle triangle)
+        {
+            triangle.Remove();
+        }
+
+        protected void FreeDiamond(RoamDiamond diamond)
+        {
+            diamond.Remove();
+        }
 
         //        void initVertexes(RoamTexture* textures[6]);
         //        void initTriangles();
@@ -86,24 +96,16 @@ namespace PlanetBuilder.Roam
                     Vector2d texCoordTriangle = Vector2d.MiddlePoint(triangle.TextureCoords[0], triangle.TextureCoords[2]);
                     Vector2d texCoordOpposite = Vector2d.MiddlePoint(opposite.TextureCoords[0], opposite.TextureCoords[2]);
 
-                    // allocVertex();
-                    var vertex = new RoamVertex();
-                    vertex.InsertBefore(ActiveVertexes);
+                    var vertex = AllocVertex();
 
                     // Compute vertex
                     triangle.Material.ComputeVertexAltitude(vertex, triangle);
 
                     // 4 x allocTriangle();
-                    var tri0 = new RoamTriangle();
-                    var tri1 = new RoamTriangle();
-                    var tri2 = new RoamTriangle();
-                    var tri3 = new RoamTriangle();
-                    tri0.InsertBefore(ActiveTriangles);
-                    tri1.InsertBefore(ActiveTriangles);
-                    tri2.InsertBefore(ActiveTriangles);
-                    tri3.InsertBefore(ActiveTriangles);
-
-                    ushort nextLevel = (ushort)(triangle.Level + 1);
+                    var tri0 = AllocTriangle();
+                    var tri1 = AllocTriangle();
+                    var tri2 = AllocTriangle();
+                    var tri3 = AllocTriangle();
 
                     // Triangle 0
                     tri0.Set(triangle, 2, 1, vertex, texCoordTriangle);
@@ -130,15 +132,13 @@ namespace PlanetBuilder.Roam
                     if (d0 != null)
                     {
                         d0.ReleaseTriangles();
-                        d0.Remove();
-                        //d0.InsertAfter(&freeDiamonds, numActiveDiamonds, numFreeDiamonds);
+                        FreeDiamond(d0);
                     }
                     var d1 = opposite.Diamond;
                     if (d1 != null)
                     {
                         d1.ReleaseTriangles();
-                        d1.Remove();
-                        //d1.InsertAfter(&freeDiamonds, numActiveDiamonds, numFreeDiamonds);
+                        FreeDiamond(d1);
                     }
 
                     // Update lists
@@ -149,9 +149,7 @@ namespace PlanetBuilder.Roam
                     triangle.InsertBefore(InactiveTriangles);
 
                     // Create new diamond
-                    //var diamond = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
-                    var diamond = new RoamDiamond();
-                    diamond.InsertBefore(ActiveDiamonds);
+                    var diamond = AllocDiamond();
                     diamond.SetTriangles(tri0, tri1, tri2, tri3);
                 }
                 triangle = next;
@@ -205,17 +203,13 @@ namespace PlanetBuilder.Roam
                         {
                             if (t0.Parent == t1.Parent && t2.Parent == t3.Parent)
                             {
-                                //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
-                                var d = new RoamDiamond();
-                                d.InsertBefore(ActiveDiamonds);
+                                var d = AllocDiamond();
                                 d.SetTriangles(t0, t1, t2, t3);
                             }
                             else
                             if (t1.Parent == t2.Parent && t3.Parent == t0.Parent)
                             {
-                                //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
-                                var d = new RoamDiamond();
-                                d.InsertBefore(ActiveDiamonds);
+                                var d = AllocDiamond();
                                 d.SetTriangles(t1, t2, t3, t0);
                             }
                         }
@@ -232,17 +226,13 @@ namespace PlanetBuilder.Roam
                         {
                             if (t0.Parent == t1.Parent && t2.Parent == t3.Parent)
                             {
-                                //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
-                                var d = new RoamDiamond();
-                                d.InsertBefore(ActiveDiamonds);
+                                var d = AllocDiamond();
                                 d.SetTriangles(t0, t1, t2, t3);
                             }
                             else
                             if (t1.Parent == t2.Parent && t3.Parent == t0.Parent)
                             {
-                                //RoamDiamond* d = freeDiamonds.nextNode.insertBefore(&activeDiamonds, numFreeDiamonds, numActiveDiamonds);
-                                var d = new RoamDiamond();
-                                d.InsertBefore(ActiveDiamonds);
+                                var d = AllocDiamond();
                                 d.SetTriangles(t1, t2, t3, t0);
                             }
                         }
@@ -251,26 +241,17 @@ namespace PlanetBuilder.Roam
                     // Free vertex and triangles
                     var vertex = tri0.Vertexes[1];
 
-                    // freeVertex(vertex);
-                    //vertex.insertAfter(&freeVertexes, numActiveVertexes, numFreeVertexes);
-                    vertex.Remove();
+                    FreeVertex(vertex);
 
                     // 4 x freeTriangle();
-                    // tri0.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
-                    // tri1.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
-                    // tri2.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
-                    // tri3.InsertAfter(&freeTriangles, numActiveTriangles, numFreeTriangles);
-
-                    tri0.Remove();
-                    tri1.Remove();
-                    tri2.Remove();
-                    tri3.Remove();
+                    FreeTriangle(tri0);
+                    FreeTriangle(tri1);
+                    FreeTriangle(tri2);
+                    FreeTriangle(tri3);
 
                     next = diamond.NextNode;
 
-                    // freeDiamond(diamond);
-                    //diamond.insertAfter(&freeDiamonds, numActiveDiamonds, numFreeDiamonds);
-                    diamond.Remove();
+                    FreeDiamond(diamond);
                 }
                 diamond = next;
             }

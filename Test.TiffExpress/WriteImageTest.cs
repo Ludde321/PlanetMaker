@@ -16,7 +16,7 @@ namespace Test.TiffExpress
 
             var tempFile = Path.Combine(Path.GetTempPath(), "TestWriteGray8.tif");
 
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(tempFile)))
+            using (var tiffWriter = new TiffWriter(File.Create(tempFile)))
             {
                 var ifd = tiffWriter.WriteImageFile(bitmap);
 
@@ -38,7 +38,7 @@ namespace Test.TiffExpress
 
             var tempFile = Path.Combine(Path.GetTempPath(), "TestWriteGray16.tif");
 
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(tempFile)))
+            using (var tiffWriter = new TiffWriter(File.Create(tempFile)))
             {
                 var ifd = tiffWriter.WriteImageFile(bitmap);
 
@@ -60,7 +60,7 @@ namespace Test.TiffExpress
 
             var tempFile = Path.Combine(Path.GetTempPath(), "TestWriteGray32.tif");
 
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(tempFile)))
+            using (var tiffWriter = new TiffWriter(File.Create(tempFile)))
             {
                 var ifd = tiffWriter.WriteImageFile(bitmap);
 
@@ -82,7 +82,7 @@ namespace Test.TiffExpress
 
             var tempFile = Path.Combine(Path.GetTempPath(), "TestWriteRGB8.tif");
 
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(tempFile)))
+            using (var tiffWriter = new TiffWriter(File.Create(tempFile)))
             {
                 var ifd = tiffWriter.WriteImageFile(bitmap);
 

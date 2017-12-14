@@ -20,12 +20,12 @@ namespace PlanetBuilder
             _writer.Write(_triangleCount);
         }
 
-        public void AddTriangle(Vector3d v0, Vector3d v1, Vector3d v2, Vector3d normal)
+        public void AddTriangle(Vector3d v0, Vector3d v1, Vector3d v2)
         {
             // Triangle Normal
-            _writer.Write((float)normal.x);
-            _writer.Write((float)normal.y);
-            _writer.Write((float)normal.z);
+            _writer.Write((float)0);
+            _writer.Write((float)0);
+            _writer.Write((float)0);
 
             // Vertex 1
             _writer.Write((float)v0.x);

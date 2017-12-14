@@ -141,14 +141,14 @@ namespace PlanetBuilder
 
         public static void SaveTiff8(string outputFilename, IBitmap<byte> bitmap)
         {
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(outputFilename)))
+            using (var tiffWriter = new TiffWriter(File.Create(outputFilename)))
             {
                 tiffWriter.WriteImageFile(bitmap);
             }
         }
         public static void SaveTiff8(string outputFilename, IBitmap<short> bitmap)
         {
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(outputFilename)))
+            using (var tiffWriter = new TiffWriter(File.Create(outputFilename)))
             {
                 var bitmap2 = bitmap.Convert((p) => (byte)((p >> 8) + 128));
                 tiffWriter.WriteImageFile(bitmap2);
@@ -157,7 +157,7 @@ namespace PlanetBuilder
 
         public static void SaveTiff16(string outputFilename, IBitmap<short> bitmap)
         {
-            using (var tiffWriter = new TiffWriter(File.OpenWrite(outputFilename)))
+            using (var tiffWriter = new TiffWriter(File.Create(outputFilename)))
             {
                 tiffWriter.WriteImageFile(bitmap);
             }
