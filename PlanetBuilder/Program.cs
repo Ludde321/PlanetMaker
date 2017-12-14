@@ -55,6 +55,7 @@ namespace PlanetBuilder
             var roamCube = new RoamCube();
             roamCube.Init();
             roamCube.Split();
+            roamCube.Merge();
 
             Console.WriteLine($"NumVertexes: {roamCube.ActiveVertexes.Count()}");
             Console.WriteLine($"NumTriangles: {roamCube.ActiveTriangles.Count()}");

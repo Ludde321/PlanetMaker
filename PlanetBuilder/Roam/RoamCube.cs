@@ -10,7 +10,10 @@ namespace PlanetBuilder.Roam
 
         public override bool SubdivideTriangle(RoamTriangle triangle, bool split)
         {
-            return triangle.Level < 2;
+            if(split)
+                return triangle.Level < 3;
+            else
+                return false;
         }
     }
 
