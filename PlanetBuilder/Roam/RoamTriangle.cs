@@ -34,6 +34,17 @@ namespace PlanetBuilder.Roam
         public double TwoDivArea;      // 2/area
         public double Radius;           // radius
 
+        public void Init(RoamVertex v0, RoamVertex v1, RoamVertex v2, Vector2d tex0, Vector2d tex1, Vector2d tex2, RoamMaterial material)
+        {
+            Material = material;
+
+            SetVertexes(v0, v1, v2);
+
+            TextureCoords[0] = tex0;
+            TextureCoords[1] = tex1;
+            TextureCoords[2] = tex2;
+        }
+
         public void Set(RoamTriangle triangle, int i0, int i2, RoamVertex v1, Vector2d texCoord)
         {
             var v0 = triangle.Vertexes[i0];
@@ -49,6 +60,7 @@ namespace PlanetBuilder.Roam
 
             Level = (ushort)(triangle.Level + 1);
             Flags = RoamTriangleFlags.Modified;
+            Material = triangle.Material;
         }
 
         void SetVertexes(RoamVertex v0, RoamVertex v1, RoamVertex v2)

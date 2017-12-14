@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using PlanetBuilder.Planets;
+using PlanetBuilder.Roam;
 
 namespace PlanetBuilder
 {
@@ -39,8 +40,8 @@ namespace PlanetBuilder
             // var marsSector = new MarsSector();
             // marsSector.Create();
 
-            var marsDouble = new MarsDouble();
-            marsDouble.Create();
+            // var marsDouble = new MarsDouble();
+            // marsDouble.Create();
 
             // var phobos = new Phobos();
             // phobos.Create();
@@ -50,6 +51,15 @@ namespace PlanetBuilder
 
             // var earth = new Earth();
             // earth.Create();
+
+            var roamCube = new RoamCube();
+            roamCube.Init();
+            roamCube.Split();
+
+            Console.WriteLine($"NumVertexes: {roamCube.ActiveVertexes.Count()}");
+            Console.WriteLine($"NumTriangles: {roamCube.ActiveTriangles.Count()}");
+            Console.WriteLine($"NumDiamonds: {roamCube.ActiveDiamonds.Count()}");
+
 
             Console.WriteLine("Done");
         }

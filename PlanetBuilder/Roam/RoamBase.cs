@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PlanetBuilder.Roam
 {
-    public class Roam
+    public class RoamBase
     {
         // public SimpleList<RoamDiamond> Diamonds;
         // public SimpleList<RoamTriangle> Triangles;
@@ -13,12 +13,12 @@ namespace PlanetBuilder.Roam
         // public SimpleList<RoamTriangle> FreeTriangles;
         // public SimpleList<RoamVertex> FreeVertexes;
 
-        public SimpleList<RoamDiamond> ActiveDiamonds;
-        public SimpleList<RoamTriangle> ActiveTriangles;
-        public SimpleList<RoamVertex> ActiveVertexes;
+        public readonly SimpleList<RoamDiamond> ActiveDiamonds = new RoamDiamond();
+        public readonly SimpleList<RoamTriangle> ActiveTriangles = new RoamTriangle();
+        public readonly SimpleList<RoamVertex> ActiveVertexes = new RoamVertex();
 
         // public SimpleList<RoamDiamond> InactiveDiamonds;
-        public SimpleList<RoamTriangle> InactiveTriangles;
+        public readonly SimpleList<RoamTriangle> InactiveTriangles = new RoamTriangle();
 
         // private RoamDiamond AllocDiamond()
         // {
@@ -277,7 +277,7 @@ namespace PlanetBuilder.Roam
         }
 
 
-        private void InitTriangles()
+        protected void InitTriangles()
         {
             // Compute neighbor relationships
             var t0 = ActiveTriangles.NextNode;
