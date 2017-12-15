@@ -113,11 +113,11 @@ namespace PlanetBuilder.Planets
 
         private double ComputeModelElevationTop(double tu, double tv)
         {
-            return 0.04 + 0.00001 * ReadBilinearPixel(_topElevationBitmap, tu, tv);
+            return 0.04 + 0.00001 * _topElevationBitmap.ReadBilinearPixel(tu, tv);
         }
         private double ComputeModelElevationBottom(double tu, double tv)
         {
-            return -0.04 - 0.00001 * ReadBilinearPixel(_bottomElevationBitmap, 1 - tu, tv);
+            return -0.04 - 0.00001 * _bottomElevationBitmap.ReadBilinearPixel(1 - tu, tv);
         }
     }
 }

@@ -105,8 +105,8 @@ namespace PlanetBuilder.Planets
         {
             var t = MathHelper.SphericalToTextureCoords(v);
 
-            short h = ReadBilinearPixel(_elevationTextureSmall, t.x, t.y);
-            byte landcover = ReadBilinearPixel(_landcoverTextureSmall, t.x, t.y);
+            short h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y);
+            byte landcover = _landcoverTextureSmall.ReadBilinearPixel(t.x, t.y);
 //            short hAvg = ReadBilinearPixel(_elevationTextureBlur, t.x, t.y);
 
             double r = PlanetRadius + h * ElevationScale;//(h - hAvg) * ElevationScale + hAvg;

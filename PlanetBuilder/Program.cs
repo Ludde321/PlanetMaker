@@ -37,6 +37,9 @@ namespace PlanetBuilder
             // var mars = new Mars();
             // mars.Create();
 
+            var mars2 = new Mars2();
+            mars2.Create();
+
             // var marsSector = new MarsSector();
             // marsSector.Create();
 
@@ -52,23 +55,23 @@ namespace PlanetBuilder
             // var earth = new Earth();
             // earth.Create();
 
-            var roamCube = new RoamCube();
-            roamCube.Init();
-            roamCube.Split();
-            //roamCube.Merge();
+            // var roamCube = new RoamCube();
+            // roamCube.Init();
+            // roamCube.Split();
+            // //roamCube.Merge();
 
-            Console.WriteLine($"NumVertexes: {roamCube.ActiveVertexes.Count()}");
-            Console.WriteLine($"NumTriangles: {roamCube.ActiveTriangles.Count()}");
-            Console.WriteLine($"NumDiamonds: {roamCube.ActiveDiamonds.Count()}");
+            // Console.WriteLine($"NumVertexes: {roamCube.ActiveVertexes.Count()}");
+            // Console.WriteLine($"NumTriangles: {roamCube.ActiveTriangles.Count()}");
+            // Console.WriteLine($"NumDiamonds: {roamCube.ActiveDiamonds.Count()}");
 
-            using(var stlWriter = new StlWriter(File.Create("Generated/Roam.stl")))
-            {
-                var triangle = roamCube.ActiveTriangles.NextNode;
-                for (; triangle != roamCube.ActiveTriangles;triangle = triangle.NextNode)
-                {
-                    stlWriter.AddTriangle(triangle.Vertexes[0].Position, triangle.Vertexes[1].Position, triangle.Vertexes[2].Position);
-                }
-            }
+            // using(var stlWriter = new StlWriter(File.Create("Generated/Roam.stl")))
+            // {
+            //     var triangle = roamCube.ActiveTriangles.NextNode;
+            //     for (; triangle != roamCube.ActiveTriangles;triangle = triangle.NextNode)
+            //     {
+            //         stlWriter.AddTriangle(triangle.Vertexes[0].Position, triangle.Vertexes[1].Position, triangle.Vertexes[2].Position);
+            //     }
+            // }
 
 
             Console.WriteLine("Done");

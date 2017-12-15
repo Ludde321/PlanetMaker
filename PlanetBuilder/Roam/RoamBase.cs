@@ -1,9 +1,11 @@
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace PlanetBuilder.Roam
 {
-    public class RoamBase
+    public abstract class RoamBase
     {
         // public SimpleList<RoamDiamond> Diamonds;
         // public SimpleList<RoamTriangle> Triangles;
@@ -62,12 +64,6 @@ namespace PlanetBuilder.Roam
         //    virtual void computeVertexAltitude(RoamVertex* vertex, const RoamTriangle* triangle) = 0;
         //    virtual double computeVertexAltitude(const Vec3d &normal) = 0;
 
-        public void Update()
-        {
-            Merge();
-            Split();
-        }
-
         public void Split()
         {
             var triangle = ActiveTriangles.NextNode;
@@ -77,7 +73,7 @@ namespace PlanetBuilder.Roam
 
                 triangle.Flags |= RoamTriangleFlags.Visible;
 
-                if (triangle.Flags.HasFlag(RoamTriangleFlags.ForceSplit) || triangle.Material.SubdivideTriangle(triangle, true))
+                if (triangle.Flags.HasFlag(RoamTriangleFlags.ForceSplit) || SubdivideTriangle(triangle))
                 {
                     var opposite = triangle.BaseNeighbor;
 
@@ -156,6 +152,9 @@ namespace PlanetBuilder.Roam
             }
         }
 
+        protected abstract bool MergeDiamond(RoamDiamond diamond);
+        protected abstract bool SubdivideTriangle(RoamTriangle triangle);
+
         public void Merge()
         {
             var diamond = ActiveDiamonds.NextNode;
@@ -166,7 +165,8 @@ namespace PlanetBuilder.Roam
                 var triangle = diamond.Triangles[0].Parent;
                 var opposite = diamond.Triangles[2].Parent;
 
-                if (!(triangle.Material.SubdivideTriangle(triangle, false) || opposite.Material.SubdivideTriangle(opposite, false)))
+                if(MergeDiamond(diamond))
+//                if (!(triangle.Material.SubdivideTriangle(triangle, false) || opposite.Material.SubdivideTriangle(opposite, false)))
                 {
                     var tri0 = diamond.Triangles[0];
                     var tri1 = diamond.Triangles[1];
@@ -278,6 +278,27 @@ namespace PlanetBuilder.Roam
                 }
                 t0.Flags |= RoamTriangleFlags.Modified;
             }
+        }
+
+
+        public void PrintSummary()
+        {
+            Console.WriteLine($"NumVertexes: {ActiveVertexes.Count()}");
+            Console.WriteLine($"NumTriangles: {ActiveTriangles.Count()}");
+            Console.WriteLine($"NumDiamonds: {ActiveDiamonds.Count()}");
+        }
+
+        public void SaveStl(string filename)
+        {
+            using(var stlWriter = new StlWriter(File.Create(filename)))
+            {
+                var triangle = ActiveTriangles.NextNode;
+                for (; triangle != ActiveTriangles;triangle = triangle.NextNode)
+                {
+                    stlWriter.AddTriangle(triangle.Vertexes[0].Position, triangle.Vertexes[1].Position, triangle.Vertexes[2].Position);
+                }
+            }
+            
         }
 
     }

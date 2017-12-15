@@ -32,12 +32,12 @@ namespace PlanetBuilder
             return new Vector2d(tx, ty);
         }
 
-        public static Vector2d SphericalToTextureCoords(Vector3d v)
+        public static Vector2d SphericalToTextureCoords(Vector3d n)
         {
-            double lat = Math.PI * 0.5 - Math.Acos(v.y);
-            double lon = Math.Atan2(v.x, v.z);
+            double lat = Math.PI * 0.5 - Math.Acos(n.z);
+            double lon = Math.Atan2(n.x, n.y);
 
-            double tx = (Math.PI + lon) / (Math.PI * 2);
+            double tx = (Math.PI - lon) / (Math.PI * 2);
             double ty = (Math.PI * 0.5 - lat) / Math.PI;
 
             return new Vector2d(tx, ty);

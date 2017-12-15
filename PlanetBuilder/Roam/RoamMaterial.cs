@@ -5,8 +5,6 @@ namespace PlanetBuilder.Roam
 
     public abstract class RoamMaterial
     {
-        public abstract bool SubdivideTriangle(RoamTriangle triangle, bool split);
-
         public virtual void ComputeVertexAltitude(RoamVertex vertex, Vector3d normal)
         {
             vertex.LinearPosition = normal;
@@ -20,6 +18,5 @@ namespace PlanetBuilder.Roam
 
             vertex.Position = vertex.LinearPosition;//vertex.Normal * (groundRadius + vertex.altitude);
         }
-
     }
 }

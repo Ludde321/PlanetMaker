@@ -8,13 +8,6 @@ namespace PlanetBuilder.Roam
         {
         }
 
-        public override bool SubdivideTriangle(RoamTriangle triangle, bool split)
-        {
-            if(split)
-                return triangle.Level < 4;
-            else
-                return false;
-        }
 
         public override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
         {
@@ -83,6 +76,16 @@ namespace PlanetBuilder.Roam
             AllocTriangle().Init(v5, v2, v1, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), m0);
 
             InitTriangles();
+        }
+
+        protected override bool SubdivideTriangle(RoamTriangle triangle)
+        {
+            return triangle.Level < 4;
+        }
+
+        protected override bool MergeDiamond(RoamDiamond diamond)
+        {
+            return true;
         }
     }
 }

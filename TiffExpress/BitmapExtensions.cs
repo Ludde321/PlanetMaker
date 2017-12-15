@@ -18,5 +18,94 @@ namespace TiffExpress
                 for(int x =0;x<row.Length;x++)
                     row[x] = func(row[x]);
         }
+
+        public static byte ReadBilinearPixel(this Bitmap<byte> texture, double tx, double ty)
+        {
+            uint width = (uint)texture.Width;
+            uint height = (uint)texture.Height;
+
+            tx *= width - 1;
+            ty *= height - 1;
+
+            uint ix0 = (uint)tx;
+            uint iy0 = (uint)ty;
+
+            double fx = tx - ix0;
+            double fy = ty - iy0;
+
+            uint ix1 = (ix0 + 1) % (width - 1); // wrap width
+            uint iy1 = iy0 + 1;
+            if (iy1 >= height) iy1 = height - 1; // clamp height
+
+            byte p00 = texture.Rows[iy0][ix0];  // p00......p01
+            byte p10 = texture.Rows[iy1][ix0];  // .        .
+            byte p01 = texture.Rows[iy0][ix1];  // .        .
+            byte p11 = texture.Rows[iy1][ix1];  // p10......p11
+
+            double p00p01 = p00 + (p01 - p00) * fx;
+            double p10p11 = p10 + (p11 - p10) * fx;
+
+            return (byte)(p00p01 + (p10p11 - p00p01) * fy);
+        }
+
+        public static short ReadBilinearPixel(this Bitmap<short> texture, double tx, double ty)
+        {
+            uint width = (uint)texture.Width;
+            uint height = (uint)texture.Height;
+
+            tx *= width - 1;
+            ty *= height - 1;
+
+            uint ix0 = (uint)tx;
+            uint iy0 = (uint)ty;
+
+            double fx = tx - ix0;
+            double fy = ty - iy0;
+
+            uint ix1 = (ix0 + 1) % (width - 1); // wrap width
+            uint iy1 = iy0 + 1;
+            if (iy1 >= height) iy1 = height - 1; // clamp height
+
+            short p00 = texture.Rows[iy0][ix0];  // p00......p01
+            short p10 = texture.Rows[iy1][ix0];  // .        .
+            short p01 = texture.Rows[iy0][ix1];  // .        .
+            short p11 = texture.Rows[iy1][ix1];  // p10......p11
+
+            double p00p01 = p00 + (p01 - p00) * fx;
+            double p10p11 = p10 + (p11 - p10) * fx;
+
+            return (short)(p00p01 + (p10p11 - p00p01) * fy);
+        }
+
+        public static float ReadBilinearPixel(this Bitmap<float> texture, double tx, double ty)
+        {
+            uint width = (uint)texture.Width;
+            uint height = (uint)texture.Height;
+
+            tx *= width - 1;
+            ty *= height - 1;
+
+            uint ix0 = (uint)tx;
+            uint iy0 = (uint)ty;
+
+            double fx = tx - ix0;
+            double fy = ty - iy0;
+
+            uint ix1 = (ix0 + 1) % (width - 1); // wrap width
+            uint iy1 = iy0 + 1;
+            if (iy1 >= height) iy1 = height - 1; // clamp height
+
+            float p00 = texture.Rows[iy0][ix0];  // p00......p01
+            float p10 = texture.Rows[iy1][ix0];  // .        .
+            float p01 = texture.Rows[iy0][ix1];  // .        .
+            float p11 = texture.Rows[iy1][ix1];  // p10......p11
+
+            double p00p01 = p00 + (p01 - p00) * fx;
+            double p10p11 = p10 + (p11 - p10) * fx;
+
+            return (float)(p00p01 + (p10p11 - p00p01) * fy);
+        }
+
+
     }
 }
