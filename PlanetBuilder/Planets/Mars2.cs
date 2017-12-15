@@ -18,7 +18,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 3396190;
             ElevationScale = 10;
-            MaxLevels = 17;
+            MaxLevels = 19;
         }
 
         public void Create()
@@ -94,14 +94,10 @@ namespace PlanetBuilder.Planets
 
         protected override bool MergeDiamond(RoamDiamond diamond)
         {
-            var triangle = diamond.Triangles[0].Parent;
-//            var opposite = diamond.Triangles[2].Parent;
+            var vm = Vector3d.MiddlePoint(diamond.Triangles[0].Vertexes[0].Position, diamond.Triangles[1].Vertexes[2].Position);
+            double d2 = Vector3d.Distance2(vm, diamond.Triangles[0].Vertexes[2].Position);
 
-            var v0 = triangle.Vertexes[0];
-            var v2 = triangle.Vertexes[2];
-            
-
-            return true;
+            return d2 < 25000 * 25000;
         }
 
         public class RoamMaterialMars : RoamMaterial

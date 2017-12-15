@@ -51,6 +51,20 @@ namespace PlanetBuilder
 
             return new Vector3d();
         }
+        public static double Distance2(Vector3d v1, Vector3d v2)
+        {
+            double dx = v2.x - v1.x;
+            double dy = v2.y - v1.y;
+            double dz = v2.z - v1.z;
+            return dx * dx + dy * dy + dz * dz;
+        }
+        public static double Distance(Vector3d v1, Vector3d v2)
+        {
+            double dx = v2.x - v1.x;
+            double dy = v2.y - v1.y;
+            double dz = v2.z - v1.z;
+            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
 
         public static Vector3d Multiply(Vector3d v, double s)
         {
