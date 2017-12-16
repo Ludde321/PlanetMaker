@@ -76,6 +76,16 @@ namespace PlanetBuilder
             return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
         }
 
+        public static Vector3d CrossProduct(Vector3d a, Vector3d b)
+        {
+            return new Vector3d(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+        }
+
+        public static double TriangleArea(Vector3d a, Vector3d b, Vector3d c)
+        {
+            return CrossProduct(a - b, c - b).Abs() * .5;
+        }
+
         public static Vector3d operator +(Vector3d a, Vector3d b)
         {
             return new Vector3d(a.x + b.x, a.y + b.y, a.z + b.z);

@@ -92,12 +92,17 @@ namespace PlanetBuilder.Planets
             return triangle.Level < MaxLevels;
         }
 
+        private readonly double _maxCos2Angle = Math.Pow(Math.Cos(MathHelper.ToRadians(5)), 2);
+
         protected override bool MergeDiamond(RoamDiamond diamond)
         {
-            var vm = Vector3d.MiddlePoint(diamond.Triangles[0].Vertexes[0].Position, diamond.Triangles[1].Vertexes[2].Position);
-            double d2 = Vector3d.Distance2(vm, diamond.Triangles[0].Vertexes[2].Position);
+            var n1 = diamond.Triangles[1].Vertexes[2].Position - diamond.Triangles[0].Vertexes[0].Position;
+            var n2 = diamond.Triangles[0].Vertexes[1].Position - diamond.Triangles[0].Vertexes[0].Position;
 
-            return d2 < 25000 * 25000;
+            double dot12 = Vector3d.Dot(n1, n2);
+            double cos2A = (dot12 * dot12) / (n1.Abs2() * n2.Abs2());
+
+            return cos2A >= _maxCos2Angle;
         }
 
         public class RoamMaterialMars : RoamMaterial

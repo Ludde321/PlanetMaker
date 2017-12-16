@@ -17,7 +17,7 @@ namespace PlanetBuilder.Planets
         public Mars()
         {
             PlanetRadius = 3396190;
-            ElevationScale = 10;
+            ElevationScale = 8;
             RecursionLevel = 9;
             PlanetProjection = Projection.Equirectangular;
         }
