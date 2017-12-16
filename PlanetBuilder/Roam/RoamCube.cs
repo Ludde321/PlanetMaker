@@ -11,7 +11,7 @@ namespace PlanetBuilder.Roam
 
         public override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
         {
-            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes[0].LinearPosition, triangle.Vertexes[2].LinearPosition);
+            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
             vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
 
             vertex.Position = Vector3d.Multiply(vertex.Normal, 1);//vertex.Normal * (groundRadius + vertex.altitude);

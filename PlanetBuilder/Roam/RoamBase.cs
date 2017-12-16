@@ -89,8 +89,8 @@ namespace PlanetBuilder.Roam
                     triangle.Flags &= ~RoamTriangleFlags.ForceSplit;
 
                     // Compute new texture coords
-                    Vector2d texCoordTriangle = Vector2d.MiddlePoint(triangle.TextureCoords[0], triangle.TextureCoords[2]);
-                    Vector2d texCoordOpposite = Vector2d.MiddlePoint(opposite.TextureCoords[0], opposite.TextureCoords[2]);
+                    Vector2d texCoordTriangle = Vector2d.MiddlePoint(triangle.TextureCoords0, triangle.TextureCoords2);
+                    Vector2d texCoordOpposite = Vector2d.MiddlePoint(opposite.TextureCoords0, opposite.TextureCoords2);
 
                     var vertex = AllocVertex();
 
@@ -104,22 +104,26 @@ namespace PlanetBuilder.Roam
                     var tri3 = AllocTriangle();
 
                     // Triangle 0
-                    tri0.Set(triangle, 2, 1, vertex, texCoordTriangle);
+//                    tri0.Set(triangle, 2, 1, vertex, texCoordTriangle);
+                    tri0.Set(triangle, triangle.Vertexes2, vertex, triangle.Vertexes1, triangle.TextureCoords2, texCoordTriangle, triangle.TextureCoords1);
                     tri0.SetNeighbors(triangle.LeftNeighbor, tri1, tri3);
                     tri0.BaseNeighbor.ReplaceNeighbor(triangle, tri0);
 
                     // Triangle 1
-                    tri1.Set(triangle, 1, 0, vertex, texCoordTriangle);
+//                    tri1.Set(triangle, 1, 0, vertex, texCoordTriangle);
+                    tri1.Set(triangle, triangle.Vertexes1, vertex, triangle.Vertexes0, triangle.TextureCoords1, texCoordTriangle, triangle.TextureCoords0);
                     tri1.SetNeighbors(triangle.RightNeighbor, tri2, tri0);
                     tri1.BaseNeighbor.ReplaceNeighbor(triangle, tri1);
 
                     // Triangle 2
-                    tri2.Set(opposite, 2, 1, vertex, texCoordOpposite);
+//                    tri2.Set(opposite, 2, 1, vertex, texCoordOpposite);
+                    tri2.Set(opposite, opposite.Vertexes2, vertex, opposite.Vertexes1, opposite.TextureCoords2, texCoordTriangle, opposite.TextureCoords1);
                     tri2.SetNeighbors(opposite.LeftNeighbor, tri3, tri1);
                     tri2.BaseNeighbor.ReplaceNeighbor(opposite, tri2);
 
                     // Triangle 3
-                    tri3.Set(opposite, 1, 0, vertex, texCoordOpposite);
+//                    tri3.Set(opposite, 1, 0, vertex, texCoordOpposite);
+                    tri3.Set(opposite, opposite.Vertexes1, vertex, opposite.Vertexes0, opposite.TextureCoords1, texCoordTriangle, opposite.TextureCoords0);
                     tri3.SetNeighbors(opposite.RightNeighbor, tri0, tri2);
                     tri3.BaseNeighbor.ReplaceNeighbor(opposite, tri3);
 
@@ -162,16 +166,15 @@ namespace PlanetBuilder.Roam
             {
                 var next = diamond.NextNode;
 
-                var triangle = diamond.Triangles[0].Parent;
-                var opposite = diamond.Triangles[2].Parent;
+                var triangle = diamond.Triangles0.Parent;
+                var opposite = diamond.Triangles2.Parent;
 
                 if(MergeDiamond(diamond))
-//                if (!(triangle.Material.SubdivideTriangle(triangle, false) || opposite.Material.SubdivideTriangle(opposite, false)))
                 {
-                    var tri0 = diamond.Triangles[0];
-                    var tri1 = diamond.Triangles[1];
-                    var tri2 = diamond.Triangles[2];
-                    var tri3 = diamond.Triangles[3];
+                    var tri0 = diamond.Triangles0;
+                    var tri1 = diamond.Triangles1;
+                    var tri2 = diamond.Triangles2;
+                    var tri3 = diamond.Triangles3;
 
                     // Update neighbors
                     triangle.SetNeighbors(opposite, tri0.BaseNeighbor, tri1.BaseNeighbor);
@@ -239,7 +242,7 @@ namespace PlanetBuilder.Roam
                     }
 
                     // Free vertex and triangles
-                    var vertex = tri0.Vertexes[1];
+                    var vertex = tri0.Vertexes1;
 
                     FreeVertex(vertex);
 
@@ -269,11 +272,11 @@ namespace PlanetBuilder.Roam
                 {
                     if (t0 == t1) continue;
 
-                    if (t1.HasVertex(t0.Vertexes[0]) && t1.HasVertex(t0.Vertexes[1]))
+                    if (t1.HasVertex(t0.Vertexes0) && t1.HasVertex(t0.Vertexes1))
                         t0.RightNeighbor = t1;
-                    else if (t1.HasVertex(t0.Vertexes[1]) && t1.HasVertex(t0.Vertexes[2]))
+                    else if (t1.HasVertex(t0.Vertexes1) && t1.HasVertex(t0.Vertexes2))
                         t0.LeftNeighbor = t1;
-                    else if (t1.HasVertex(t0.Vertexes[2]) && t1.HasVertex(t0.Vertexes[0]))
+                    else if (t1.HasVertex(t0.Vertexes2) && t1.HasVertex(t0.Vertexes0))
                         t0.BaseNeighbor = t1;
                 }
                 t0.Flags |= RoamTriangleFlags.Modified;
@@ -295,7 +298,7 @@ namespace PlanetBuilder.Roam
                 var triangle = ActiveTriangles.NextNode;
                 for (; triangle != ActiveTriangles;triangle = triangle.NextNode)
                 {
-                    stlWriter.AddTriangle(triangle.Vertexes[0].Position, triangle.Vertexes[1].Position, triangle.Vertexes[2].Position);
+                    stlWriter.AddTriangle(triangle.Vertexes0.Position, triangle.Vertexes1.Position, triangle.Vertexes2.Position);
                 }
             }
             

@@ -96,8 +96,8 @@ namespace PlanetBuilder.Planets
 
         protected override bool MergeDiamond(RoamDiamond diamond)
         {
-            var n1 = diamond.Triangles[1].Vertexes[2].Position - diamond.Triangles[0].Vertexes[0].Position;
-            var n2 = diamond.Triangles[0].Vertexes[1].Position - diamond.Triangles[0].Vertexes[0].Position;
+            var n1 = diamond.Triangles1.Vertexes2.Position - diamond.Triangles0.Vertexes0.Position;
+            var n2 = diamond.Triangles0.Vertexes1.Position - diamond.Triangles0.Vertexes0.Position;
 
             double dot12 = Vector3d.Dot(n1, n2);
             double cos2A = (dot12 * dot12) / (n1.Abs2() * n2.Abs2());
@@ -116,7 +116,7 @@ namespace PlanetBuilder.Planets
 
             public override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
             {
-                vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes[0].LinearPosition, triangle.Vertexes[2].LinearPosition);
+                vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
                 vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
 
                 var t = MathHelper.SphericalToTextureCoords(vertex.Normal);

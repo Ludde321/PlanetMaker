@@ -22,9 +22,13 @@ namespace PlanetBuilder.Roam
         public RoamTriangle Parent;
 
         public RoamDiamond Diamond;
-        public readonly RoamVertex[] Vertexes = new RoamVertex[3];
+        public RoamVertex Vertexes0;
+        public RoamVertex Vertexes1;
+        public RoamVertex Vertexes2;
 
-        public readonly Vector2d[] TextureCoords = new Vector2d[3];
+        public Vector2d TextureCoords0;
+        public Vector2d TextureCoords1;
+        public Vector2d TextureCoords2;
 
         public RoamMaterial Material;
         public RoamTriangleFlags Flags = RoamTriangleFlags.Modified;
@@ -40,34 +44,32 @@ namespace PlanetBuilder.Roam
 
             SetVertexes(v0, v1, v2);
 
-            TextureCoords[0] = tex0;
-            TextureCoords[1] = tex1;
-            TextureCoords[2] = tex2;
+            TextureCoords0 = tex0;
+            TextureCoords1 = tex1;
+            TextureCoords2 = tex2;
         }
 
-        public void Set(RoamTriangle triangle, int i0, int i2, RoamVertex v1, Vector2d texCoord)
+//        public void Set(RoamTriangle triangle, int i0, int i2, RoamVertex v1, Vector2d texCoord)
+        public void Set(RoamTriangle parent, RoamVertex v0, RoamVertex v1, RoamVertex v2, Vector2d texCoord0, Vector2d texCoord1, Vector2d texCoord2)
         {
-            var v0 = triangle.Vertexes[i0];
-            var v2 = triangle.Vertexes[i2];
-
             SetVertexes(v0, v1, v2);
 
-            TextureCoords[0] = triangle.TextureCoords[i0];
-            TextureCoords[1] = texCoord;
-            TextureCoords[2] = triangle.TextureCoords[i2];
+            TextureCoords0 = texCoord0;
+            TextureCoords1 = texCoord1;
+            TextureCoords2 = texCoord2;
 
-            Parent = triangle;
+            Parent = parent;
 
-            Level = (ushort)(triangle.Level + 1);
+            Level = (ushort)(parent.Level + 1);
             Flags = RoamTriangleFlags.Modified;
-            Material = triangle.Material;
+            Material = parent.Material;
         }
 
         void SetVertexes(RoamVertex v0, RoamVertex v1, RoamVertex v2)
         {
-            Vertexes[0] = v0;
-            Vertexes[1] = v1;
-            Vertexes[2] = v2;
+            Vertexes0 = v0;
+            Vertexes1 = v1;
+            Vertexes2 = v2;
 
             Center = Vector3d.Center(v0.Position, v1.Position, v2.Position);
 
@@ -109,7 +111,7 @@ namespace PlanetBuilder.Roam
 
         public bool HasVertex(RoamVertex v)
         {
-            return Vertexes[0] == v || Vertexes[1] == v || Vertexes[2] == v;
+            return Vertexes0 == v || Vertexes1 == v || Vertexes2 == v;
         }
 
     }
