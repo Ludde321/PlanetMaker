@@ -28,14 +28,14 @@ namespace PlanetBuilder.Roam
             var n6 = Vector3d.Normalize(new Vector3d(-1, -1, -1));
             var n7 = Vector3d.Normalize(new Vector3d(-1, 1, -1));
 
-            material.ComputeVertexAltitude(v0, n0);
-            material.ComputeVertexAltitude(v1, n1);
-            material.ComputeVertexAltitude(v2, n2);
-            material.ComputeVertexAltitude(v3, n3);
-            material.ComputeVertexAltitude(v4, n4);
-            material.ComputeVertexAltitude(v5, n5);
-            material.ComputeVertexAltitude(v6, n6);
-            material.ComputeVertexAltitude(v7, n7);
+            ComputeVertexAltitude(v0, n0);
+            ComputeVertexAltitude(v1, n1);
+            ComputeVertexAltitude(v2, n2);
+            ComputeVertexAltitude(v3, n3);
+            ComputeVertexAltitude(v4, n4);
+            ComputeVertexAltitude(v5, n5);
+            ComputeVertexAltitude(v6, n6);
+            ComputeVertexAltitude(v7, n7);
 
             // Create front face vertices and triangles
             AllocTriangle().Init(v0, v1, v2, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);

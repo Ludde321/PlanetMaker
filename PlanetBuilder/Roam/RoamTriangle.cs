@@ -34,9 +34,9 @@ namespace PlanetBuilder.Roam
         public RoamTriangleFlags Flags = RoamTriangleFlags.Modified;
         public ushort Level;
 
-        public Vector3d Center;
-        public double TwoDivArea;      // 2/area
-        public double Radius;           // radius
+        // public Vector3d Center;
+        // public double TwoDivArea;      // 2/area
+        // public double Radius;           // radius
 
         public void Init(RoamVertex v0, RoamVertex v1, RoamVertex v2, Vector2d tex0, Vector2d tex1, Vector2d tex2, RoamMaterial material)
         {
@@ -49,7 +49,6 @@ namespace PlanetBuilder.Roam
             TextureCoords2 = tex2;
         }
 
-//        public void Set(RoamTriangle triangle, int i0, int i2, RoamVertex v1, Vector2d texCoord)
         public void Set(RoamTriangle parent, RoamVertex v0, RoamVertex v1, RoamVertex v2, Vector2d texCoord0, Vector2d texCoord1, Vector2d texCoord2)
         {
             SetVertexes(v0, v1, v2);
@@ -71,7 +70,7 @@ namespace PlanetBuilder.Roam
             Vertexes1 = v1;
             Vertexes2 = v2;
 
-            Center = Vector3d.Center(v0.Position, v1.Position, v2.Position);
+            //Center = Vector3d.Center(v0.Position, v1.Position, v2.Position);
 
             // Compute plane and area
             // Vector3d n = Vector3d.CrossProduct(v2.Position - v1.Position, v0.Position - v1.Position);

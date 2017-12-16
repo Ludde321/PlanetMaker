@@ -18,7 +18,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 3396190;
             ElevationScale = 10;
-            MaxLevels = 19;
+            MaxLevels = 17;
         }
 
         public void Create()
@@ -83,8 +83,7 @@ namespace PlanetBuilder.Planets
 
         public void Init()
         {
-            var material = new RoamMaterialMars(this);
-            base.Init(material);
+            base.Init(null);
         }
 
         protected override bool SubdivideTriangle(RoamTriangle triangle)
@@ -105,44 +104,33 @@ namespace PlanetBuilder.Planets
             return cos2A >= _maxCos2Angle;
         }
 
-        public class RoamMaterialMars : RoamMaterial
+        protected override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
         {
-            public readonly Mars2 Planet;
+            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
+            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
 
-            public RoamMaterialMars(Mars2 planet)
-            {
-                Planet = planet;
-            }
+            var t = MathHelper.SphericalToTextureCoords(vertex.Normal);
 
-            public override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
-            {
-                vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
-                vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
+            short h = _elevationTexture.ReadBilinearPixel(t.x, t.y);
+            short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y);
 
-                var t = MathHelper.SphericalToTextureCoords(vertex.Normal);
+            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
-                short h = Planet._elevationTexture.ReadBilinearPixel(t.x, t.y);
-                short hAvg = Planet._elevationTextureBlur.ReadBilinearPixel(t.x, t.y);
+            vertex.Position = Vector3d.Multiply(vertex.Normal, r);
+        }
 
-                double r = Planet.PlanetRadius + (h - hAvg) * Planet.ElevationScale + hAvg;
+        protected override void ComputeVertexAltitude(RoamVertex vertex, Vector3d normal)
+        {
+            var t = MathHelper.SphericalToTextureCoords(vertex.Normal);
 
-                vertex.Position = Vector3d.Multiply(vertex.Normal, r);
-            }
+            short h = _elevationTexture.ReadBilinearPixel(t.x, t.y);
+            short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y);
 
-            public override void ComputeVertexAltitude(RoamVertex vertex, Vector3d normal)
-            {
-                var t = MathHelper.SphericalToTextureCoords(vertex.Normal);
+            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
-                short h = Planet._elevationTexture.ReadBilinearPixel(t.x, t.y);
-                short hAvg = Planet._elevationTextureBlur.ReadBilinearPixel(t.x, t.y);
-
-                double r = Planet.PlanetRadius + (h - hAvg) * Planet.ElevationScale + hAvg;
-
-                vertex.Normal = normal;
-                vertex.Position = Vector3d.Multiply(vertex.Normal, r);
-                vertex.LinearPosition = vertex.Position;
-            }
-
+            vertex.Normal = normal;
+            vertex.Position = Vector3d.Multiply(vertex.Normal, r);
+            vertex.LinearPosition = vertex.Position;
         }
 
     }

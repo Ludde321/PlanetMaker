@@ -95,7 +95,7 @@ namespace PlanetBuilder.Roam
                     var vertex = AllocVertex();
 
                     // Compute vertex
-                    triangle.Material.ComputeVertexAltitude(vertex, triangle);
+                    ComputeVertexAltitude(vertex, triangle);
 
                     // 4 x allocTriangle();
                     var tri0 = AllocTriangle();
@@ -260,6 +260,20 @@ namespace PlanetBuilder.Roam
             }
         }
 
+
+        protected virtual void ComputeVertexAltitude(RoamVertex vertex, Vector3d normal)
+        {
+            vertex.LinearPosition = normal;
+            vertex.Normal = normal;
+            vertex.Position = normal;
+        }
+        protected virtual void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
+        {
+            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.Position, triangle.Vertexes2.Position);
+            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
+
+            vertex.Position = vertex.LinearPosition;//vertex.Normal * (groundRadius + vertex.altitude);
+        }
 
         protected void InitTriangles()
         {

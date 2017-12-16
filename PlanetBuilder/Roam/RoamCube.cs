@@ -4,18 +4,6 @@ namespace PlanetBuilder.Roam
 {
     public class RoamMaterialCube : RoamMaterial
     {
-        public RoamMaterialCube()
-        {
-        }
-
-
-        public override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
-        {
-            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
-            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
-
-            vertex.Position = Vector3d.Multiply(vertex.Normal, 1);//vertex.Normal * (groundRadius + vertex.altitude);
-        }
     }
 
     public class RoamCube : RoamBase
@@ -42,14 +30,14 @@ namespace PlanetBuilder.Roam
             var n6 = Vector3d.Normalize(new Vector3d(-1, -1, -1));
             var n7 = Vector3d.Normalize(new Vector3d(-1, 1, -1));
 
-            m0.ComputeVertexAltitude(v0, n0);
-            m0.ComputeVertexAltitude(v1, n1);
-            m0.ComputeVertexAltitude(v2, n2);
-            m0.ComputeVertexAltitude(v3, n3);
-            m0.ComputeVertexAltitude(v4, n4);
-            m0.ComputeVertexAltitude(v5, n5);
-            m0.ComputeVertexAltitude(v6, n6);
-            m0.ComputeVertexAltitude(v7, n7);
+            ComputeVertexAltitude(v0, n0);
+            ComputeVertexAltitude(v1, n1);
+            ComputeVertexAltitude(v2, n2);
+            ComputeVertexAltitude(v3, n3);
+            ComputeVertexAltitude(v4, n4);
+            ComputeVertexAltitude(v5, n5);
+            ComputeVertexAltitude(v6, n6);
+            ComputeVertexAltitude(v7, n7);
 
             // Create front face vertices and triangles
             AllocTriangle().Init(v0, v1, v2, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), m0);
@@ -86,6 +74,14 @@ namespace PlanetBuilder.Roam
         protected override bool MergeDiamond(RoamDiamond diamond)
         {
             return true;
+        }
+
+        protected override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
+        {
+            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
+            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
+
+            vertex.Position = Vector3d.Multiply(vertex.Normal, 1);//vertex.Normal * (groundRadius + vertex.altitude);
         }
     }
 }
