@@ -28,7 +28,7 @@ namespace PlanetBuilder.Planets
 
             int width = 2880;
             int height = 1440;
-            string elevationTextureSmallFilename = $@"Generated\Planets\Moon\Moon{width}x{height}.raw";
+            string elevationTextureSmallFilename = $@"Generated\Planets\Moon\Moon{width}x{height}.tif";
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
@@ -40,15 +40,15 @@ namespace PlanetBuilder.Planets
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                BitmapHelper.SaveTiff16(elevationTextureSmallFilename, _elevationTextureSmall);
+                BitmapHelper.SavePng8($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
             }
             else
             {
-                _elevationTextureSmall = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+                _elevationTextureSmall = BitmapHelper.LoadTiff16(elevationTextureSmallFilename);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
 
-            string elevationTextureBlurFilename = $@"Generated\Planets\Moon\MoonBlur{width}x{height}.raw";
+            string elevationTextureBlurFilename = $@"Generated\Planets\Moon\MoonBlur{width}x{height}.tif";
             if (!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
@@ -56,13 +56,13 @@ namespace PlanetBuilder.Planets
                 _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Moon\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+                BitmapHelper.SaveTiff16(elevationTextureBlurFilename, _elevationTextureBlur);
             }
             else
             {
-                _elevationTextureBlur = BitmapHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
+                _elevationTextureBlur = BitmapHelper.LoadTiff16(elevationTextureBlurFilename);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Moon\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            //BitmapHelper.SavePng8($@"Generated\Planets\Moon\MoonBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
