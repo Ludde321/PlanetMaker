@@ -51,6 +51,14 @@ namespace PlanetBuilder
             return texture;
         }
 
+        public static Bitmap<short> LoadTiff16(string inputFilename)
+        {
+            using (var tiffReader = new TiffReader(File.OpenRead(inputFilename)))
+            {
+                return tiffReader.ReadImageFile<short>().ToBitmap();
+            }
+        }
+
         // public static Bitmap<short> LoadTiff16(string inputFilename)
         // {
         //     int width;

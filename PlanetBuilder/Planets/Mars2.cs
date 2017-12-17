@@ -18,7 +18,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 3396190;
             ElevationScale = 10;
-            MaxLevels = 19;
+            MaxLevels = 18;
         }
 
         public void Create()
@@ -27,7 +27,7 @@ namespace PlanetBuilder.Planets
 
             int width = 2880;
             int height = 1440;
-            string elevationTextureFilename = $@"Generated\Planets\Mars2\Mars{width}x{height}.raw";
+            string elevationTextureFilename = $@"Generated\Planets\Mars2\Mars{width}x{height}.tif";
             if (!File.Exists(elevationTextureFilename))
             {
                 sw = Stopwatch.StartNew();
@@ -41,16 +41,16 @@ namespace PlanetBuilder.Planets
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Mars2\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
+                BitmapHelper.SaveTiff16(elevationTextureFilename, _elevationTexture);
             }
             else
             {
-                _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureFilename, width, height);
+                _elevationTexture = BitmapHelper.LoadTiff16(elevationTextureFilename);
             }
-            BitmapHelper.SaveTiff8($@"Generated\Planets\Mars2\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
+            //BitmapHelper.SaveTiff8($@"Generated\Planets\Mars2\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
 
             // Blur
-            string elevationTextureBlurFilename = $@"Generated\Planets\Mars2\MarsBlur{width}x{height}.raw";
+            string elevationTextureBlurFilename = $@"Generated\Planets\Mars2\MarsBlur{width}x{height}.tif";
             if (!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
@@ -58,13 +58,13 @@ namespace PlanetBuilder.Planets
                 _elevationTextureBlur = blurFilter.Blur3(_elevationTexture, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Mars2\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
+                BitmapHelper.SaveTiff16(elevationTextureBlurFilename, _elevationTextureBlur);
             }
             else
             {
-                _elevationTextureBlur = BitmapHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
+                _elevationTextureBlur = BitmapHelper.LoadTiff16(elevationTextureBlurFilename);
             }
-            BitmapHelper.SaveTiff8($@"Generated\Planets\Mars2\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
+            //BitmapHelper.SaveTiff8($@"Generated\Planets\Mars2\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
 
             Init();
 

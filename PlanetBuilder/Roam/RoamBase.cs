@@ -195,7 +195,7 @@ namespace PlanetBuilder.Roam
                     RoamTriangle t0, t1, t2, t3;
 
                     // Create new diamond 1
-                    if (triangle.Level > 0)
+                    if (triangle.Parent != null)
                     {
                         t0 = triangle;
                         t1 = t0.LeftNeighbor;
@@ -218,7 +218,7 @@ namespace PlanetBuilder.Roam
                         }
                     }
                     // Create new diamond 2
-                    if (opposite.Level > 0)
+                    if (opposite.Parent != null)
                     {
                         t0 = opposite;
                         t1 = t0.LeftNeighbor;
