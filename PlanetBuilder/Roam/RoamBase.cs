@@ -297,7 +297,8 @@ namespace PlanetBuilder.Roam
  
             for (var t0 = ActiveTriangles.NextNode; t0 != ActiveTriangles; t0 = t0.NextNode)
             {
-                Console.WriteLine($"{t0.BaseNeighbor.BaseNeighbor != t0}");
+                if(t0.BaseNeighbor.BaseNeighbor != t0)
+                    throw new Exception("BaseNeighbor must meet BaseNeighbor");
             }
         }
 

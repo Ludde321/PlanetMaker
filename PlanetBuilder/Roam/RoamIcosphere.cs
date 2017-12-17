@@ -22,32 +22,32 @@ namespace PlanetBuilder.Roam
             var v11 = AddVertex(-t, 0, 1);
 
             // 5 faces around point 0
-            AllocTriangle().Init(v0, v11, v5, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v0, v5, v1, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v0, v1, v7, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v0, v7, v10, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v0, v10, v11, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v5, v0, v11, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v1, v0, v5, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v7, v0, v1, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v10, v0, v7, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v11, v0, v10, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
 
             // 5 adjacent faces
-            AllocTriangle().Init(v1, v5, v9, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v5, v11, v4, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v11, v10, v2, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v10, v7, v6, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v7, v1, v8, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v11, v4, v5, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v5, v9, v1, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v1, v8, v7, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v7, v6, v10, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v10, v2, v11, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
 
             // 5 faces around point 3
-            AllocTriangle().Init(v3, v9, v4, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v3, v4, v2, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v3, v2, v6, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v3, v6, v8, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v3, v8, v9, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v4, v3, v9, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v2, v3, v4, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v6, v3, v2, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v8, v3, v6, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v9, v3, v8, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
 
             // 5 adjacent faces
-            AllocTriangle().Init(v4, v9, v5, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v2, v4, v11, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v6, v2, v10, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v8, v6, v7, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
-            AllocTriangle().Init(v9, v8, v1, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v9, v5, v4, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v4, v11, v2, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v2, v10, v6, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v6, v7, v8, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v8, v1, v9, new Vector2d(0, 0), new Vector2d(0, 0), new Vector2d(0, 0), material);
 
             InitTriangles();
         }
