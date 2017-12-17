@@ -18,7 +18,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 3396190;
             ElevationScale = 10;
-            MaxLevels = 17;
+            MaxLevels = 1;
         }
 
         public void Create()
@@ -74,7 +74,7 @@ namespace PlanetBuilder.Planets
             PrintSummary();
 
             sw = Stopwatch.StartNew();
-            Merge();
+ //           Merge();
             Console.WriteLine($"Time used to merge planet geometry: {sw.Elapsed}");
             PrintSummary();
 

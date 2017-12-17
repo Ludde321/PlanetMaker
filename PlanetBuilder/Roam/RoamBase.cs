@@ -278,8 +278,7 @@ namespace PlanetBuilder.Roam
         protected void InitTriangles()
         {
             // Compute neighbor relationships
-            var t0 = ActiveTriangles.NextNode;
-            for (; t0 != ActiveTriangles; t0 = t0.NextNode)
+            for (var t0 = ActiveTriangles.NextNode; t0 != ActiveTriangles; t0 = t0.NextNode)
             {
                 var t1 = ActiveTriangles.NextNode;
                 for (; t1 != ActiveTriangles; t1 = t1.NextNode)
@@ -294,6 +293,11 @@ namespace PlanetBuilder.Roam
                         t0.BaseNeighbor = t1;
                 }
                 t0.Flags |= RoamTriangleFlags.Modified;
+            }
+ 
+            for (var t0 = ActiveTriangles.NextNode; t0 != ActiveTriangles; t0 = t0.NextNode)
+            {
+                Console.WriteLine($"{t0.BaseNeighbor.BaseNeighbor != t0}");
             }
         }
 
