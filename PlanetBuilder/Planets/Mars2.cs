@@ -18,7 +18,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 3396190;
             ElevationScale = 10;
-            MaxLevels = 18;
+            MaxLevels = 20;
         }
 
         public void Create()
