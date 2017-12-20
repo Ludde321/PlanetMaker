@@ -162,8 +162,8 @@ namespace PlanetBuilder.Planets
             double sy = t.y * _sy - _sy0;
             double sx = t.x * _sx - _sx0;
 
-            short h = _elevationSectorBitmap.ReadBilinearPixel(sx, sy);
-            short hAvg = _elevationBitmapBlur.ReadBilinearPixel(t.x, t.y);
+            short h = _elevationSectorBitmap.ReadBilinearPixel(sx, sy, true, false);
+            short hAvg = _elevationBitmapBlur.ReadBilinearPixel(t.x, t.y, true, false);
 
             double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
@@ -173,7 +173,7 @@ namespace PlanetBuilder.Planets
         {
             var t = MathHelper.SphericalToTextureCoords(lat, lon);
 
-            short hAvg = _elevationBitmapBlur.ReadBilinearPixel(t.x, t.y);
+            short hAvg = _elevationBitmapBlur.ReadBilinearPixel(t.x, t.y, true, false);
 
             double r = PlanetRadius - 50000 + hAvg;
 

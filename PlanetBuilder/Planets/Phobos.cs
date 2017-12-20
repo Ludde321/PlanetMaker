@@ -50,7 +50,7 @@ namespace PlanetBuilder.Planets
         {
             var t = MathHelper.SphericalToTextureCoords(v);
 
-            short h = _elevationTexture.ReadBilinearPixel(t.x, t.y);
+            short h = _elevationTexture.ReadBilinearPixel(t.x, t.y, true, false);
 
             double r = PlanetRadius + h;
 

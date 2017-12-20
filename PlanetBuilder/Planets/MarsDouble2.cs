@@ -139,11 +139,11 @@ namespace PlanetBuilder.Planets
             double z = vertex.LinearPosition.z;
             if (triangle.Material == 0)
             {
-                z += 0.17 + 0.000030 * _topElevationBitmap.ReadBilinearPixel(tex.x, tex.y);
+                z += 0.17 + 0.000030 * _topElevationBitmap.ReadBilinearPixel(tex.x, tex.y, false, false);
             }
             else if (triangle.Material == 1)
             {
-                z -= 0.22 + 0.000034 * _bottomElevationBitmap.ReadBilinearPixel(tex.x, tex.y);
+                z -= 0.22 + 0.000034 * _bottomElevationBitmap.ReadBilinearPixel(tex.x, tex.y, false, false);
             }
 
             vertex.Position = new Vector3d(vertex.LinearPosition.x, vertex.LinearPosition.y, z);
