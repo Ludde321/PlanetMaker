@@ -17,7 +17,7 @@ namespace PlanetBuilder.Planets
         public Mars()
         {
             PlanetRadius = 3396190;
-            ElevationScale = 8;
+            ElevationScale = 20;
             RecursionLevel = 9;
             PlanetProjection = Projection.Equirectangular;
         }
@@ -89,7 +89,7 @@ namespace PlanetBuilder.Planets
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\Mars\Mars{RecursionLevel}.stl");
+            SaveSTL($@"Generated\Planets\Mars\Mars{RecursionLevel}_{(int)ElevationScale}x.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)

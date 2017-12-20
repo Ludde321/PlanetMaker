@@ -81,11 +81,6 @@ namespace PlanetBuilder.Planets
             SaveStl("Generated/Planets/Mars2/Mars2.stl");
         }
 
-        public void Init()
-        {
-            base.Init(null);
-        }
-
         protected override bool SubdivideTriangle(RoamTriangle triangle)
         {
             return triangle.Level < MaxLevels;
@@ -121,7 +116,7 @@ namespace PlanetBuilder.Planets
 
         protected override void ComputeVertexAltitude(RoamVertex vertex, Vector3d normal)
         {
-            var t = MathHelper.SphericalToTextureCoords(vertex.Normal);
+            var t = MathHelper.SphericalToTextureCoords(normal);
 
             short h = _elevationTexture.ReadBilinearPixel(t.x, t.y);
             short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y);

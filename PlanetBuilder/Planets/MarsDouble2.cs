@@ -5,13 +5,14 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using ImageMagick;
+using PlanetBuilder.Roam;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
 {
-    public class MarsDouble : Planet
+    public class MarsDouble2 : RoamSquare
     {
-        public int NumSegments;
+        public ushort MaxLevels;
         private Bitmap<short> _topElevationBitmap;
         private Bitmap<short> _bottomElevationBitmap;
 
@@ -32,12 +33,9 @@ namespace PlanetBuilder.Planets
         public double LatB1;
         public double LonB1;
 
-        public MarsDouble()
+        public MarsDouble2()
         {
-            // PlanetRadius = 3396190;
-            // ElevationScale = 2.5;
-            NumSegments = 1150;
-            // PlanetProjection = Projection.Equirectangular;
+            MaxLevels = 22;
 
             // Gale crater 5.4°S 137.8°E
             LatT0 = MathHelper.ToRadians(-5.4 + 3.0);
@@ -68,11 +66,10 @@ namespace PlanetBuilder.Planets
                 _topSectorHeight = (int)Math.Ceiling(ifd.ImageWidth * (LonT1 - LonT0) / (Math.PI * 2));
 
                 var topElevationBitmap = tiffReader.ReadImageFile<short>(ifd, _topSectorOffsetX, _topSectorOffsetY, _topSectorWidth, _topSectorHeight);
-                // _topElevationBitmap = Resampler.Resample(topElevationBitmap, 899, 899).ToBitmap();
-                _topElevationBitmap = topElevationBitmap.ToBitmap();
+                _topElevationBitmap = topElevationBitmap/*Resampler.Resample(topElevationBitmap, 1024, 1024)*/.ToBitmap();
                 Console.WriteLine($"Loading image top {_topElevationBitmap.Width}x{_topElevationBitmap.Height} sector used {sw.Elapsed}");
 
-                using (var tiffWriter = new TiffWriter(File.Create($@"Generated\Planets\MarsDouble\MarsTop.tif")))
+                using (var tiffWriter = new TiffWriter(File.Create($@"Generated\Planets\MarsDouble2\MarsTop.tif")))
                 {
                     var bitmap = _topElevationBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
                     tiffWriter.WriteImageFile(bitmap);
@@ -86,11 +83,10 @@ namespace PlanetBuilder.Planets
                 _bottomSectorHeight = (int)Math.Ceiling(ifd.ImageWidth * (LonB1 - LonB0) / (Math.PI * 2));
 
                 var bottomElevationBitmap = tiffReader.ReadImageFile<short>(ifd, _bottomSectorOffsetX, _bottomSectorOffsetY, _bottomSectorWidth, _bottomSectorHeight);
-                // _bottomElevationBitmap = Resampler.Resample(bottomElevationBitmap, 899, 899).ToBitmap();
-                _bottomElevationBitmap = bottomElevationBitmap.ToBitmap();
+                _bottomElevationBitmap = bottomElevationBitmap/*Resampler.Resample(bottomElevationBitmap, 1024, 1024)*/.ToBitmap();
                 Console.WriteLine($"Loading image bottom {_bottomElevationBitmap.Width}x{_bottomElevationBitmap.Height} sector used {sw.Elapsed}");
 
-                using (var tiffWriter = new TiffWriter(File.Create($@"Generated\Planets\MarsDouble\MarsBottom.tif")))
+                using (var tiffWriter = new TiffWriter(File.Create($@"Generated\Planets\MarsDouble2\MarsBottom.tif")))
                 {
                     var bitmap = _bottomElevationBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
                     tiffWriter.WriteImageFile(bitmap);
@@ -98,33 +94,66 @@ namespace PlanetBuilder.Planets
 
             }
 
+            Init();
+
             sw = Stopwatch.StartNew();
+            Split();
+            Console.WriteLine($"Time used to split planet geometry: {sw.Elapsed}");
+            PrintSummary();
 
-            var sphericalSector = new Box();
-            sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
-            sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
+            sw = Stopwatch.StartNew();
+            Merge();
+            Console.WriteLine($"Time used to merge planet geometry: {sw.Elapsed}");
+            PrintSummary();
 
-            sphericalSector.Create(NumSegments, NumSegments);
-
-            PlanetVertexes = sphericalSector.Vertexes;
-            PlanetTriangles = sphericalSector.Triangles;
-
-            Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
-
-            Console.WriteLine($"NumVertexes: {PlanetVertexes.Count()}");
-            Console.WriteLine($"NumTriangles: {PlanetTriangles.Count()}");
-
-            SaveSTL($@"Generated\Planets\MarsDouble\MarsDouble{NumSegments}.stl");
+            SaveStl("Generated/Planets/MarsDouble2/MarsDouble2.stl");
         }
 
+        private readonly double _maxCos2Angle = Math.Pow(Math.Cos(MathHelper.ToRadians(6)), 2);
 
-        private double ComputeModelElevationTop(double tu, double tv)
+        protected override bool MergeDiamond(RoamDiamond diamond)
         {
-            return 0.07 + 0.000015 * _topElevationBitmap.ReadBilinearPixel(tu, tv);
+            var n1 = diamond.Triangles1.Vertexes2.Position - diamond.Triangles0.Vertexes0.Position;
+            var n2 = diamond.Triangles0.Vertexes1.Position - diamond.Triangles0.Vertexes0.Position;
+
+            double dot12 = Vector3d.Dot(n1, n2);
+            double cos2A = (dot12 * dot12) / (n1.Abs2() * n2.Abs2());
+
+            return cos2A >= _maxCos2Angle;
         }
-        private double ComputeModelElevationBottom(double tu, double tv)
+
+        protected override bool SubdivideTriangle(RoamTriangle triangle)
         {
-            return -0.07 - 0.000017 * _bottomElevationBitmap.ReadBilinearPixel(1 - tu, tv);
+            if (triangle.Material > 1)
+                return false;
+            return triangle.Level < MaxLevels;
+        }
+
+        protected override void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
+        {
+            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.LinearPosition, triangle.Vertexes2.LinearPosition);
+            //vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
+
+            var tex = Vector2d.MiddlePoint(triangle.TextureCoords0, triangle.TextureCoords2);
+
+            double z = vertex.LinearPosition.z;
+            if (triangle.Material == 0)
+            {
+                z += 0.17 + 0.000030 * _topElevationBitmap.ReadBilinearPixel(tex.x, tex.y);
+            }
+            else if (triangle.Material == 1)
+            {
+                z -= 0.22 + 0.000034 * _bottomElevationBitmap.ReadBilinearPixel(tex.x, tex.y);
+            }
+
+            vertex.Position = new Vector3d(vertex.LinearPosition.x, vertex.LinearPosition.y, z);
+        }
+
+        protected override void ComputeVertexAltitude(RoamVertex vertex, Vector3d position)
+        {
+            vertex.LinearPosition = position;
+            //vertex.Normal = Vector3d.Normalize(position);
+            vertex.Position = position;
         }
     }
 }

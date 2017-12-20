@@ -30,15 +30,15 @@ namespace PlanetBuilder.Roam
         public Vector2d TextureCoords1;
         public Vector2d TextureCoords2;
 
-        public RoamMaterial Material;
         public RoamTriangleFlags Flags = RoamTriangleFlags.Modified;
         public ushort Level;
+        public ushort Material;
 
         // public Vector3d Center;
         // public double TwoDivArea;      // 2/area
         // public double Radius;           // radius
 
-        public void Init(RoamVertex v0, RoamVertex v1, RoamVertex v2, Vector2d tex0, Vector2d tex1, Vector2d tex2, RoamMaterial material)
+        public void Init(RoamVertex v0, RoamVertex v1, RoamVertex v2, Vector2d tex0, Vector2d tex1, Vector2d tex2, ushort material)
         {
             Material = material;
 

@@ -2,13 +2,9 @@ using PlanetBuilder.Roam;
 
 namespace PlanetBuilder.Roam
 {
-    public class RoamMaterialCube : RoamMaterial
-    {
-    }
-
     public abstract class RoamCube : RoamBase
     {
-        public void Init(RoamMaterial material)
+        public virtual void Init()
         {
             var v0 = AddVertex(-1, 1, 1);
             var v1 = AddVertex(-1, -1, 1);
@@ -20,37 +16,36 @@ namespace PlanetBuilder.Roam
             var v7 = AddVertex(-1, 1, -1);
 
             // Create front face vertices and triangles
-            AllocTriangle().Init(v0, v1, v2, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);
-            AllocTriangle().Init(v2, v3, v0, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v0, v1, v2, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), 0);
+            AllocTriangle().Init(v2, v3, v0, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), 0);
 
             // Create back face vertices and triangles
-            AllocTriangle().Init(v4, v5, v6, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);
-            AllocTriangle().Init(v6, v7, v4, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v4, v5, v6, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), 1);
+            AllocTriangle().Init(v6, v7, v4, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), 1);
 
             // Create left face vertices and triangles
-            AllocTriangle().Init(v7, v6, v1, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);
-            AllocTriangle().Init(v1, v0, v7, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v7, v6, v1, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), 2);
+            AllocTriangle().Init(v1, v0, v7, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), 2);
 
             // Create right face vertices and triangles
-            AllocTriangle().Init(v3, v2, v5, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);
-            AllocTriangle().Init(v5, v4, v3, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v3, v2, v5, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), 3);
+            AllocTriangle().Init(v5, v4, v3, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), 3);
 
             // Create top face vertices and triangles
-            AllocTriangle().Init(v7, v0, v3, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);
-            AllocTriangle().Init(v3, v4, v7, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v7, v0, v3, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), 4);
+            AllocTriangle().Init(v3, v4, v7, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), 4);
 
             // Create bottom face vertices and triangles
-            AllocTriangle().Init(v1, v6, v5, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), material);
-            AllocTriangle().Init(v5, v2, v1, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), material);
+            AllocTriangle().Init(v1, v6, v5, new Vector2d(0, 0), new Vector2d(0, 1), new Vector2d(1, 1), 5);
+            AllocTriangle().Init(v5, v2, v1, new Vector2d(1, 1), new Vector2d(1, 0), new Vector2d(0, 0), 5);
 
             InitTriangles();
         }
 
         private RoamVertex AddVertex(double x, double y, double z)
         {
-            var n = Vector3d.Normalize(x, y, z);
             var v = AllocVertex();
-            ComputeVertexAltitude(v, n);
+            ComputeVertexAltitude(v, new Vector3d(x, y, z));
             return v;
         }
     }

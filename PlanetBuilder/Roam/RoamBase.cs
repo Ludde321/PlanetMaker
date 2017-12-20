@@ -117,13 +117,13 @@ namespace PlanetBuilder.Roam
 
                     // Triangle 2
 //                    tri2.Set(opposite, 2, 1, vertex, texCoordOpposite);
-                    tri2.Set(opposite, opposite.Vertexes2, vertex, opposite.Vertexes1, opposite.TextureCoords2, texCoordTriangle, opposite.TextureCoords1);
+                    tri2.Set(opposite, opposite.Vertexes2, vertex, opposite.Vertexes1, opposite.TextureCoords2, texCoordOpposite, opposite.TextureCoords1);
                     tri2.SetNeighbors(opposite.LeftNeighbor, tri3, tri1);
                     tri2.BaseNeighbor.ReplaceNeighbor(opposite, tri2);
 
                     // Triangle 3
 //                    tri3.Set(opposite, 1, 0, vertex, texCoordOpposite);
-                    tri3.Set(opposite, opposite.Vertexes1, vertex, opposite.Vertexes0, opposite.TextureCoords1, texCoordTriangle, opposite.TextureCoords0);
+                    tri3.Set(opposite, opposite.Vertexes1, vertex, opposite.Vertexes0, opposite.TextureCoords1, texCoordOpposite, opposite.TextureCoords0);
                     tri3.SetNeighbors(opposite.RightNeighbor, tri0, tri2);
                     tri3.BaseNeighbor.ReplaceNeighbor(opposite, tri3);
 
@@ -261,19 +261,19 @@ namespace PlanetBuilder.Roam
         }
 
 
-        protected virtual void ComputeVertexAltitude(RoamVertex vertex, Vector3d normal)
-        {
-            vertex.LinearPosition = normal;
-            vertex.Normal = normal;
-            vertex.Position = normal;
-        }
-        protected virtual void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle)
-        {
-            vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.Position, triangle.Vertexes2.Position);
-            vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
+        protected abstract void ComputeVertexAltitude(RoamVertex vertex, Vector3d position);
+        // {
+        //     vertex.LinearPosition = normal;
+        //     vertex.Normal = normal;
+        //     vertex.Position = normal;
+        // }
+        protected abstract void ComputeVertexAltitude(RoamVertex vertex, RoamTriangle triangle);
+        // {
+        //     vertex.LinearPosition = Vector3d.MiddlePoint(triangle.Vertexes0.Position, triangle.Vertexes2.Position);
+        //     vertex.Normal = Vector3d.Normalize(vertex.LinearPosition);
 
-            vertex.Position = vertex.LinearPosition;//vertex.Normal * (groundRadius + vertex.altitude);
-        }
+        //     vertex.Position = vertex.LinearPosition;//vertex.Normal * (groundRadius + vertex.altitude);
+        // }
 
         protected void InitTriangles()
         {

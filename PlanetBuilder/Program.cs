@@ -37,14 +37,17 @@ namespace PlanetBuilder
             // var mars = new Mars();
             // mars.Create();
 
-            var mars2 = new Mars2();
-            mars2.Create();
+            // var mars2 = new Mars2();
+            // mars2.Create();
 
             // var marsSector = new MarsSector();
             // marsSector.Create();
 
             // var marsDouble = new MarsDouble();
             // marsDouble.Create();
+
+            var marsDouble2 = new MarsDouble2();
+            marsDouble2.Create();
 
             // var phobos = new Phobos();
             // phobos.Create();
