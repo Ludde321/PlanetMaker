@@ -10,8 +10,6 @@ namespace PlanetBuilder.Planets
 {
     public class Phobos : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<short> _elevationTexture;
 
         public Phobos()
         {
@@ -50,7 +48,7 @@ namespace PlanetBuilder.Planets
         {
             var t = MathHelper.SphericalToTextureCoords(v);
 
-            short h = _elevationTexture.ReadBilinearPixel(t.x, t.y, true, false);
+            double h = _elevationTexture.ReadBilinearPixel(t.x, t.y, true, false);
 
             double r = PlanetRadius + h;
 

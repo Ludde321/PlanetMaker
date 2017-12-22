@@ -15,11 +15,16 @@ namespace PlanetBuilder.Planets
     {
         public double PlanetRadius;
         public double ElevationScale;
+        public int RecursionLevel = 8;
 
         public Projection PlanetProjection = Projection.Equirectangular;
 
         public List<Vector3d> PlanetVertexes;
         public List<Triangle> PlanetTriangles;
+
+        protected Bitmap<short> _elevationTexture;
+        protected Bitmap<short> _elevationTextureBlur;
+
 
         protected void CreatePlanetVertexes(int recursionLevel)
         {
@@ -30,9 +35,16 @@ namespace PlanetBuilder.Planets
             PlanetTriangles = icosphere.Triangles.ToList();
         }
 
-        protected virtual Vector3d ComputeModelElevation(Vector3d v) 
+        protected virtual Vector3d ComputeModelElevation(Vector3d v)
         {
-            return v;
+            var t = MathHelper.SphericalToTextureCoords(v);
+
+            double h = _elevationTexture.ReadBilinearPixel(t.x, t.y, true, false);
+            double hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y, true, false);
+
+            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
+
+            return Vector3d.Multiply(v, r * 0.00001);
         }
 
         protected void SaveSTL(string outputFilename)

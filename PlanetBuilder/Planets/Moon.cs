@@ -10,9 +10,6 @@ namespace PlanetBuilder.Planets
 {
     public class Moon : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<short> _elevationTextureSmall;
-        private Bitmap<short> _elevationTextureBlur;
 
         public Moon()
         {
@@ -36,16 +33,16 @@ namespace PlanetBuilder.Planets
                 {
                     var elevationTextureLarge = tiffReader.ReadImageFile<short>();
                     
-                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
+                    _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 
-                BitmapHelper.SaveTiff16(elevationTextureSmallFilename, _elevationTextureSmall);
-                BitmapHelper.SavePng8($@"Generated\Planets\Moon\Moon{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+                BitmapHelper.SaveTiff16(elevationTextureSmallFilename, _elevationTexture);
+                BitmapHelper.SavePng8($@"Generated\Planets\Moon\Moon{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
             }
             else
             {
-                _elevationTextureSmall = BitmapHelper.LoadTiff16(elevationTextureSmallFilename);
+                _elevationTexture = BitmapHelper.LoadTiff16(elevationTextureSmallFilename);
             }
 
             string elevationTextureBlurFilename = $@"Generated\Planets\Moon\MoonBlur{width}x{height}.tif";
@@ -53,7 +50,7 @@ namespace PlanetBuilder.Planets
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
-                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
+                _elevationTextureBlur = blurFilter.Blur3(_elevationTexture, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
                 BitmapHelper.SaveTiff16(elevationTextureBlurFilename, _elevationTextureBlur);
@@ -71,16 +68,6 @@ namespace PlanetBuilder.Planets
             SaveSTL($@"Generated\Planets\Moon\Moon{RecursionLevel}.stl");
         }
 
-        protected override Vector3d ComputeModelElevation(Vector3d v)
-        {
-            var t = MathHelper.SphericalToTextureCoords(v);
 
-            short h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-            short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y, true, false);
-
-            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
-
-            return Vector3d.Multiply(v, r * 0.00001);
-        }
     }
 }

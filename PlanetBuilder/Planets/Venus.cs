@@ -10,9 +10,6 @@ namespace PlanetBuilder.Planets
 {
     public class Venus : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<short> _elevationTextureSmall;
-        private Bitmap<short> _elevationTextureBlur;
 
         public Venus()
         {
@@ -58,23 +55,23 @@ namespace PlanetBuilder.Planets
                 // Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
                 sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
+                _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Venus\Venus{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                BitmapHelper.SaveRaw16($@"Generated\Planets\Venus\Venus{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
             }
             else
             {
-                _elevationTextureSmall = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+                _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-                BitmapHelper.SavePng8($@"Generated\Planets\Venus\Venus{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+                BitmapHelper.SavePng8($@"Generated\Planets\Venus\Venus{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
             string elevationTextureBlurFilename = $@"Generated\Planets\Venus\VenusBlur{width}x{height}.raw";
             if(!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
-                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
+                _elevationTextureBlur = blurFilter.Blur3(_elevationTexture, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
                 BitmapHelper.SaveRaw16($@"Generated\Planets\Venus\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
@@ -92,16 +89,5 @@ namespace PlanetBuilder.Planets
             SaveSTL($@"Generated\Planets\Venus\Venus{RecursionLevel}.stl");
         }
 
-        protected override Vector3d ComputeModelElevation(Vector3d v)
-        {
-            var t = MathHelper.SphericalToTextureCoords(v);
-
-            short h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-            short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y, true, false);
-
-            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
-
-            return Vector3d.Multiply(v, r * 0.00001);
-        }
     }
 }

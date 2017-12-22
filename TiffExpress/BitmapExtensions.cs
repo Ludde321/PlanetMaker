@@ -19,7 +19,7 @@ namespace TiffExpress
                     row[x] = func(row[x]);
         }
 
-        public static byte ReadBilinearPixel(this Bitmap<byte> texture, double tx, double ty, bool repeatX, bool repeatY)
+        public static double ReadBilinearPixel(this Bitmap<byte> texture, double tx, double ty, bool repeatX, bool repeatY)
         {
             uint width = (uint)texture.Width;
             uint height = (uint)texture.Height;
@@ -59,11 +59,11 @@ namespace TiffExpress
             double p00p01 = p00 + (p01 - p00) * fx;
             double p10p11 = p10 + (p11 - p10) * fx;
 
-            return (byte)(p00p01 + (p10p11 - p00p01) * fy);
+            return (p00p01 + (p10p11 - p00p01) * fy);
         }
 
 
-        public static short ReadBilinearPixel(this Bitmap<short> texture, double tx, double ty, bool repeatX, bool repeatY)
+        public static double ReadBilinearPixel(this Bitmap<short> texture, double tx, double ty, bool repeatX, bool repeatY)
         {
             uint width = (uint)texture.Width;
             uint height = (uint)texture.Height;
@@ -103,10 +103,10 @@ namespace TiffExpress
             double p00p01 = p00 + (p01 - p00) * fx;
             double p10p11 = p10 + (p11 - p10) * fx;
 
-            return (short)(p00p01 + (p10p11 - p00p01) * fy);
+            return (p00p01 + (p10p11 - p00p01) * fy);
         }
 
-        public static float ReadBilinearPixel(this Bitmap<float> texture, double tx, double ty, bool repeatX, bool repeatY)
+        public static double ReadBilinearPixel(this Bitmap<float> texture, double tx, double ty, bool repeatX, bool repeatY)
         {
             uint width = (uint)texture.Width;
             uint height = (uint)texture.Height;
@@ -146,7 +146,7 @@ namespace TiffExpress
             double p00p01 = p00 + (p01 - p00) * fx;
             double p10p11 = p10 + (p11 - p10) * fx;
 
-            return (float)(p00p01 + (p10p11 - p00p01) * fy);
+            return (p00p01 + (p10p11 - p00p01) * fy);
         }
 
 

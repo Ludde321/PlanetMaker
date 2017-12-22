@@ -10,9 +10,8 @@ namespace PlanetBuilder.Planets
 {
     public class Vesta : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<float> _elevationTextureSmall;
-        private Bitmap<float> _elevationTextureBlur;
+        private Bitmap<float> _elevationTextureFloat;
+        private Bitmap<float> _elevationTextureBlurFloat;
 
         public Vesta()
         {
@@ -30,7 +29,7 @@ namespace PlanetBuilder.Planets
             {
                 var elevationTextureLarge = tiffReader.ReadImageFile<float>();
 
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+                _elevationTextureFloat = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
             }
 
@@ -41,13 +40,13 @@ namespace PlanetBuilder.Planets
             // _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
             // Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-            var textureSmall = _elevationTextureSmall.Convert((h) => {return (short)(h-PlanetRadius);});
+            var textureSmall = _elevationTextureFloat.Convert((h) => {return (short)(h-PlanetRadius);});
             // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\Vesta{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
             BitmapHelper.SavePng8($@"Generated\Planets\Vesta\Vesta{textureSmall.Width}x{textureSmall.Height}.png", textureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
-            _elevationTextureBlur = blurFilter.Blur2(_elevationTextureSmall, MathHelper.ToRadians(10));
+            _elevationTextureBlurFloat = blurFilter.Blur2(_elevationTextureFloat, MathHelper.ToRadians(10));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             var textureBlur = _elevationTextureBlur.Convert((h) => {return (short)(h-PlanetRadius);});
@@ -65,8 +64,8 @@ namespace PlanetBuilder.Planets
         {
             var t = MathHelper.SphericalToTextureCoords(v);
 
-            float h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-            float hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y, true, false);
+            double h = _elevationTextureFloat.ReadBilinearPixel(t.x, t.y, true, false);
+            double hAvg = _elevationTextureBlurFloat.ReadBilinearPixel(t.x, t.y, true, false);
 
             double r = (h - hAvg) * ElevationScale + hAvg;
 

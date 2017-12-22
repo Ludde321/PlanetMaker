@@ -10,10 +10,7 @@ namespace PlanetBuilder.Planets
 {
     public class Earth : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<short> _elevationTextureSmall;
         private Bitmap<byte> _landcoverTextureSmall;
-        //private Texture<short> _elevationTextureBlur;
 
         public Earth()
         {
@@ -41,16 +38,16 @@ namespace PlanetBuilder.Planets
                 elevationTextureLarge.Process((p) => { return (short)(p - 32768); });
 
                 sw = Stopwatch.StartNew();
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
+                _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                BitmapHelper.SaveRaw16($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
             }
             else
             {
-                _elevationTextureSmall = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+                _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
             // Landcover
             string landcoverTextureSmallFilename = $@"Generated\Planets\Earth\landcover.{width}x{height}.raw";
@@ -83,7 +80,7 @@ namespace PlanetBuilder.Planets
             // {
             //     sw = Stopwatch.StartNew();
             //     var blurFilter = new BlurFilter(PlanetProjection);
-            //     _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
+            //     _elevationTextureBlur = blurFilter.Blur3(_elevationTexture, MathHelper.ToRadians(10));
             //     Console.WriteLine($"Blur used {sw.Elapsed}");
 
             //     TextureHelper.SaveRaw16($@"Generated\Planets\Earth\EarthBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
@@ -105,8 +102,8 @@ namespace PlanetBuilder.Planets
         {
             var t = MathHelper.SphericalToTextureCoords(v);
 
-            short h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-            byte landcover = _landcoverTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
+            double h = _elevationTexture.ReadBilinearPixel(t.x, t.y, true, false);
+            byte landcover = (byte)_landcoverTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
 //            short hAvg = ReadBilinearPixel(_elevationTextureBlur, t.x, t.y);
 
             double r = PlanetRadius + h * ElevationScale;//(h - hAvg) * ElevationScale + hAvg;
