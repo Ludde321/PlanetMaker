@@ -98,8 +98,8 @@ namespace PlanetBuilder.Planets
                 _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0) / Math.PI);
                 _sectorOffsetX = (int)(_elevationWidth * (Math.PI + Lon0) / (Math.PI * 2));
 
-                _sectorWidth = (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
-                _sectorHeight = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
+                _sectorHeight = (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
+                _sectorWidth = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
 
                 _elevationSectorBitmap = tiffReader.ReadImageFile<short>(ifd, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
                 Console.WriteLine($"Loading image sector used {sw.Elapsed}");

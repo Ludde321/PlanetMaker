@@ -34,8 +34,8 @@ namespace PlanetBuilder
 
         public static Vector2d SphericalToTextureCoords(Vector3d n)
         {
-            double lat = Math.PI * 0.5 - Math.Acos(n.z);
-            double lon = Math.Atan2(n.x, n.y);
+            double lat = Math.Asin(n.z);
+            double lon = Math.Atan2(n.y, n.x);
 
             return SphericalToTextureCoords(lat, lon);
         }

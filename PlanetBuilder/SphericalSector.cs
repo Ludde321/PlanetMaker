@@ -40,8 +40,8 @@ namespace PlanetBuilder.Planets
                 {
                     double lon = longitudeOffset0 + dLon * x;
 
-                    double nx = Math.Sin(lon) * cosLat;
-                    double ny = Math.Cos(lon) * cosLat;
+                    double nx = Math.Cos(lon) * cosLat;
+                    double ny = Math.Sin(lon) * cosLat;
                     double nz = sinLat;
 
                     var v = new Vector3d(nx, ny, nz);

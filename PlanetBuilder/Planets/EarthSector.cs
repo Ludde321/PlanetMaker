@@ -34,14 +34,14 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 6371000;
             ElevationScale = 9;
-            NumSegmentsLon = 1000;
-            NumSegmentsLat = 1000;
+            NumSegmentsLon = 400;
+            NumSegmentsLat = 400;
             PlanetProjection = Projection.Equirectangular;
 
             // Bylot Island 73.25N, 78.68W
-            Lat0 = MathHelper.ToRadians(73.25 + 3.0);
+            Lat0 = MathHelper.ToRadians(73.25 + 1.0);
             Lon0 = MathHelper.ToRadians(-78.68 - 3.0);
-            Lat1 = MathHelper.ToRadians(73.25 - 3.0);
+            Lat1 = MathHelper.ToRadians(73.25 - 1.0);
             Lon1 = MathHelper.ToRadians(-78.68 + 3.0);
 
             // Disco Island 69.81°N 53.47°W 
@@ -69,40 +69,29 @@ namespace PlanetBuilder.Planets
 
             // Topo Bathymetry
             sw = Stopwatch.StartNew();
-            var elevationTextureLargeW = BitmapHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.W.21600x21600.raw", 21600, 21600);
-            var elevationTextureLargeE = BitmapHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.E.21600x21600.raw", 21600, 21600);
-            var elevationTextureLarge = BitmapTools.Concatenate(elevationTextureLargeW, elevationTextureLargeE);
-
-            elevationTextureLarge = elevationTextureLarge.Convert((p) =>
+            using (var rawElevationReader = new RawReader(File.OpenRead(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.43200x21600.raw")))
+            using (var rawLandcoverReader = new RawReader(File.OpenRead(@"Datasets\Planets\Earth\Blue Marble\landcover.43200x21600.raw")))
             {
-                int p2 = ((p >> 8) & 0xff) | ((p<< 8) & 0xff00);
-                return (short)(p2 - 32768);
-            });
+                var elevationTextureLarge = rawElevationReader.ReadBitmap<short>(43200, 21600);
+                var landcoverTextureLarge = rawElevationReader.ReadBitmap<byte>(43200, 21600);
+                
+                elevationTextureLarge = elevationTextureLarge.Convert((p) => { return (short)(p - short.MinValue); });
+                landcoverTextureLarge = landcoverTextureLarge.Convert((p) => { return p != 0 ? (byte)0xff : (byte)0x00; });
 
-            Console.WriteLine($"Loading elevation texture used {sw.Elapsed}");
+                _elevationWidth = elevationTextureLarge.Width;
+                _elevationHeight = elevationTextureLarge.Height;
 
-            // Landcover
-            sw = Stopwatch.StartNew();
-            var landcoverTextureLargeW = BitmapHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.W.21600x21600.raw", 21600, 21600);
-            var landcoverTextureLargeE = BitmapHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.E.21600x21600.raw", 21600, 21600);
-            var landcoverTextureLarge = BitmapTools.Concatenate(landcoverTextureLargeW, landcoverTextureLargeE);
-            Console.WriteLine($"Loading landcover texture used {sw.Elapsed}");
+                // --
+                _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0) / Math.PI);
+                _sectorOffsetX = (int)(_elevationWidth * (Math.PI + Lon0) / (Math.PI * 2));
 
-            landcoverTextureLarge.Process((p) => { return p != 0 ? (byte)0xff : (byte)0x00; });
+                _sectorHeight= (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
+                _sectorWidth = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
 
-            _elevationWidth = elevationTextureLarge.Width;
-            _elevationHeight = elevationTextureLarge.Height;
-
-            // --
-            _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0) / Math.PI);
-            _sectorOffsetX = (int)(_elevationWidth * (Math.PI + Lon0) / (Math.PI * 2));
-
-            _sectorWidth = (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
-            _sectorHeight = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
-
-            _elevationSectorBitmap = BitmapTools.Crop(elevationTextureLarge, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
-            _landcoverSectorBitmap = BitmapTools.Crop(landcoverTextureLarge, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
-            Console.WriteLine($"Loading image sector used {sw.Elapsed}");
+                _elevationSectorBitmap = BitmapTools.Crop(elevationTextureLarge, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
+                _landcoverSectorBitmap = BitmapTools.Crop(landcoverTextureLarge, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
+                Console.WriteLine($"Loading image sector used {sw.Elapsed}");
+            }
 
             // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();
             // Console.WriteLine($"Resampling used {sw.Elapsed}");
@@ -137,8 +126,11 @@ namespace PlanetBuilder.Planets
             double sx = t.x * _sx - _sx0;
 
             double h = _elevationSectorBitmap.ReadBilinearPixel(sx, sy, true, false);
+            double lc = _landcoverSectorBitmap.ReadBilinearPixel(sx, sy, true, false);
 
-            double r = PlanetRadius + h * ElevationScale;
+            double r = PlanetRadius;
+            if(h > 0)
+                r += h * ElevationScale;
 
             return r * 0.00001;
         }

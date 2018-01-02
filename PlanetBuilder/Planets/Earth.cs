@@ -17,7 +17,7 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 6371000;
             ElevationScale = 15;
-            RecursionLevel = 9;
+            RecursionLevel = 8;
             PlanetProjection = Projection.Equirectangular;
         }
 
