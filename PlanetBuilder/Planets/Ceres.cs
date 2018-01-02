@@ -10,9 +10,6 @@ namespace PlanetBuilder.Planets
 {
     public class Ceres : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<short> _elevationTextureSmall;
-        private Bitmap<short> _elevationTextureBlur;
 
         public Ceres()
         {
@@ -29,16 +26,16 @@ namespace PlanetBuilder.Planets
             {
                 var elevationTextureLarge = tiffReader.ReadImageFile<short>();
 
-                _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
+                _elevationTexture = Resampler.Resample(elevationTextureLarge, 1200, 600).ToBitmap();
                 Console.WriteLine($"Resampling used {sw.Elapsed}");
             }
 
-            BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            BitmapHelper.SavePng8($@"Generated\Planets\Ceres\Ceres{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\Ceres{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
+            BitmapHelper.SavePng8($@"Generated\Planets\Ceres\Ceres{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
-            _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
+            _elevationTextureBlur = blurFilter.Blur3(_elevationTexture, MathHelper.ToRadians(10));
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
@@ -51,16 +48,5 @@ namespace PlanetBuilder.Planets
             SaveSTL($@"Generated\Planets\Ceres\Ceres{RecursionLevel}.stl");
         }
 
-        protected override Vector3d ComputeModelElevation(Vector3d v)
-        {
-            var t = MathHelper.SphericalToTextureCoords(v);
-
-            short h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-            short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y, true, false);
-
-            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
-
-            return Vector3d.Multiply(v, r * 0.00001);
-        }
     }
 }

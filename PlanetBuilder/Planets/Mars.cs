@@ -10,9 +10,6 @@ namespace PlanetBuilder.Planets
 {
     public class Mars : Planet
     {
-        public int RecursionLevel;
-        private Bitmap<short> _elevationTextureSmall;
-        private Bitmap<short> _elevationTextureBlur;
 
         public Mars()
         {
@@ -28,8 +25,8 @@ namespace PlanetBuilder.Planets
 
             int width = 2880;
             int height = 1440;
-            string elevationTextureSmallFilename = $@"Generated\Planets\Mars\Mars{width}x{height}.raw";
-            if (!File.Exists(elevationTextureSmallFilename))
+            string elevationTextureFilename = $@"Generated\Planets\Mars\Mars{width}x{height}.raw";
+            if (!File.Exists(elevationTextureFilename))
             {
                 sw = Stopwatch.StartNew();
                 using(var tiffReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Mars\Mars_HRSC_MOLA_BlendDEM_Global_200mp.tif")))
@@ -38,17 +35,17 @@ namespace PlanetBuilder.Planets
                     var ifd = tiffReader.ImageFileDirectories[0];
                     var elevationTextureLarge = tiffReader.ReadImageFile<short>(0, 0, ifd.ImageWidth - 1, ifd.ImageHeight);
 
-                    _elevationTextureSmall = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
+                    _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
                     Console.WriteLine($"Resampling used {sw.Elapsed}");
                 }
 
-                BitmapHelper.SaveRaw16($@"Generated\Planets\Mars\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
+                BitmapHelper.SaveRaw16($@"Generated\Planets\Mars\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
             }
             else
             {
-                _elevationTextureSmall = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
+                _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureFilename, width, height);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Mars\Mars{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.png", _elevationTextureSmall);
+            BitmapHelper.SavePng8($@"Generated\Planets\Mars\Mars{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
 
             // var sw = Stopwatch.StartNew();
             // var elevationTextureLarge = TextureHelper.LoadTiff16(@"Datasets\Planets\Mars\Mars_MGS_MOLA_DEM_mosaic_global_463m.tif");
@@ -66,7 +63,7 @@ namespace PlanetBuilder.Planets
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
-                _elevationTextureBlur = blurFilter.Blur3(_elevationTextureSmall, MathHelper.ToRadians(10));
+                _elevationTextureBlur = blurFilter.Blur3(_elevationTexture, MathHelper.ToRadians(10));
                 Console.WriteLine($"Blur used {sw.Elapsed}");
 
                 BitmapHelper.SaveRaw16($@"Generated\Planets\Mars\MarsBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
@@ -92,16 +89,6 @@ namespace PlanetBuilder.Planets
             SaveSTL($@"Generated\Planets\Mars\Mars{RecursionLevel}_{(int)ElevationScale}x.stl");
         }
 
-        protected override Vector3d ComputeModelElevation(Vector3d v)
-        {
-            var t = MathHelper.SphericalToTextureCoords(v);
 
-            short h = _elevationTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-            short hAvg = _elevationTextureBlur.ReadBilinearPixel(t.x, t.y, true, false);
-
-            double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
-
-            return Vector3d.Multiply(v, r * 0.00001);
-        }
     }
 }
