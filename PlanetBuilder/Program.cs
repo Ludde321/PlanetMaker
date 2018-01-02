@@ -46,8 +46,8 @@ namespace PlanetBuilder
             // var marsDouble = new MarsDouble();
             // marsDouble.Create();
 
-            var marsDouble2 = new MarsDouble2();
-            marsDouble2.Create();
+            // var marsDouble2 = new MarsDouble2();
+            // marsDouble2.Create();
 
             // var phobos = new Phobos();
             // phobos.Create();
@@ -57,6 +57,13 @@ namespace PlanetBuilder
 
             // var earth = new Earth();
             // earth.Create();
+
+            var earthSector = new EarthSector();
+            earthSector.Create();
+
+            // var earthBoylotIsland = new EarthBylotIsland();
+            // earthBoylotIsland.Create();
+
 
             // var roamCube = new RoamCube();
             // roamCube.Init();

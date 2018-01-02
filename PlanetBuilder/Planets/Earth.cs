@@ -1,8 +1,9 @@
-
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using ImageMagick;
 using TiffExpress;
 
@@ -32,10 +33,17 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var elevationTextureLarge = BitmapHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.43200x21600.raw", 43200, 21600);
-                Console.WriteLine($"Loading texture used {sw.Elapsed}");
+                var elevationTextureLargeW = BitmapHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.W.21600x21600.raw", 21600, 21600);
+                var elevationTextureLargeE = BitmapHelper.LoadRaw16(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.E.21600x21600.raw", 21600, 21600);
+                var elevationTextureLarge = BitmapTools.Concatenate(elevationTextureLargeW, elevationTextureLargeE);
 
-                elevationTextureLarge.Process((p) => { return (short)(p - 32768); });
+                elevationTextureLarge = elevationTextureLarge.Convert((p) =>
+                {
+                    int p2 = ((p >> 8) & 0xff) | ((p<< 8) & 0xff00);
+                    return (short)(p2 - 32768);
+                });
+
+                Console.WriteLine($"Loading elevation texture used {sw.Elapsed}");
 
                 sw = Stopwatch.StartNew();
                 _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
@@ -54,8 +62,10 @@ namespace PlanetBuilder.Planets
             if (!File.Exists(landcoverTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
-                var landcoverTextureLarge = BitmapHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.43200x21600.raw", 43200, 21600);
-                Console.WriteLine($"Loading texture used {sw.Elapsed}");
+                var landcoverTextureLargeW = BitmapHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.W.21600x21600.raw", 21600, 21600);
+                var landcoverTextureLargeE = BitmapHelper.LoadRaw8(@"Datasets\Planets\Earth\Blue Marble\landcover.E.21600x21600.raw", 21600, 21600);
+                var landcoverTextureLarge = BitmapTools.Concatenate(landcoverTextureLargeW, landcoverTextureLargeE);
+                Console.WriteLine($"Loading landcover texture used {sw.Elapsed}");
 
                 var histo = new long[256];
 
@@ -98,23 +108,26 @@ namespace PlanetBuilder.Planets
             SaveSTL($@"Generated\Planets\Earth\Earth{RecursionLevel}.stl");
         }
 
+
+
         protected override Vector3d ComputeModelElevation(Vector3d v)
         {
             var t = MathHelper.SphericalToTextureCoords(v);
 
             double h = _elevationTexture.ReadBilinearPixel(t.x, t.y, true, false);
             byte landcover = (byte)_landcoverTextureSmall.ReadBilinearPixel(t.x, t.y, true, false);
-//            short hAvg = ReadBilinearPixel(_elevationTextureBlur, t.x, t.y);
+            //            short hAvg = ReadBilinearPixel(_elevationTextureBlur, t.x, t.y);
 
             double r = PlanetRadius + h * ElevationScale;//(h - hAvg) * ElevationScale + hAvg;
-            if(h < 0)
+            if (h < 0)
             {
-            //    r = PlanetRadius - 8000 * (1 - landcover * 0.0078125);
-             //   r -= 15000;
+                //    r = PlanetRadius - 8000 * (1 - landcover * 0.0078125);
+                //   r -= 15000;
                 r = PlanetRadius - 12000;
             }
 
             return Vector3d.Multiply(v, r * 0.00001);
         }
+
     }
 }

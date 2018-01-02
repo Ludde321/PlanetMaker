@@ -283,12 +283,52 @@ namespace TiffExpress
 
         private static T[] ResampleX<T>(T[][] inputRows, int inputWidth, int outputWidth)
         {
-            if (typeof(T) == typeof(short))
+            if (typeof(T) == typeof(byte))
+                return (T[])(object)ResampleXAsInt8((byte[][])(object)inputRows, inputWidth, outputWidth);
+            else if (typeof(T) == typeof(short))
                 return (T[])(object)ResampleXAsInt16((short[][])(object)inputRows, inputWidth, outputWidth);
             else if (typeof(T) == typeof(float))
                 return (T[])(object)ResampleXAsFloat((float[][])(object)inputRows, inputWidth, outputWidth);
             
             throw new NotSupportedException($"ResampleX does not support {typeof(T)}");
+        }
+
+        private static byte[] ResampleXAsInt8(byte[][] inputRows, int inputWidth, int outputWidth)
+        {
+            var outputRow = new byte[outputWidth];
+
+            long accum = 0;
+            int count = 0;
+
+            int epsx = 0;
+
+            int dx0 = inputWidth - 1;
+            int dx1 = outputWidth - 1;
+            int x1 = 0;
+
+            for (int x0 = 0; x0 <= dx0; x0++)
+            {
+                foreach (var inputRow in inputRows)
+                    accum += inputRow[x0];
+                count += inputRows.Length;
+
+                epsx += dx1;
+
+                if (2 * epsx >= dx0)
+                {
+                    outputRow[x1] = (byte)(accum / count);
+                    accum = 0;
+                    count = 0;
+
+                    x1++;
+                    epsx -= dx0;
+                }
+            }
+
+            if (x1 == dx1)
+                outputRow[x1] = (byte)(accum / count);
+
+            return outputRow;
         }
         private static short[] ResampleXAsInt16(short[][] inputRows, int inputWidth, int outputWidth)
         {
