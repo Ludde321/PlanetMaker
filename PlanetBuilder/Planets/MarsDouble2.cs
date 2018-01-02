@@ -35,7 +35,7 @@ namespace PlanetBuilder.Planets
 
         public MarsDouble2()
         {
-            MaxLevels = 22;
+            MaxLevels = 21;
 
             // Gale crater 5.4°S 137.8°E
             LatT0 = MathHelper.ToRadians(-5.4 + 3.0);
@@ -109,7 +109,7 @@ namespace PlanetBuilder.Planets
             SaveStl("Generated/Planets/MarsDouble2/MarsDouble2.stl");
         }
 
-        private readonly double _maxCos2Angle = Math.Pow(Math.Cos(MathHelper.ToRadians(6)), 2);
+        private readonly double _maxCos2Angle = Math.Pow(Math.Cos(MathHelper.ToRadians(4)), 2);
 
         protected override bool MergeDiamond(RoamDiamond diamond)
         {
