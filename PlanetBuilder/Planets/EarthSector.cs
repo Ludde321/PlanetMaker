@@ -11,7 +11,8 @@ namespace PlanetBuilder.Planets
 {
     public class EarthSector : Planet
     {
-        public int NumSegments;
+        public int NumSegmentsLon;
+        public int NumSegmentsLat;
         private Bitmap<short> _elevationSectorBitmap;
         private Bitmap<byte> _landcoverSectorBitmap;
 
@@ -32,8 +33,9 @@ namespace PlanetBuilder.Planets
         public EarthSector()
         {
             PlanetRadius = 6371000;
-            ElevationScale = 5;
-            NumSegments = 800;
+            ElevationScale = 9;
+            NumSegmentsLon = 1000;
+            NumSegmentsLat = 1000;
             PlanetProjection = Projection.Equirectangular;
 
             // Bylot Island 73.25N, 78.68W
@@ -117,14 +119,14 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegments, NumSegments);
+            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon);
 
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;
 
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\EarthSector\EarthSector{NumSegments}.stl");
+            SaveSTL($@"Generated\Planets\EarthSector\EarthSector{NumSegmentsLon}.stl");
         }
 
         private double ComputeModelElevationTop(Vector3d v, double lat, double lon)
