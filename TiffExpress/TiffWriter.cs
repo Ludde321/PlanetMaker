@@ -19,8 +19,10 @@ namespace TiffExpress
         private Stream _stream;
         private BinaryWriter _writer;
 
-        private bool _bigTiff = false;
+        public bool BigTiff = false;
         private long _lastReferencePosition;
+
+        private bool _writeFileHeader = true;
 
         public ImageFileDirectory[] ImageFileDirectories { get; private set; }
 
@@ -28,7 +30,6 @@ namespace TiffExpress
         {
             _stream = stream;
             _writer = new BinaryWriter(_stream, Encoding.ASCII, true);
-            WriteImageFileHeader();
         }
 
         public void Close()
@@ -45,23 +46,27 @@ namespace TiffExpress
 
         private void WriteImageFileHeader()
         {
-            if (BitConverter.IsLittleEndian)
-                _writer.Write((ushort)0x4949);
-            else
-                _writer.Write((ushort)0x4d4d);
-
-            if (_bigTiff)
+            if (_writeFileHeader)
             {
-                _writer.Write((ushort)43);
-                _writer.Write((ushort)8);
-                _writer.Write((ushort)0);
+                if (BitConverter.IsLittleEndian)
+                    _writer.Write((ushort)0x4949);
+                else
+                    _writer.Write((ushort)0x4d4d);
+
+                if (BigTiff)
+                {
+                    _writer.Write((ushort)43);
+                    _writer.Write((ushort)8);
+                    _writer.Write((ushort)0);
+                }
+                else
+                    _writer.Write((ushort)42);
+
+                _lastReferencePosition = _writer.BaseStream.Position;
+
+                WriteReference(0);
             }
-            else
-                _writer.Write((ushort)42);
-
-            _lastReferencePosition = _writer.BaseStream.Position;
-
-            WriteReference(0);
+            _writeFileHeader = false;
         }
 
         private void WriteImageFileDirectory(ImageFileDirectory ifd)
@@ -76,7 +81,7 @@ namespace TiffExpress
 
             var entries = ifd.Entries.Values.OrderBy(v => v.Tag).ToArray();
 
-            if (_bigTiff)
+            if (BigTiff)
                 _writer.Write((long)entries.Length);
             else
                 _writer.Write((ushort)entries.Length);
@@ -85,7 +90,7 @@ namespace TiffExpress
             {
                 _writer.Write((ushort)entry.Tag);
                 _writer.Write((ushort)entry.FieldType);
-                if (_bigTiff)
+                if (BigTiff)
                 {
                     _writer.Write((long)entry.NumValues);
                     _writer.Write((long)entry.ValueOffset);
@@ -103,7 +108,7 @@ namespace TiffExpress
 
         private void WriteFieldValue(FieldType fieldType, long value)
         {
-            int paddingBytes = (_bigTiff ? 8 : 4);
+            int paddingBytes = (BigTiff ? 8 : 4);
             switch (fieldType)
             {
                 case FieldType.Int64:
@@ -156,14 +161,14 @@ namespace TiffExpress
             ifd.Entries[IfdTag.PlanarConfiguration] = new IfdEntry { Tag = IfdTag.PlanarConfiguration, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (uint)ifd.PlanarConfiguration };
             ifd.Entries[IfdTag.SampleFormat] = new IfdEntry { Tag = IfdTag.SampleFormat, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (uint)ifd.SampleFormat };
 
-            ifd.Entries[IfdTag.StripOffsets] = new IfdEntry { Tag = IfdTag.StripOffsets, FieldType = _bigTiff ? FieldType.UInt64 : FieldType.UInt32 };
-            ifd.Entries[IfdTag.StripByteCounts] = new IfdEntry { Tag = IfdTag.StripByteCounts, FieldType = _bigTiff ? FieldType.UInt64 : FieldType.UInt32 };
+            ifd.Entries[IfdTag.StripOffsets] = new IfdEntry { Tag = IfdTag.StripOffsets, FieldType = BigTiff ? FieldType.UInt64 : FieldType.UInt32 };
+            ifd.Entries[IfdTag.StripByteCounts] = new IfdEntry { Tag = IfdTag.StripByteCounts, FieldType = BigTiff ? FieldType.UInt64 : FieldType.UInt32 };
         }
 
 
         private void WriteReference(long position)
         {
-            if (_bigTiff)
+            if (BigTiff)
                 _writer.Write((long)position);
             else
                 _writer.Write((uint)position);
@@ -223,12 +228,14 @@ namespace TiffExpress
             if (ifd.SamplesPerPixel > 1 && ifd.PlanarConfiguration != PlanarConfiguration.Chunky)
                 throw new NotSupportedException($"PlanarConfiguration must be ChunkyFormat: {ifd.PlanarConfiguration}");
 
+            WriteImageFileHeader();
+
             ifd.ImageWidth = imageWidth;
             ifd.ImageHeight = imageHeight;
             ifd.SamplesPerPixel = (ushort)bitmap.SamplesPerPixel;
-            if(bitmap.SamplesPerPixel == 1)
+            if (bitmap.SamplesPerPixel == 1)
                 ifd.PhotometricInterpretation = PhotometricInterpretation.BlackIsZero;
-            else if(bitmap.SamplesPerPixel == 3)
+            else if (bitmap.SamplesPerPixel == 3)
                 ifd.PhotometricInterpretation = PhotometricInterpretation.RGB;
             ifd.Compression = Compression.NoCompression;
 

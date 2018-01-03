@@ -66,6 +66,23 @@ namespace TiffExpress
                 enumerator.Dispose();
         }
 
+        public static EnumerableBitmap<T> Append<T>(params IBitmap<T>[] inputBitmaps)
+        {
+            int outputWidth = inputBitmaps.Min(t => t.Width);
+            int outputHeight = inputBitmaps.Sum(t => t.Height);
+            int samplesPerPixel = inputBitmaps.Min(t => t.SamplesPerPixel);
 
+            var inputRowsArray = inputBitmaps.Select(t => t.GetRows()).ToArray();
+            var rows = AppendRows(inputRowsArray);
+            return new EnumerableBitmap<T>(outputWidth, outputHeight, samplesPerPixel, rows);
+        }
+        private static IEnumerable<T[]> AppendRows<T>(params IEnumerable<T[]>[] inputBitmapsRows)
+        {
+            foreach(var inputRows in inputBitmapsRows)
+            {
+                foreach(var row in inputRows)
+                    yield return row;
+            }
+        }
     }
 }

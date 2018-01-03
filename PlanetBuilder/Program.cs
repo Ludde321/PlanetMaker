@@ -64,25 +64,8 @@ namespace PlanetBuilder
             // var earthBoylotIsland = new EarthBylotIsland();
             // earthBoylotIsland.Create();
 
-
-            // var roamCube = new RoamCube();
-            // roamCube.Init();
-            // roamCube.Split();
-            // //roamCube.Merge();
-
-            // Console.WriteLine($"NumVertexes: {roamCube.ActiveVertexes.Count()}");
-            // Console.WriteLine($"NumTriangles: {roamCube.ActiveTriangles.Count()}");
-            // Console.WriteLine($"NumDiamonds: {roamCube.ActiveDiamonds.Count()}");
-
-            // using(var stlWriter = new StlWriter(File.Create("Generated/Roam.stl")))
-            // {
-            //     var triangle = roamCube.ActiveTriangles.NextNode;
-            //     for (; triangle != roamCube.ActiveTriangles;triangle = triangle.NextNode)
-            //     {
-            //         stlWriter.AddTriangle(triangle.Vertexes[0].Position, triangle.Vertexes[1].Position, triangle.Vertexes[2].Position);
-            //     }
-            // }
-
+            // var joinBitmaps = new JoinViewFinderPanoramas();
+            // joinBitmaps.Join();
 
             Console.WriteLine("Done");
         }

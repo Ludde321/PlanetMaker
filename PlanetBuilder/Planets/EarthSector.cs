@@ -14,7 +14,6 @@ namespace PlanetBuilder.Planets
         public int NumSegmentsLon;
         public int NumSegmentsLat;
         private Bitmap<short> _elevationSectorBitmap;
-        private Bitmap<byte> _landcoverSectorBitmap;
 
         private int _elevationWidth;
         private int _elevationHeight;
@@ -34,22 +33,21 @@ namespace PlanetBuilder.Planets
         {
             PlanetRadius = 6371000;
             ElevationScale = 9;
-            NumSegmentsLon = 400;
-            NumSegmentsLat = 400;
+            NumSegmentsLon = 800;
+            NumSegmentsLat = 800;
             PlanetProjection = Projection.Equirectangular;
 
-            // Bylot Island 73.25N, 78.68W
-            Lat0 = MathHelper.ToRadians(73.25 + 1.0);
-            Lon0 = MathHelper.ToRadians(-78.68 - 3.0);
-            Lat1 = MathHelper.ToRadians(73.25 - 1.0);
-            Lon1 = MathHelper.ToRadians(-78.68 + 3.0);
+            // // Bylot Island 73.25N, 78.68W
+            // Lat0 = MathHelper.ToRadians(73.25 + 1.0);
+            // Lon0 = MathHelper.ToRadians(-78.68 - 3.0);
+            // Lat1 = MathHelper.ToRadians(73.25 - 1.0);
+            // Lon1 = MathHelper.ToRadians(-78.68 + 3.0);
 
             // Disco Island 69.81°N 53.47°W 
-            // Lat0 = MathHelper.ToRadians(69.81 + 3.0);
-            // Lon0 = MathHelper.ToRadians(-53.47 - 3.0);
-            // Lat1 = MathHelper.ToRadians(69.81 - 3.0);
-            // Lon1 = MathHelper.ToRadians(-53.47 + 3.0);
-
+            Lat0 = MathHelper.ToRadians(69.81 + 1.0);
+            Lon0 = MathHelper.ToRadians(-53.47 - 3.0);
+            Lat1 = MathHelper.ToRadians(69.81 - 1.0);
+            Lon1 = MathHelper.ToRadians(-53.47 + 3.0);
         }
 
         public void Create()
@@ -69,17 +67,12 @@ namespace PlanetBuilder.Planets
 
             // Topo Bathymetry
             sw = Stopwatch.StartNew();
-            using (var rawElevationReader = new RawReader(File.OpenRead(@"Datasets\Planets\Earth\Blue Marble\topo.bathymetry.43200x21600.raw")))
-            using (var rawLandcoverReader = new RawReader(File.OpenRead(@"Datasets\Planets\Earth\Blue Marble\landcover.43200x21600.raw")))
+            using (var tiffElevationReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Earth\ViewFinderPanoramas\dem15.tif")))
             {
-                var elevationTextureLarge = rawElevationReader.ReadBitmap<short>(43200, 21600);
-                var landcoverTextureLarge = rawElevationReader.ReadBitmap<byte>(43200, 21600);
-                
-                elevationTextureLarge = elevationTextureLarge.Convert((p) => { return (short)(p - short.MinValue); });
-                landcoverTextureLarge = landcoverTextureLarge.Convert((p) => { return p != 0 ? (byte)0xff : (byte)0x00; });
+                var ifd = tiffElevationReader.ImageFileDirectories[0];
 
-                _elevationWidth = elevationTextureLarge.Width;
-                _elevationHeight = elevationTextureLarge.Height;
+                _elevationWidth = ifd.ImageWidth;
+                _elevationHeight = ifd.ImageHeight;
 
                 // --
                 _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0) / Math.PI);
@@ -88,8 +81,7 @@ namespace PlanetBuilder.Planets
                 _sectorHeight= (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
                 _sectorWidth = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
 
-                _elevationSectorBitmap = BitmapTools.Crop(elevationTextureLarge, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
-                _landcoverSectorBitmap = BitmapTools.Crop(landcoverTextureLarge, _sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
+                _elevationSectorBitmap = tiffElevationReader.ReadImageFile<short>(_sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
                 Console.WriteLine($"Loading image sector used {sw.Elapsed}");
             }
 
@@ -115,7 +107,7 @@ namespace PlanetBuilder.Planets
 
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\EarthSector\EarthSector{NumSegmentsLon}.stl");
+            SaveSTL($@"Generated\Planets\EarthSector\Disco{NumSegmentsLon}.stl");
         }
 
         private double ComputeModelElevationTop(Vector3d v, double lat, double lon)
@@ -126,11 +118,12 @@ namespace PlanetBuilder.Planets
             double sx = t.x * _sx - _sx0;
 
             double h = _elevationSectorBitmap.ReadBilinearPixel(sx, sy, true, false);
-            double lc = _landcoverSectorBitmap.ReadBilinearPixel(sx, sy, true, false);
 
             double r = PlanetRadius;
             if(h > 0)
                 r += h * ElevationScale;
+            // else
+            //     r -= 50 * ElevationScale;
 
             return r * 0.00001;
         }
