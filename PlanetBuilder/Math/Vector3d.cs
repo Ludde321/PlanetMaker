@@ -101,6 +101,15 @@ namespace PlanetBuilder
             return CrossProduct(a - b, c - b).Abs() * .5;
         }
 
+        public static Vector3d Min(Vector3d v1, Vector3d v2)
+        {
+            return new Vector3d(Math.Min(v1.x, v2.x), Math.Min(v1.y, v2.y), Math.Min(v1.z, v2.z));
+        }
+        public static Vector3d Max(Vector3d v1, Vector3d v2)
+        {
+            return new Vector3d(Math.Max(v1.x, v2.x), Math.Max(v1.y, v2.y), Math.Max(v1.z, v2.z));
+        }
+
         public static Vector3d operator +(Vector3d a, Vector3d b)
         {
             return new Vector3d(a.x + b.x, a.y + b.y, a.z + b.z);

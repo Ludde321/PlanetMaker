@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -102,12 +103,31 @@ namespace PlanetBuilder.Planets
 
             sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon);
 
+            CenterVertexes(sphericalSector.Vertexes);
+
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;
 
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
             SaveSTL($@"Generated\Planets\EarthSector\Disco{NumSegmentsLon}.stl");
+        }
+
+        private void CenterVertexes(List<Vector3d> vertexes)
+        {
+            var vMin = new Vector3d(double.MaxValue, double.MaxValue, double.MaxValue);
+            var vMax = new Vector3d(double.MinValue, double.MinValue, double.MinValue);
+
+            foreach(var v in vertexes)
+            {
+                vMin = Vector3d.Min(vMin, v);
+                vMax = Vector3d.Max(vMax, v);
+            }
+
+            var vCenter = Vector3d.MiddlePoint(vMin, vMax);
+
+            for(int i=0;i<vertexes.Count;i++)
+                vertexes[i] -= vCenter;
         }
 
         private double ComputeModelElevationTop(Vector3d v, double lat, double lon)
@@ -125,13 +145,13 @@ namespace PlanetBuilder.Planets
             // else
             //     r -= 50 * ElevationScale;
 
-            return r * 0.00001;
+            return r * 0.0005;
         }
         private double ComputeModelElevationBottom(Vector3d v, double lat, double lon)
         {
             double r = PlanetRadius - 50000;
 
-            return r * 0.00001;
+            return r * 0.0005;
         }
     }
 }

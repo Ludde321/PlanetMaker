@@ -49,42 +49,61 @@ namespace PlanetBuilder.Planets
 
         protected void SaveSTL(string outputFilename)
         {
-            var sw = Stopwatch.StartNew();
+            Console.WriteLine($"Vertexes: {PlanetVertexes.Count}");
+            Console.WriteLine($"Triangles: {PlanetTriangles.Count}");
 
-            using (var binaryWriter = new BinaryWriter(File.Create(outputFilename)))
+            using(var stlWriter = new StlWriter(File.Create(outputFilename)))
             {
-                binaryWriter.Write(new byte[80]); // Header 80 bytes
-                binaryWriter.Write(PlanetTriangles.Count);
                 foreach (var triangle in PlanetTriangles)
                 {
                     var v1 = PlanetVertexes[triangle.i1];
                     var v2 = PlanetVertexes[triangle.i2];
                     var v3 = PlanetVertexes[triangle.i3];
 
-                    // Triangle Normal
-                    binaryWriter.Write(0f);
-                    binaryWriter.Write(0f);
-                    binaryWriter.Write(0f);
-
-                    // Vertex 1
-                    binaryWriter.Write((float)v1.x);
-                    binaryWriter.Write((float)v1.y);
-                    binaryWriter.Write((float)v1.z);
-
-                    // Vertex 2
-                    binaryWriter.Write((float)v2.x);
-                    binaryWriter.Write((float)v2.y);
-                    binaryWriter.Write((float)v2.z);
-
-                    // Vertex 3
-                    binaryWriter.Write((float)v3.x);
-                    binaryWriter.Write((float)v3.y);
-                    binaryWriter.Write((float)v3.z);
-
-                    binaryWriter.Write((short)0); // Attribute byte count
+                    stlWriter.AddTriangle(v1, v2, v3);
                 }
             }
-            Console.WriteLine($"Time used saving {outputFilename}: {sw.Elapsed}");
+            
         }
+
+        // protected void SaveSTL(string outputFilename)
+        // {
+        //     var sw = Stopwatch.StartNew();
+
+        //     using (var binaryWriter = new BinaryWriter(File.Create(outputFilename)))
+        //     {
+        //         binaryWriter.Write(new byte[80]); // Header 80 bytes
+        //         binaryWriter.Write(PlanetTriangles.Count);
+        //         foreach (var triangle in PlanetTriangles)
+        //         {
+        //             var v1 = PlanetVertexes[triangle.i1];
+        //             var v2 = PlanetVertexes[triangle.i2];
+        //             var v3 = PlanetVertexes[triangle.i3];
+
+        //             // Triangle Normal
+        //             binaryWriter.Write(0f);
+        //             binaryWriter.Write(0f);
+        //             binaryWriter.Write(0f);
+
+        //             // Vertex 1
+        //             binaryWriter.Write((float)v1.x);
+        //             binaryWriter.Write((float)v1.y);
+        //             binaryWriter.Write((float)v1.z);
+
+        //             // Vertex 2
+        //             binaryWriter.Write((float)v2.x);
+        //             binaryWriter.Write((float)v2.y);
+        //             binaryWriter.Write((float)v2.z);
+
+        //             // Vertex 3
+        //             binaryWriter.Write((float)v3.x);
+        //             binaryWriter.Write((float)v3.y);
+        //             binaryWriter.Write((float)v3.z);
+
+        //             binaryWriter.Write((short)0); // Attribute byte count
+        //         }
+        //     }
+        //     Console.WriteLine($"Time used saving {outputFilename}: {sw.Elapsed}");
+        // }
     }
 }
