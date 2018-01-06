@@ -142,7 +142,7 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegments, NumSegments);
+            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegments, NumSegments, PlanetRadius - 50000);
 
             PlanetVertexes = sphericalSector.Vertexes;
             PlanetTriangles = sphericalSector.Triangles;
