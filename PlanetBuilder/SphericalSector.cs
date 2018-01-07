@@ -22,7 +22,8 @@ namespace PlanetBuilder.Planets
         {
             Vertexes = new List<Vector3d>();
             Triangles = new List<Triangle>();
-            var edgeVertexes = new List<Vector3d>();
+            var edgeVertexesA = new List<Vector3d>();
+            var edgeVertexesB = new List<Vector3d>();
 
             double latitudeAngle = latitudeOffset1 - latitudeOffset0;
             double longitudeAngle = longitudeOffset1 - longitudeOffset0;
@@ -50,21 +51,36 @@ namespace PlanetBuilder.Planets
                     double rTop = ComputeRadiusTop(v, lat, lon);
                     Vertexes.Add(Vector3d.Multiply(v, rTop));
 
-                    if (x == 0 || y == 0)
-                        edgeVertexes.Add(Vector3d.Multiply(v, bottomRadius));
-                    else if (x == longitudeSegments - 1 || y == latitudeSegments - 1)
-                        edgeVertexes.Add(Vector3d.Multiply(v, bottomRadius));
+                    if (x == 0 || x == longitudeSegments - 1)
+                        edgeVertexesA.Add(Vector3d.Multiply(v, bottomRadius));
+
+                    if (y == 0 || y == latitudeSegments - 1) 
+                        edgeVertexesB.Add(Vector3d.Multiply(v, bottomRadius));
                 }
             }
 
-            int edgeIndex = Vertexes.Count;
-            Vertexes.AddRange(edgeVertexes);
+            int edgeIndexA = Vertexes.Count;
+            Vertexes.AddRange(edgeVertexesA);
+
+            int edgeIndexB0 = Vertexes.Count;
+            int edgeIndexB1 = edgeIndexB0 + longitudeSegments;
+            Vertexes.AddRange(edgeVertexesB);
+
+            double cLat = 0.5 * (latitudeOffset0 + latitudeOffset1);
+            double cLon = 0.5 * (longitudeOffset0 + longitudeOffset1);
+            double cx = Math.Cos(cLon) * Math.Cos(cLat);
+            double cy = Math.Sin(cLon) * Math.Cos(cLat);
+            double cz = Math.Sin(cLat);
+
+            int bottomCenter = Vertexes.Count;
+            Vertexes.Add(Vector3d.Multiply(new Vector3d(cx, cy, cz), bottomRadius));
 
             int ofsY = 0;
             for (int y = 0; y < latitudeSegments - 1; y++)
             {
-                // Triangles.Add(new Triangle(ofsY, ofsY + 1, ofsY + longitudeSegments + 1));
-                // Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments + 1, ofsY + longitudeSegments));
+                Triangles.Add(new Triangle(ofsY, edgeIndexA, edgeIndexA + 2));
+                Triangles.Add(new Triangle(ofsY, edgeIndexA + 2, ofsY + longitudeSegments));
+                Triangles.Add(new Triangle(bottomCenter, edgeIndexA + 2, edgeIndexA));
 
                 for (int x = 0; x < longitudeSegments - 1; x++)
                 {
@@ -76,25 +92,31 @@ namespace PlanetBuilder.Planets
                     ofsY += 1;
                 }
 
-                // Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments + 1, ofsY + 1));
-                // Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments, ofsY + longitudeSegments + 1));
+                Triangles.Add(new Triangle(ofsY, edgeIndexA + 3, edgeIndexA + 1));
+                Triangles.Add(new Triangle(ofsY, ofsY + longitudeSegments, edgeIndexA + 3));
+                Triangles.Add(new Triangle(bottomCenter, edgeIndexA + 1, edgeIndexA + 3));
 
-                ofsY += 2;
+                ofsY += 1;
+                edgeIndexA+=2;
             }
 
-            // int ofsYT = 0;
-            // int ofsYB = longitudeSegments * (latitudeSegments - 1);
-            // for (int x = 0; x < longitudeSegments - 1; x++)
-            // {
-            //     Triangles.Add(new Triangle(ofsYT, ofsYT + 3, ofsYT + 1));
-            //     Triangles.Add(new Triangle(ofsYT, ofsYT + 2, ofsYT + 3));
+            int ofsYT = 0;
+            int ofsYB = longitudeSegments * (latitudeSegments - 1);
+            for (int x = 0; x < longitudeSegments - 1; x++)
+            {
+                Triangles.Add(new Triangle(ofsYT, edgeIndexB0 + 1, edgeIndexB0));
+                Triangles.Add(new Triangle(ofsYT, ofsYT + 1, edgeIndexB0 + 1));
+                Triangles.Add(new Triangle(bottomCenter, edgeIndexB0, edgeIndexB0 + 1));
 
-            //     Triangles.Add(new Triangle(ofsYB, ofsYB + 1, ofsYB + 3));
-            //     Triangles.Add(new Triangle(ofsYB, ofsYB + 3, ofsYB + 2));
+                Triangles.Add(new Triangle(ofsYB, edgeIndexB1, edgeIndexB1 + 1));
+                Triangles.Add(new Triangle(ofsYB, edgeIndexB1 + 1, ofsYB + 1));
+                Triangles.Add(new Triangle(bottomCenter, edgeIndexB1 + 1, edgeIndexB1));
 
-            //     ofsYT += 2;
-            //     ofsYB += 2;
-            // }
+                ofsYT++;
+                ofsYB++;
+                edgeIndexB0++;
+                edgeIndexB1++;
+            }
         }
 
     }

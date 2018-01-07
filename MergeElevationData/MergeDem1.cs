@@ -11,8 +11,8 @@ namespace MergeElevationData
         public readonly List<string> InputPaths = new List<string>();
         public string OutputPath;
 
-        public const int BitmapWidth = 3603;
-        public const int BitmapHeight = 3603;
+        public const int BitmapWidth = 3601;
+        public const int BitmapHeight = 3601;
 
         private readonly Bitmap<short> _oceanBitmap = new Bitmap<short>(BitmapWidth, BitmapHeight);
 
@@ -30,10 +30,10 @@ namespace MergeElevationData
             var tiffReaders = new List<TiffReader>();
 
             var latBitmaps = new List<IBitmap<short>>();
-            for (int lat = lat0; lat >= lat1; lat--)
+            for(int lat = lat0;lat>=lat1;lat--)
             {
                 var lonBitmaps = new List<IBitmap<short>>();
-                for (int lon = lon0; lon <= lon1; lon++)
+                for(int lon = lon0;lon<=lon1;lon++)
                 {
                     string bitmapPath = LocateMapGranulate(lat, lon);
 
@@ -63,10 +63,10 @@ namespace MergeElevationData
             using (var tiffWriter = new TiffWriter(File.Create(string.Format(OutputPath, MapGranulateName(lat0, lon0), MapGranulateName(lat1, lon1)))))
             {
                 tiffWriter.BigTiff = true;
-                // theBitmap = theBitmap.Convert((p) =>
-                // {
-                //     return (short)(((p >> 8) & 0xff) | ((p << 8) & 0xff00));
-                // });
+                theBitmap = theBitmap.Convert((p) =>
+                {
+                    return (short)(50 + (((p >> 8) & 0xff) | ((p << 8) & 0xff00)));
+                });
                 tiffWriter.WriteImageFile(theBitmap);
             }
 
@@ -79,6 +79,7 @@ namespace MergeElevationData
             foreach (string inputPath in InputPaths)
             {
                 string bitmapPath = string.Format(inputPath, MapGranulateName(lat, lon));
+                Console.WriteLine(bitmapPath);
                 if (File.Exists(bitmapPath))
                     return bitmapPath;
             }

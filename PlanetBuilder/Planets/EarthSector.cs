@@ -33,9 +33,9 @@ namespace PlanetBuilder.Planets
         public EarthSector()
         {
             PlanetRadius = 6371000;
-            ElevationScale = 9;
-            NumSegmentsLon = 800;
-            NumSegmentsLat = 800;
+            ElevationScale = 2;
+            NumSegmentsLon = 1500;
+            NumSegmentsLat = 1500;
             PlanetProjection = Projection.Equirectangular;
 
             // // Bylot Island 73.25N, 78.68W
@@ -45,10 +45,10 @@ namespace PlanetBuilder.Planets
             // Lon1 = MathHelper.ToRadians(-78.68 + 3.0);
 
             // Disco Island 69.81°N 53.47°W 
-            Lat0 = MathHelper.ToRadians(69.81 + 1.0);
-            Lon0 = MathHelper.ToRadians(-53.47 - 3.0);
-            Lat1 = MathHelper.ToRadians(69.81 - 1.0);
-            Lon1 = MathHelper.ToRadians(-53.47 + 3.0);
+            Lat0 = MathHelper.ToRadians(69.81 + 0.75);
+            Lon0 = MathHelper.ToRadians(-53.47 - 2.0);
+            Lat1 = MathHelper.ToRadians(69.81 - 0.75);
+            Lon1 = MathHelper.ToRadians(-53.47 + 2.0);
         }
 
         public void Create()
@@ -67,23 +67,26 @@ namespace PlanetBuilder.Planets
             sw = Stopwatch.StartNew();
 
             // Topo Bathymetry
-            sw = Stopwatch.StartNew();
-            using (var tiffElevationReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Earth\ViewFinderPanoramas\dem15.tif")))
+            // using (var tiffElevationReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Earth\ViewFinderPanoramas\dem15.tif")))
+            using (var tiffElevationReader = new TiffReader(File.OpenRead(@"Datasets\Planets\Earth\ViewFinderPanoramas\dem3_N75W085_N65W050.tif")))
             {
                 var ifd = tiffElevationReader.ImageFileDirectories[0];
 
-                _elevationWidth = ifd.ImageWidth;
-                _elevationHeight = ifd.ImageHeight;
+                _elevationWidth = 1201 * 360;//ifd.ImageWidth;
+                _elevationHeight = 1201 * 180;//ifd.ImageHeight;
+
+                double latOffset = MathHelper.ToRadians(89-75);
+                double lonOffset = MathHelper.ToRadians(180 - 85);
 
                 // --
-                _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0) / Math.PI);
-                _sectorOffsetX = (int)(_elevationWidth * (Math.PI + Lon0) / (Math.PI * 2));
+                _sectorOffsetY = (int)(_elevationHeight * (Math.PI / 2 - Lat0 - latOffset) / Math.PI);
+                _sectorOffsetX = (int)(_elevationWidth * (Math.PI + Lon0 - lonOffset) / (Math.PI * 2));
 
                 _sectorHeight= (int)Math.Ceiling(_elevationHeight * dLat / Math.PI);
                 _sectorWidth = (int)Math.Ceiling(_elevationWidth * dLon / (Math.PI * 2));
 
                 _elevationSectorBitmap = tiffElevationReader.ReadImageFile<short>(_sectorOffsetX, _sectorOffsetY, _sectorWidth, _sectorHeight).ToBitmap();
-                Console.WriteLine($"Loading image sector used {sw.Elapsed}");
+                Console.WriteLine($"Loading image sector {_sectorWidth}x{_sectorHeight} used {sw.Elapsed}");
             }
 
             // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();
@@ -101,7 +104,7 @@ namespace PlanetBuilder.Planets
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
             sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
-            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon, PlanetRadius - 50000);
+            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon, 0.0005 * (PlanetRadius - 50000));
 
             CenterVertexes(sphericalSector.Vertexes);
 

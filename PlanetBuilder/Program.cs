@@ -58,8 +58,8 @@ namespace PlanetBuilder
             // var earth = new Earth();
             // earth.Create();
 
-            // var earthSector = new EarthSector();
-            // earthSector.Create();
+            var earthSector = new EarthSector();
+            earthSector.Create();
 
             // var earthBoylotIsland = new EarthBylotIsland();
             // earthBoylotIsland.Create();
@@ -67,8 +67,8 @@ namespace PlanetBuilder
             // var joinBitmaps = new JoinViewFinderPanoramas();
             // joinBitmaps.Join();
 
-            var joinEarthDem3 = new JoinEarthDem3();
-            joinEarthDem3.Join(75, -85, 65, -50);
+            // var joinEarthDem3 = new JoinEarthDem3();
+            // joinEarthDem3.Join(75, -85, 65, -50);
 
             Console.WriteLine("Done");
         }
