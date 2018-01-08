@@ -66,14 +66,11 @@ namespace PlanetBuilder.Planets
             int edgeIndexB1 = edgeIndexB0 + longitudeSegments;
             Vertexes.AddRange(edgeVertexesB);
 
-            double cLat = 0.5 * (latitudeOffset0 + latitudeOffset1);
-            double cLon = 0.5 * (longitudeOffset0 + longitudeOffset1);
-            double cx = Math.Cos(cLon) * Math.Cos(cLat);
-            double cy = Math.Sin(cLon) * Math.Cos(cLat);
-            double cz = Math.Sin(cLat);
+            // Center bottom
+            var cBottom = Vector3d.MiddlePoint(edgeVertexesB.First(), edgeVertexesB.Last());
 
             int bottomCenter = Vertexes.Count;
-            Vertexes.Add(Vector3d.Multiply(new Vector3d(cx, cy, cz), bottomRadius));
+            Vertexes.Add(cBottom);
 
             int ofsY = 0;
             for (int y = 0; y < latitudeSegments - 1; y++)

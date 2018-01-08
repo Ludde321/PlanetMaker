@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using PlanetBuilder.Planets;
@@ -14,6 +15,7 @@ namespace PlanetBuilder
         {
             Console.WriteLine("Welcome to PlanetBuilder!");
 
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             Directory.SetCurrentDirectory(@"c:\Ludde\FractalWorlds");
 
             // var ceres = new Ceres();

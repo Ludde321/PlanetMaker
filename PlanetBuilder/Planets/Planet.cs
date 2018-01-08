@@ -17,6 +17,8 @@ namespace PlanetBuilder.Planets
         public double ElevationScale;
         public int RecursionLevel = 8;
 
+        public string Name;
+
         public Projection PlanetProjection = Projection.Equirectangular;
 
         public List<Vector3d> PlanetVertexes;
