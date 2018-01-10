@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using ImageMagick;
 using PlanetBuilder.Roam;
 using TiffExpress;
 

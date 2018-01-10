@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -33,7 +32,7 @@ namespace PlanetBuilder.Planets
         public EarthSector()
         {
             PlanetRadius = 6371000;
-            ElevationScale = 1.5;
+            ElevationScale = 2;
             NumSegmentsLon = 1200;
             NumSegmentsLat = 1200;
             PlanetProjection = Projection.Equirectangular;
@@ -58,7 +57,6 @@ namespace PlanetBuilder.Planets
             Lon0 = MathHelper.ToRadians(44.565 - 0.20);
             Lat1 = MathHelper.ToRadians(42.677 - 0.160);
             Lon1 = MathHelper.ToRadians(44.615 + 0.20);
-
         }
 
         public void Create()

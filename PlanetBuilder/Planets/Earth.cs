@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -55,7 +54,7 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Earth\topo.bathymetry.{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
 
             // Landcover
             string landcoverTextureSmallFilename = $@"Generated\Planets\Earth\landcover.{width}x{height}.raw";
@@ -81,7 +80,7 @@ namespace PlanetBuilder.Planets
             {
                 _landcoverTextureSmall = BitmapHelper.LoadRaw8(landcoverTextureSmallFilename, width, height);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Earth\landcover.{width}x{height}.png", _landcoverTextureSmall);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Earth\landcover.{width}x{height}.tif", _landcoverTextureSmall);
 
 
 
@@ -99,7 +98,7 @@ namespace PlanetBuilder.Planets
             // {
             //     _elevationTextureBlur = TextureHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
             // }
-            //     TextureHelper.SavePng8($@"Generated\Planets\Earth\EarthBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            //     TextureHelper.SaveTiff8($@"Generated\Planets\Earth\EarthBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

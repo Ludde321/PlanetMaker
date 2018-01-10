@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -113,7 +112,7 @@ namespace PlanetBuilder.Planets
                     tiffWriter.WriteImageFile(bitmap);
                 }
 
-                BitmapHelper.SavePng8($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.png", _elevationSectorBitmap);
+                BitmapHelper.SaveTiff8($@"Generated\Planets\MarsSector\Mars{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif", _elevationSectorBitmap);
 
                 int width = 2880;
                 int height = 1440;
@@ -128,7 +127,7 @@ namespace PlanetBuilder.Planets
                     Console.WriteLine($"Blur used {sw.Elapsed}");
 
                     BitmapHelper.SaveRaw16($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.raw", _elevationBitmapBlur);
-                    BitmapHelper.SavePng8($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.png", _elevationBitmapBlur);
+                    BitmapHelper.SaveTiff8($@"Generated\Planets\MarsSector\MarsBlur{_elevationBitmapBlur.Width}x{_elevationBitmapBlur.Height}.tif", _elevationBitmapBlur);
                 }
                 else
                 {

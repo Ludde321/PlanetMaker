@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -42,7 +41,7 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Mercury\Mercury{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Mercury\Mercury{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
 
             string elevationTextureBlurFilename = $@"Generated\Planets\Mercury\MercuryBlur{width}x{height}.raw";
             if (!File.Exists(elevationTextureBlurFilename))
@@ -58,7 +57,7 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTextureBlur = BitmapHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
             }
-            BitmapHelper.SavePng8($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Mercury\MercuryBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

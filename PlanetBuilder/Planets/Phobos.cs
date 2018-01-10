@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -30,7 +29,7 @@ namespace PlanetBuilder.Planets
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
            }
 
-            BitmapHelper.SavePng8($@"Generated\Planets\Phobos\Phobos{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Phobos\Phobos{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
 
             sw = Stopwatch.StartNew();
             var blurFilter = new BlurFilter(PlanetProjection);

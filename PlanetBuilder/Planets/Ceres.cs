@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -31,7 +30,7 @@ namespace PlanetBuilder.Planets
             }
 
             BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\Ceres{_elevationTexture.Width}x{_elevationTexture.Height}.raw", _elevationTexture);
-            BitmapHelper.SavePng8($@"Generated\Planets\Ceres\Ceres{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Ceres\Ceres{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
@@ -39,7 +38,7 @@ namespace PlanetBuilder.Planets
             Console.WriteLine($"Blur used {sw.Elapsed}");
 
             BitmapHelper.SaveRaw16($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            BitmapHelper.SavePng8($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Ceres\CeresBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

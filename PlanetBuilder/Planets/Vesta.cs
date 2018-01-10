@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -42,7 +41,7 @@ namespace PlanetBuilder.Planets
 
             var textureSmall = _elevationTextureFloat.Convert((h) => {return (short)(h-PlanetRadius);});
             // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\Vesta{_elevationTextureSmall.Width}x{_elevationTextureSmall.Height}.raw", _elevationTextureSmall);
-            BitmapHelper.SavePng8($@"Generated\Planets\Vesta\Vesta{textureSmall.Width}x{textureSmall.Height}.png", textureSmall);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Vesta\Vesta{textureSmall.Width}x{textureSmall.Height}.tif", textureSmall);
 
             var blurFilter = new BlurFilter(PlanetProjection);
             sw = Stopwatch.StartNew();
@@ -51,7 +50,7 @@ namespace PlanetBuilder.Planets
 
             var textureBlur = _elevationTextureBlur.Convert((h) => {return (short)(h-PlanetRadius);});
             // TextureHelper.SaveFile16($@"Generated\Planets\Vesta\VestaBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.raw", _elevationTextureBlur);
-            BitmapHelper.SavePng8($@"Generated\Planets\Vesta\VestaBlur{textureBlur.Width}x{textureBlur.Height}.png", textureBlur);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Vesta\VestaBlur{textureBlur.Width}x{textureBlur.Height}.tif", textureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);

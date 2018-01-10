@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder
@@ -57,61 +56,6 @@ namespace PlanetBuilder
             {
                 return tiffReader.ReadImageFile<short>().ToBitmap();
             }
-        }
-
-        // public static Bitmap<short> LoadTiff16(string inputFilename)
-        // {
-        //     int width;
-        //     int height;
-        //     byte[] buffer;
-        //     using (var image = new MagickImage(inputFilename))
-        //     {
-        //         width = image.Width;
-        //         height = image.Height;
-
-        //         image.Format = MagickFormat.Gray;
-        //         image.Endian = Endian.LSB;
-        //         buffer = image.ToByteArray();
-        //     }
-
-        //     var texture = new Bitmap<short>(width, height);
-
-        //     int idx = 0;
-        //     for (int y = 0; y < height; y++)
-        //     {
-        //         Buffer.BlockCopy(buffer, idx, texture.Rows[y], 0, width * 2);
-        //         idx += width * 2;
-        //     }
-
-        //     return texture;
-        // }
-
-
-        public static Bitmap<byte> LoadAny8(string inputFilename)
-        {
-            int width;
-            int height;
-            byte[] buffer;
-            using (var image = new MagickImage(inputFilename))
-            {
-                width = image.Width;
-                height = image.Height;
-
-                image.Format = MagickFormat.Gray;
-                image.Endian = Endian.LSB;
-                buffer = image.ToByteArray();
-            }
-
-            var texture = new Bitmap<byte>(width, height);
-
-            int idx = 0;
-            for (int y = 0; y < height; y++)
-            {
-                Buffer.BlockCopy(buffer, idx, texture.Rows[y], 0, width);
-                idx += width;
-            }
-
-            return texture;
         }
 
         public static void SaveRaw8(string outputFilename, Bitmap<byte> texture)
@@ -176,68 +120,5 @@ namespace PlanetBuilder
             var bitmap2 = bitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
             SaveTiff16(outputFilename, bitmap2);
         }
-
-        public static void SavePng8(string outputFilename, IBitmap<byte> texture)
-        {
-            var buffer = new byte[texture.Width * texture.Height];
-
-            int idx = 0;
-            foreach (var row in texture.GetRows())
-            {
-                Buffer.BlockCopy(row, 0, buffer, idx, texture.Width);
-                idx += texture.Width;
-            }
-
-            using (var image = new MagickImage(buffer, new MagickReadSettings { Format = MagickFormat.Gray, Width = texture.Width, Height = texture.Height }))
-            {
-                image.Format = MagickFormat.Png;
-                image.Write(outputFilename);
-            }
-        }
-        public static void SavePng8(string outputFilename, IBitmap<short> texture)
-        {
-            var buffer = new byte[texture.Width * texture.Height];
-
-            int idx = 0;
-            foreach (var row in texture.GetRows())
-            {
-                foreach (short h in row)
-                    buffer[idx++] = (byte)((h >> 8) + 128);
-            }
-
-            using (var image = new MagickImage(buffer, new MagickReadSettings { Format = MagickFormat.Gray, Width = texture.Width, Height = texture.Height }))
-            {
-                image.Format = MagickFormat.Png;
-                image.Write(outputFilename);
-            }
-        }
-
-        // public static Bitmap<B> Convert<A,B>(Bitmap<A> inputTexture, Func<A, B> func)
-        // {
-        //     int width = inputTexture.Width;
-        //     int height = inputTexture.Height;
-        //     var outputTexture = new Bitmap<B>(width, height);
-        //     for(int y =0;y<height;y++)
-        //     {
-        //         var inputLine = inputTexture.Rows[y];
-        //         var outputLine = outputTexture.Rows[y];
-        //         for(int x =0;x<width;x++)
-        //             outputLine[x] = func(inputLine[x]);
-        //     }
-        //     return outputTexture;
-        // }
-
-        // public static void Process<A>(Bitmap<A> inputTexture, Func<A, A> func)
-        // {
-        //     int width = inputTexture.Width;
-        //     int height = inputTexture.Height;
-        //     for(int y =0;y<height;y++)
-        //     {
-        //         var line = inputTexture.Rows[y];
-        //         for(int x =0;x<width;x++)
-        //             line[x] = func(line[x]);
-        //     }
-        // }
-
     }
 }

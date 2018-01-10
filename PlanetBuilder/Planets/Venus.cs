@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using ImageMagick;
 using TiffExpress;
 
 namespace PlanetBuilder.Planets
@@ -43,16 +42,11 @@ namespace PlanetBuilder.Planets
             int width = 2880;
             int height = 1440;
             string elevationTextureSmallFilename = $@"Generated\Planets\Venus\Venus{width}x{height}.raw";
-            if(!File.Exists(elevationTextureSmallFilename))
+            if (!File.Exists(elevationTextureSmallFilename))
             {
                 sw = Stopwatch.StartNew();
                 var elevationTextureLarge = BitmapHelper.LoadRaw16(@"Datasets\Planets\Venus\Venus_Magellan_Topography_Global_4641m_v02_ca2.raw", 8192, 4096);
                 Console.WriteLine($"Loading texture used {sw.Elapsed}");
-
-                // sw = Stopwatch.StartNew();
-                // var elevationTextureLarge8 = TextureHelper.LoadAny8(@"Datasets\Planets\Venus\4kVenus.png");
-                // var elevationTextureLarge = TextureHelper.Convert(elevationTextureLarge8, (p) => {return (short)(p*64);});
-                // Console.WriteLine($"Loading texture used {sw.Elapsed}");
 
                 sw = Stopwatch.StartNew();
                 _elevationTexture = Resampler.Resample(elevationTextureLarge, width, height).ToBitmap();
@@ -64,10 +58,10 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTexture = BitmapHelper.LoadRaw16(elevationTextureSmallFilename, width, height);
             }
-                BitmapHelper.SavePng8($@"Generated\Planets\Venus\Venus{_elevationTexture.Width}x{_elevationTexture.Height}.png", _elevationTexture);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Venus\Venus{_elevationTexture.Width}x{_elevationTexture.Height}.tif", _elevationTexture);
 
             string elevationTextureBlurFilename = $@"Generated\Planets\Venus\VenusBlur{width}x{height}.raw";
-            if(!File.Exists(elevationTextureBlurFilename))
+            if (!File.Exists(elevationTextureBlurFilename))
             {
                 sw = Stopwatch.StartNew();
                 var blurFilter = new BlurFilter(PlanetProjection);
@@ -80,7 +74,7 @@ namespace PlanetBuilder.Planets
             {
                 _elevationTextureBlur = BitmapHelper.LoadRaw16(elevationTextureBlurFilename, width, height);
             }
-                BitmapHelper.SavePng8($@"Generated\Planets\Venus\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.png", _elevationTextureBlur);
+            BitmapHelper.SaveTiff8($@"Generated\Planets\Venus\VenusBlur{_elevationTextureBlur.Width}x{_elevationTextureBlur.Height}.tif", _elevationTextureBlur);
 
             sw = Stopwatch.StartNew();
             CreatePlanetVertexes(RecursionLevel);
