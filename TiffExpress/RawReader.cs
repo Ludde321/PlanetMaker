@@ -75,7 +75,8 @@ namespace TiffExpress
         }
         private IEnumerable<byte[]> ReadBitmapRows8(int inputWidth, int inputHeight, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
-            _stream.Position = 2 * (offsetY * inputWidth + offsetX);
+            if(offsetY != 0 || offsetX != 0)
+                _stream.Position = 2 * (offsetY * inputWidth + offsetX);
 
             var row = new byte[outputWidth];
 
@@ -89,7 +90,8 @@ namespace TiffExpress
         }
         private IEnumerable<short[]> ReadBitmapRows16(int inputWidth, int inputHeight, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
-            _stream.Position = 2 * (offsetY * inputWidth + offsetX);
+            if(offsetY != 0 || offsetX != 0)
+                _stream.Position = 2 * (offsetY * inputWidth + offsetX);
 
             var row = new short[outputWidth];
             var buffer = new byte[2 * outputWidth];
@@ -107,7 +109,8 @@ namespace TiffExpress
 
         private IEnumerable<float[]> ReadBitmapRows32(int inputWidth, int inputHeight, int offsetX, int offsetY, int outputWidth, int outputHeight)
         {
-            _stream.Position = 4 * (offsetY * inputWidth + offsetX);
+            if(offsetY != 0 || offsetX != 0)
+                _stream.Position = 4 * (offsetY * inputWidth + offsetX);
 
             var row = new float[outputWidth];
             var buffer = new byte[4 * outputWidth];

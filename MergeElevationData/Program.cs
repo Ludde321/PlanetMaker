@@ -15,7 +15,8 @@ namespace MergeElevationData
 
             var sw = Stopwatch.StartNew();
 
-            var demReader = new DemHgtReader(@"\\luddepc\Earth\SRTMunzip\{0}.hgt", 3601, 3601);
+//            var demReader = new DemHgtReader(@"\\luddepc\Earth\SRTMunzip\{0}.hgt", 3601, 3601);
+            var demReader = new DemZipRawReader(@"\\luddepc\Earth2\SRTM.zip", "{0}.hgt", 3601, 3601);
             //t.InputPaths.Add(@"\\luddepc\Earth\ASTERunzip\ASTGTM2_{0}_dem.tif");
             
             // t.InputPaths.Add(@"Datasets\Planets\Earth\STRMv3Arc1\{0}.hgt");

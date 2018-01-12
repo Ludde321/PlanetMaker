@@ -6,7 +6,7 @@ using TiffExpress;
 
 namespace MergeElevationData
 {
-    public class DemHgtReader : DemReader<short>, IDisposable
+    public class DemRawReader : DemReader<short>, IDisposable
     {
         private readonly List<RawReader> _rawReaders = new List<RawReader>();
 
@@ -17,7 +17,7 @@ namespace MergeElevationData
 
         private readonly Bitmap<short> _oceanBitmap;
 
-        public DemHgtReader(string inputPath, int bitmapWidth, int bitmapHeight)
+        public DemRawReader(string inputPath, int bitmapWidth, int bitmapHeight)
         {
             InputPath = inputPath;
             BitmapWidth = bitmapWidth;
