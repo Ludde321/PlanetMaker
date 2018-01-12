@@ -8,14 +8,14 @@ namespace MergeElevationData
 {
     public class DemRawReader : DemReader<short>, IDisposable
     {
-        private readonly List<RawReader> _rawReaders = new List<RawReader>();
+        protected readonly List<RawReader> _rawReaders = new List<RawReader>();
 
         public readonly string InputPath;
 
         public readonly int BitmapWidth;
         public readonly int BitmapHeight;
 
-        private readonly Bitmap<short> _oceanBitmap;
+        protected readonly Bitmap<short> _oceanBitmap;
 
         public DemRawReader(string inputPath, int bitmapWidth, int bitmapHeight)
         {
@@ -25,7 +25,7 @@ namespace MergeElevationData
             _oceanBitmap = new Bitmap<short>(BitmapWidth, BitmapHeight);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             foreach (var rawReader in _rawReaders)
                 rawReader.Dispose();
