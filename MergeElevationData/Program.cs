@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Common.Dem;
 using TiffExpress;
 
 namespace MergeElevationData
@@ -15,12 +16,9 @@ namespace MergeElevationData
 
             var sw = Stopwatch.StartNew();
 
-//            var demReader = new DemHgtReader(@"\\luddepc\Earth\SRTMunzip\{0}.hgt", 3601, 3601);
-            var demReader = new DemZipRawReader(@"\\luddepc\Earth2\SRTM.zip", "{0}.hgt", 3601, 3601);
-            //t.InputPaths.Add(@"\\luddepc\Earth\ASTERunzip\ASTGTM2_{0}_dem.tif");
-            
-            // t.InputPaths.Add(@"Datasets\Planets\Earth\STRMv3Arc1\{0}.hgt");
-            // t.InputPaths.Add(@"Datasets\Planets\Earth\ASTERv2Arc1\{0}.tif");
+//            var demReader = new DemZipRawReader(@"\\luddepc\Earth2\SRTM.zip", "{0}.hgt", 3601, 3601);
+            var demReader = new DemZipTiffReader(@"\\luddepc\Earth2\ASTER.zip", "ASTGTM2_{0}_dem.tif", 3601, 3601);
+            //var demReader = new DemTiffReader(@"\\luddepc\Earth\ASTERunzip\ASTGTM2_{0}_dem.tif", 3601, 3601);
 
             //t.Join(78, -83, 68, -73);
             // t.Join(64, 5, 54, 15);
@@ -32,7 +30,7 @@ namespace MergeElevationData
             int lon1 = 48;
             var theBitmap = demReader.LoadBitmap(lat0, lon0, lat1, lon1);
 
-            using (var tiffWriter = new TiffWriter(File.Create(string.Format(@"Datasets\Planets\Earth\SRTM_{0}_{1}.tif", demReader.MapGranulateName(lat0, lon0), demReader.MapGranulateName(lat1, lon1)))))
+            using (var tiffWriter = new TiffWriter(File.Create(string.Format(@"Datasets\Planets\Earth\ASTER_{0}_{1}.tif", demReader.MapGranulateName(lat0, lon0), demReader.MapGranulateName(lat1, lon1)))))
             {
                 tiffWriter.BigTiff = true;
                 tiffWriter.WriteImageFile(theBitmap);

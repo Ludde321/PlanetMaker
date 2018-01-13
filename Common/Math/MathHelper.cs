@@ -1,6 +1,6 @@
 using System;
 
-namespace PlanetBuilder
+namespace Common
 {
     public static class MathHelper
     {

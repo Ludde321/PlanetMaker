@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlanetBuilder
+namespace Common
 {
     public struct Vector3d
     {

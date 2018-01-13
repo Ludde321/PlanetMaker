@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using TiffExpress;
 
-namespace MergeElevationData
+namespace Common.Dem
 {
     public class DemZipRawReader : DemRawReader, IDisposable
     {

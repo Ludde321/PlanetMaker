@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using TiffExpress;
 
-namespace MergeElevationData
+namespace Common.Dem
 {
     public abstract class DemReader<T>
     {
@@ -31,5 +31,10 @@ namespace MergeElevationData
         }
 
         protected abstract IBitmap<T> LoadMapGranulate(int lat, int lon);
+
+        public virtual string MapGranulateName(int lat, int lon)
+        {
+            return string.Format("{0}{1:D2}{2}{3:D3}", lat >= 0 ? 'N' : 'S', Math.Abs(lat), lon >= 0 ? 'E' : 'W', Math.Abs(lon));
+        }
     }
 }
