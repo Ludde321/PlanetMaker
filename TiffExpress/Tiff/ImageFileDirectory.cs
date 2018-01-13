@@ -18,6 +18,8 @@ namespace TiffExpress.Tiff
         public PlanarConfiguration PlanarConfiguration = PlanarConfiguration.Chunky;
         public SampleFormat SampleFormat = SampleFormat.Unsigned; // 1 = unsigned integer data, 2 = two’s complement signed integer data, 3 = IEEE floating point data [IEEE]
 
+        public ushort FillOrder = 1;
+
         public long[] StripOffsets;
         public long[] StripByteCounts;
 
@@ -26,6 +28,7 @@ namespace TiffExpress.Tiff
         public string Copyright;
         public DateTime DateTime;
         public string Software;
+        public string DocumentName;
         public ushort ExtraSamples;
         public string HostComputer;
         public string ImageDescription;

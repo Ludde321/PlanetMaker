@@ -41,7 +41,12 @@ namespace TiffExpress.Tiff
         Software = 305,
         SubfileType = 255,
         Threshholding = 263,
+        DocumentName = 269,
 
+        // GeoTiff
+        ModelPixelScaleTag     = 33550,
+        ModelTiepointTag       = 33922,
+        GeoKeyDirectoryTag     = 34735,
     }
 
 }
