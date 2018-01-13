@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -256,13 +255,12 @@ namespace TiffExpress
                                 {
                                     long valueOffset = ReadFieldValue<long>(ifdReader, fieldType);
                                     ifd.Entries[tag] = new IfdEntry { Tag = tag, FieldType = fieldType, ValueOffset = valueOffset };
-                                    Debug.WriteLine($"Tag: {tag} Type: {fieldType} NumValues: {numValues} ValueOffset: {valueOffset}");
+                                    Console.WriteLine($"Tag: {tag} Type: {fieldType} NumValues: {numValues} ValueOffset: {valueOffset}");
                                 }
                                 break;
                         }
 
                         ifdReader.Stream.Position = pos + (_bigTiff ? 8 : 4);
-
                     }
 
                     if (_bigTiff)
@@ -319,7 +317,7 @@ namespace TiffExpress
                 case FieldType.Double:
                     return reader.ReadDouble();
             }
-            Trace.WriteLine($"Unknown field type {fieldType}");
+            Console.WriteLine($"Unknown field type {fieldType}");
             return 0;
         }
 
