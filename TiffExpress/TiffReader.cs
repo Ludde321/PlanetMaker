@@ -288,7 +288,6 @@ namespace TiffExpress
 
             if (typeof(T).IsEnum)
                 return (T)Enum.ToObject(typeof(T), value);
-                //return (T)Enum.Parse(typeof(T), value.ToString());
 
             return (T)Convert.ChangeType(value, typeof(T));
         }
@@ -337,7 +336,7 @@ namespace TiffExpress
             return array.Select(value =>
             {
                 if (typeof(T).IsEnum)
-                    return (T)Enum.Parse(typeof(T), value.ToString());
+                    return (T)Enum.ToObject(typeof(T), value);
 
                 return (T)Convert.ChangeType(value, typeof(T));
             }).ToArray();
