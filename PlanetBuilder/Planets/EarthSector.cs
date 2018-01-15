@@ -24,42 +24,21 @@ namespace PlanetBuilder.Planets
 
         private double _sx, _sy, _sx0, _sy0;
 
+        public bool UseAster;
+
         public EarthSector()
         {
             PlanetRadius = 6371000;
             ElevationScale = 1.5;
             NumSegmentsLon = 1200;
             NumSegmentsLat = 1200;
-            PlanetProjection = Projection.Equirectangular;
-
-            // Bylot Island 73.25N, 78.68W
-            // Name = "Bylot";
-            // Lat0 = MathHelper.ToRadians(73.25 + 0.80);
-            // Lon0 = MathHelper.ToRadians(-78.65 - 2.85);
-            // Lat1 = MathHelper.ToRadians(73.25 - 0.80);
-            // Lon1 = MathHelper.ToRadians(-78.65 + 2.85);
-
-            // Disco Island 69.81°N 53.47°W 
-            // Name = "Disco";
-            // Lat0 = MathHelper.ToRadians(69.81 + 0.75);
-            // Lon0 = MathHelper.ToRadians(-53.47 - 2.0);
-            // Lat1 = MathHelper.ToRadians(69.81 - 0.75);
-            // Lon1 = MathHelper.ToRadians(-53.47 + 2.0);
-
-            // Kazbek 42°41′57″N 44°31′06″ECoordinates: 42°41′57″N 44°31′06″E [1]
-            Name = "Kazbek";
-            Lat0 = MathHelper.ToRadians(42.677 + 0.160);
-            Lat1 = MathHelper.ToRadians(42.677 - 0.160);
-            Lon0 = MathHelper.ToRadians(44.590 - 0.225);
-            Lon1 = MathHelper.ToRadians(44.590 + 0.225);
-            // Lat0 = MathHelper.ToRadians(42.696 + 0.5);
-            // Lon0 = MathHelper.ToRadians(44.514 - 0.5);
-            // Lat1 = MathHelper.ToRadians(42.696 - 0.5);
-            // Lon1 = MathHelper.ToRadians(44.514 + 0.5);
         }
 
         public void Create()
         {
+            var targetPath = $@"Generated\Planets\Earth\{Name}";
+            Directory.CreateDirectory(targetPath);
+
             int lat0deg = (int)Math.Floor(MathHelper.ToDegrees(Lat0));
             int lat1deg = (int)Math.Floor(MathHelper.ToDegrees(Lat1));
             int lon0deg = (int)Math.Floor(MathHelper.ToDegrees(Lon0));
@@ -88,34 +67,30 @@ namespace PlanetBuilder.Planets
 
             var sw = Stopwatch.StartNew();
 
-                        // using (var demReader = new DemZipTiffReader(@"\\luddepc\Earth2\ASTER.zip", "ASTGTM2_{0}_dem.tif", 3601, 3601))
-            using (var demReader = new DemZipRawReader(@"\\luddepc\Earth2\SRTM.zip", "{0}.hgt", 3601, 3601))
+            if (UseAster)
             {
-                var elevationSectorBitmap = demReader.LoadBitmap(lat0deg, lon0deg, lat1deg, lon1deg);
-                _elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
-
-                Console.WriteLine($"Loading image sector {_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height} used {sw.Elapsed}");
+                using (var demReader = new DemZipTiffReader(@"Datasets\Planets\Earth\ASTER.zip", "ASTGTM2_{0}_dem.tif", 3601, 3601))
+                {
+                    var elevationSectorBitmap = demReader.LoadBitmap(lat0deg, lon0deg, lat1deg, lon1deg);
+                    //_elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
+                    _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, NumSegmentsLon, NumSegmentsLat).ToBitmap();
+                }
             }
+            else
+            {
+                using (var demReader = new DemZipRawReader(@"Datasets\Planets\Earth\SRTM.zip", "{0}.hgt", 3601, 3601))
+                {
+                    var elevationSectorBitmap = demReader.LoadBitmap(lat0deg, lon0deg, lat1deg, lon1deg);
+                    _elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
+                }
+            }
+            Console.WriteLine($"Loading image sector {_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height} used {sw.Elapsed}");
 
-            // _elevationSectorBitmap = Resampler.Resample(elevationBitmap, width, height).ToBitmap();
-            // Console.WriteLine($"Resampling used {sw.Elapsed}");
-
-            // using (var tiffWriter = new TiffWriter(File.Create($@"Generated\Planets\EarthSector\Earth{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif")))
-            // {
-            //     var bitmap = _elevationSectorBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
-            //     tiffWriter.WriteImageFile(bitmap);
-            // }
-
-            // short pMin = short.MaxValue;
-            // short pMax = short.MinValue;
-            // _elevationSectorBitmap.Process(p => 
-            // { 
-            //     pMin = Math.Min(pMin, p);
-            //     pMax = Math.Max(pMax, p);
-            //     return p;
-            // });
-
-            // Console.WriteLine($"Min: {pMin}, Max: {pMax}");
+            using (var tiffWriter = new TiffWriter(File.Create(Path.Combine(targetPath, $"Earth{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif"))))
+            {
+                var bitmap = _elevationSectorBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
+                tiffWriter.WriteImageFile(bitmap);
+            }
 
             sw = Stopwatch.StartNew();
 
@@ -132,14 +107,7 @@ namespace PlanetBuilder.Planets
 
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\EarthSector\{Name}{NumSegmentsLon}_{ElevationScale}x.stl");
-
-            using (var tiffWriter = new TiffWriter(File.Create($@"Generated\Planets\EarthSector\Earth{_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height}.tif")))
-            {
-                var bitmap = _elevationSectorBitmap.Convert((p) => { return (ushort)(p - short.MinValue); });
-                tiffWriter.WriteImageFile(bitmap);
-            }
-
+            SaveSTL(Path.Combine(targetPath, $"{Name}{NumSegmentsLon}_{ElevationScale}x.stl"));
         }
 
         private void CenterVertexes(List<Vector3d> vertexes)
@@ -168,10 +136,9 @@ namespace PlanetBuilder.Planets
 
             double h = _elevationSectorBitmap.ReadBilinearPixel(sx, sy, true, false);
 
-            // _elevationSectorBitmap.Rows[(int)(sy * _elevationSectorBitmap.Height)][(int)(sx * _elevationSectorBitmap.Width)] = 0x7fff;
-
             double r = PlanetRadius;
-            if (h > 0)
+
+            //if (h > 0)
                 r += h * ElevationScale;
             // else
             //     r -= 50 * ElevationScale;
@@ -180,7 +147,7 @@ namespace PlanetBuilder.Planets
         }
         private double ComputeModelElevationBottom(Vector3d v, double lat, double lon)
         {
-            double r = PlanetRadius + 1000;
+            double r = PlanetRadius - 1000 * ElevationScale;
 
             return r * 0.0005;
         }

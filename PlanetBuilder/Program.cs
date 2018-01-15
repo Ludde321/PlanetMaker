@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using PlanetBuilder.Planets;
+using PlanetBuilder.Planets.Earth;
 using PlanetBuilder.Roam;
 
 namespace PlanetBuilder
@@ -16,7 +17,7 @@ namespace PlanetBuilder
             Console.WriteLine("Welcome to PlanetBuilder!");
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-            Directory.SetCurrentDirectory(@"c:\Ludde\FractalWorlds");
+            Directory.SetCurrentDirectory(@"D:\Ludde\FractalWorlds");
 
             // var ceres = new Ceres();
             // ceres.Create();
@@ -60,8 +61,12 @@ namespace PlanetBuilder
             // var earth = new Earth();
             // earth.Create();
 
-            var earthSector = new EarthSector();
-            earthSector.Create();
+            // var discoIsland = new DiscoIsland();
+            // discoIsland.Create();
+
+            var bylotIsland = new BylotIsland();
+            bylotIsland.Create();
+
 
             // var earthBoylotIsland = new EarthBylotIsland();
             // earthBoylotIsland.Create();

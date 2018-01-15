@@ -9,11 +9,11 @@ using TiffExpress;
 
 namespace PlanetBuilder.Planets
 {
-    public class Earth : Planet
+    public class EarthPlanet : Planet
     {
         private Bitmap<byte> _landcoverTextureSmall;
 
-        public Earth()
+        public EarthPlanet()
         {
             PlanetRadius = 6371000;
             ElevationScale = 15;
