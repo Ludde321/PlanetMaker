@@ -287,7 +287,8 @@ namespace TiffExpress
             object value = ReadFieldValueAsObject(reader, fieldType);
 
             if (typeof(T).IsEnum)
-                return (T)Enum.Parse(typeof(T), value.ToString());
+                return (T)Enum.ToObject(typeof(T), value);
+                //return (T)Enum.Parse(typeof(T), value.ToString());
 
             return (T)Convert.ChangeType(value, typeof(T));
         }
