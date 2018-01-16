@@ -61,14 +61,20 @@ namespace PlanetBuilder
             // var earth = new Earth();
             // earth.Create();
 
-            var kazbek = new Kazbek();
-            kazbek.Create();
+            // var kazbek = new Kazbek();
+            // kazbek.Create();
 
-            var discoIsland = new DiscoIsland();
-            discoIsland.Create();
+            // var discoIsland = new DiscoIsland();
+            // discoIsland.Create();
 
             var bylotIsland = new BylotIsland();
             bylotIsland.Create();
+
+            // var matterhorn = new Matterhorn();
+            // matterhorn.Create();
+
+            // var lysefjord = new Lysefjord();
+            // lysefjord.Create();
 
             // var earthBoylotIsland = new EarthBylotIsland();
             // earthBoylotIsland.Create();

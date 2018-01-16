@@ -72,16 +72,27 @@ namespace PlanetBuilder.Planets
                 using (var demReader = new DemZipTiffReader(@"Datasets\Planets\Earth\ASTER.zip", "ASTGTM2_{0}_dem.tif", 3601, 3601))
                 {
                     var elevationSectorBitmap = demReader.LoadBitmap(lat0deg, lon0deg, lat1deg, lon1deg);
-                    //_elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
-                    _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, NumSegmentsLon, NumSegmentsLat).ToBitmap();
-                }
+                    
+                    Console.WriteLine($"Loading ASTER image {elevationSectorBitmap.Width}x{elevationSectorBitmap.Height}");
+
+                    int w = (elevationSectorBitmap.Width * NumSegmentsLon) / sectorWidth;
+                    int h = (elevationSectorBitmap.Height * NumSegmentsLat) / sectorHeight;
+
+                    _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, w, h).ToBitmap();                }
             }
             else
             {
                 using (var demReader = new DemZipRawReader(@"Datasets\Planets\Earth\SRTM.zip", "{0}.hgt", 3601, 3601))
                 {
                     var elevationSectorBitmap = demReader.LoadBitmap(lat0deg, lon0deg, lat1deg, lon1deg);
-                    _elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
+
+                    Console.WriteLine($"Loading SRTM image {elevationSectorBitmap.Width}x{elevationSectorBitmap.Height}");
+
+                    int w = (elevationSectorBitmap.Width * NumSegmentsLon) / sectorWidth;
+                    int h = (elevationSectorBitmap.Height * NumSegmentsLat) / sectorHeight;
+
+                    _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, w, h).ToBitmap();
+                    //_elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
                 }
             }
             Console.WriteLine($"Loading image sector {_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height} used {sw.Elapsed}");
@@ -97,7 +108,7 @@ namespace PlanetBuilder.Planets
             var sphericalSector = new SphericalSector();
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
 
-            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon, 0.0005 * (PlanetRadius - 1000));
+            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon, 0.0005 * (PlanetRadius - 400));
 
             CenterVertexes(sphericalSector.Vertexes);
 
