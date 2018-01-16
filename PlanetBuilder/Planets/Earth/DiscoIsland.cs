@@ -6,9 +6,9 @@ namespace PlanetBuilder.Planets.Earth
     {
         public DiscoIsland()
         {
-            ElevationScale = 1.5;
-            NumSegmentsLon = 1200;
-            NumSegmentsLat = 1200;
+            ElevationScale = 3;
+            NumSegmentsLon = 1500;
+            NumSegmentsLat = 1500;
 
             // Disco Island 69.81°N 53.47°W 
             Name = "DiscoIsland";

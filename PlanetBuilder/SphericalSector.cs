@@ -14,7 +14,6 @@ namespace PlanetBuilder.Planets
         public List<Triangle> Triangles;
 
         public Func<Vector3d, double, double, double> ComputeRadiusTop = ComputeRadiusTopDefault;
-        public Func<Vector3d, double, double, double> ComputeRadiusBottom = ComputeRadiusBottomDefault;
 
         private static double ComputeRadiusTopDefault(Vector3d v, double lat, double lon) { return 1; }
         private static double ComputeRadiusBottomDefault(Vector3d v, double lat, double lon) { return 0.8; }

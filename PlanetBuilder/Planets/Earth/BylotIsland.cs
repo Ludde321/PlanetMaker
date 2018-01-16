@@ -6,9 +6,9 @@ namespace PlanetBuilder.Planets.Earth
     {
         public BylotIsland()
         {
-            ElevationScale = 2.5;
-            NumSegmentsLon = 2500;
-            NumSegmentsLat = 2500;
+            ElevationScale = 3;
+            NumSegmentsLon = 1500;
+            NumSegmentsLat = 1500;
 
             // Bylot Island 73.25N, 78.68W
             Name = "BylotIsland";

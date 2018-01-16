@@ -140,7 +140,6 @@ namespace PlanetBuilder.Planets
 
             var sphericalSector = new SphericalSector();
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
-            sphericalSector.ComputeRadiusBottom = ComputeModelElevationBottom;
 
             sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegments, NumSegments, PlanetRadius - 50000);
 
@@ -169,15 +168,6 @@ namespace PlanetBuilder.Planets
 
             return r * 0.00001;
         }
-        private double ComputeModelElevationBottom(Vector3d v, double lat, double lon)
-        {
-            var t = MathHelper.SphericalToTextureCoords(lat, lon);
 
-            double hAvg = _elevationBitmapBlur.ReadBilinearPixel(t.x, t.y, true, false);
-
-            double r = PlanetRadius - 50000 + hAvg;
-
-            return r * 0.00001;
-        }
     }
 }
