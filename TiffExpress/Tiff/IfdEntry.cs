@@ -5,7 +5,8 @@ namespace TiffExpress.Tiff
         public IfdTag Tag;
         public FieldType FieldType;
         public long NumValues;
-        public long ValueOffset;
+        public long Offset;
+        public object Value;
     }
 
 }

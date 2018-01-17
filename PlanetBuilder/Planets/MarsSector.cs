@@ -148,7 +148,7 @@ namespace PlanetBuilder.Planets
 
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\MarsSector\MarsSector{NumSegments}.stl");
+            SaveStl($@"Generated\Planets\MarsSector\MarsSector{NumSegments}.stl");
         }
 
 

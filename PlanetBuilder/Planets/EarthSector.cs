@@ -117,7 +117,7 @@ namespace PlanetBuilder.Planets
 
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL(Path.Combine(targetPath, $"{Name}{NumSegmentsLon}_{ElevationScale}x.stl"));
+            SaveStl(Path.Combine(targetPath, $"{Name}{NumSegmentsLon}_{ElevationScale}x.stl"));
         }
 
         private void CenterVertexes(List<Vector3d> vertexes)

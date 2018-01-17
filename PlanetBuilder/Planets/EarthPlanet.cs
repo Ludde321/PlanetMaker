@@ -105,7 +105,7 @@ namespace PlanetBuilder.Planets
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\Earth\Earth{RecursionLevel}.stl");
+            SaveStl($@"Generated\Planets\Earth\Earth{RecursionLevel}.stl");
         }
 
 

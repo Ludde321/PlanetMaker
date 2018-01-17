@@ -86,7 +86,7 @@ namespace PlanetBuilder.Planets
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\Mars\Mars{RecursionLevel}_{(int)ElevationScale}x.stl");
+            SaveStl($@"Generated\Planets\Mars\Mars{RecursionLevel}_{(int)ElevationScale}x.stl");
         }
 
 

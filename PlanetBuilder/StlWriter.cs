@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Common;
 
@@ -10,6 +11,21 @@ namespace PlanetBuilder
         private BinaryWriter _writer;
 
         private int _triangleCount = 0;
+
+        public static void Create(string outputFilename, IList<Triangle> triangles, IList<Vector3d> vertexes)
+        {
+            using(var stlWriter = new StlWriter(File.Create(outputFilename)))
+            {
+                foreach (var triangle in triangles)
+                {
+                    var v1 = vertexes[triangle.i1];
+                    var v2 = vertexes[triangle.i2];
+                    var v3 = vertexes[triangle.i3];
+
+                    stlWriter.AddTriangle(v1, v2, v3);
+                }
+            }
+        }
 
         public StlWriter(Stream stream)
         {

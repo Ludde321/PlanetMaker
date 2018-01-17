@@ -253,9 +253,18 @@ namespace TiffExpress
                                 break;
                             default:
                                 {
-                                    long valueOffset = ReadFieldValue<long>(ifdReader, fieldType);
-                                    ifd.Entries[tag] = new IfdEntry { Tag = tag, FieldType = fieldType, ValueOffset = valueOffset };
-                                    Console.WriteLine($"Tag: {tag} Type: {fieldType} NumValues: {numValues} ValueOffset: {valueOffset}");
+                                    if(numValues == 1)
+                                    {
+                                        object value = ReadFieldValueAsObject(ifdReader, fieldType);
+                                        ifd.Entries[tag] = new IfdEntry { Tag = tag, FieldType = fieldType, Value = value };
+                                        Console.WriteLine($"Tag: {tag} Type: {fieldType} NumValues: {numValues} Value: {value}");
+                                    }
+                                    else
+                                    {
+                                        long offset = ReadFieldOffset(ifdReader);
+                                        ifd.Entries[tag] = new IfdEntry { Tag = tag, FieldType = fieldType, Offset = offset };
+                                        Console.WriteLine($"Tag: {tag} Type: {fieldType} NumValues: {numValues} Offset: {offset}");
+                                    }
                                 }
                                 break;
                         }
@@ -286,10 +295,15 @@ namespace TiffExpress
         {
             object value = ReadFieldValueAsObject(reader, fieldType);
 
-            if (typeof(T).IsEnum)
-                return (T)Enum.ToObject(typeof(T), value);
+            var typeT = typeof(T);
 
-            return (T)Convert.ChangeType(value, typeof(T));
+            if (typeT.IsEnum)
+                return (T)Enum.ToObject(typeT, value);
+
+            // if(typeT == typeof(Rational) || typeT == typeof(SRational))
+            //     return (T)value;
+
+            return (T)Convert.ChangeType(value, typeT);
         }
 
         private object ReadFieldValueAsObject(BinaryReader2 reader, FieldType fieldType)
@@ -316,6 +330,10 @@ namespace TiffExpress
                     return reader.ReadSingle();
                 case FieldType.Double:
                     return reader.ReadDouble();
+                case FieldType.Rational:
+                    return new Rational(reader.ReadUInt32(), reader.ReadUInt32());
+                case FieldType.SRational:
+                    return new SRational(reader.ReadInt32(), reader.ReadInt32());
             }
             Console.WriteLine($"Unknown field type {fieldType}");
             return 0;
@@ -333,12 +351,17 @@ namespace TiffExpress
         {
             var array = ReadFieldValuesAsObjects(reader, fieldType, numValues);
 
+            var typeofT = typeof(T);
+
             return array.Select(value =>
             {
-                if (typeof(T).IsEnum)
-                    return (T)Enum.ToObject(typeof(T), value);
+                if (typeofT.IsEnum)
+                    return (T)Enum.ToObject(typeofT, value);
 
-                return (T)Convert.ChangeType(value, typeof(T));
+                // if(typeofT == typeof(Rational) || typeofT == typeof(SRational))
+                //     return (T)value;
+
+                return (T)Convert.ChangeType(value, typeofT);
             }).ToArray();
 
         }
@@ -399,13 +422,25 @@ namespace TiffExpress
                 case FieldType.Float:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = (long)reader.ReadSingle();
+                            array[i] = reader.ReadSingle();
                     }
                     break;
                 case FieldType.Double:
                     {
                         for (int i = 0; i < numValues; i++)
-                            array[i] = (long)reader.ReadDouble();
+                            array[i] = reader.ReadDouble();
+                    }
+                    break;
+                case FieldType.Rational:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = new Rational(reader.ReadUInt32(), reader.ReadUInt32());
+                    }
+                    break;
+                case FieldType.SRational:
+                    {
+                        for (int i = 0; i < numValues; i++)
+                            array[i] = new SRational(reader.ReadInt32(), reader.ReadInt32());
                     }
                     break;
                 default:

@@ -45,7 +45,7 @@ namespace PlanetBuilder.Planets
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\Charon\Charon{RecursionLevel}.stl");
+            SaveStl($@"Generated\Planets\Charon\Charon{RecursionLevel}.stl");
         }
 
         protected override Vector3d ComputeModelElevation(Vector3d v)

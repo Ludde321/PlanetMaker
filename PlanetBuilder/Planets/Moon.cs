@@ -65,7 +65,7 @@ namespace PlanetBuilder.Planets
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\Moon\Moon{RecursionLevel}.stl");
+            SaveStl($@"Generated\Planets\Moon\Moon{RecursionLevel}.stl");
         }
 
 

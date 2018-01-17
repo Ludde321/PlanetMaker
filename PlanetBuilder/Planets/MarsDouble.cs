@@ -114,7 +114,7 @@ namespace PlanetBuilder.Planets
             Console.WriteLine($"NumVertexes: {PlanetVertexes.Count()}");
             Console.WriteLine($"NumTriangles: {PlanetTriangles.Count()}");
 
-            SaveSTL($@"Generated\Planets\MarsDouble\MarsDouble{NumSegments}.stl");
+            SaveStl($@"Generated\Planets\MarsDouble\MarsDouble{NumSegments}.stl");
         }
 
 

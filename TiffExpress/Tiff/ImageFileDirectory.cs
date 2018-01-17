@@ -36,7 +36,6 @@ namespace TiffExpress.Tiff
         public string Model;
         public ushort Orientation;
 
-
         // private T GetValue<T>(IfdTag tag, T defaultValue = default(T))
         // {
         //     if (Entries.TryGetValue(tag, out var entry))

@@ -45,6 +45,10 @@ namespace TiffExpress.Tiff
 
         // Adobe
         XMP = 700,
+        IPTC = 33723,
+        Photoshop = 34377,
+        Exif_IFD = 34665,
+        ICC_Profile = 34675,
 
         // GeoTiff
         ModelPixelScaleTag     = 33550,

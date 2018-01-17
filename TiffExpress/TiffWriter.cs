@@ -91,57 +91,72 @@ namespace TiffExpress
                 _writer.Write((ushort)entry.Tag);
                 _writer.Write((ushort)entry.FieldType);
                 if (BigTiff)
-                {
                     _writer.Write((long)entry.NumValues);
-                    _writer.Write((long)entry.ValueOffset);
-                }
                 else
-                {
                     _writer.Write((uint)entry.NumValues);
-                    _writer.Write((uint)entry.ValueOffset);
-                }
+                
+                if(entry.Value != null)
+                    WriteFieldValue(entry.FieldType, entry.Value);
+                else
+                    WriteFieldValue(entry.FieldType, entry.Offset);
             }
 
             _lastReferencePosition = _writer.BaseStream.Position;
             WriteReference(0);
         }
 
-        private void WriteFieldValue(FieldType fieldType, long value)
+        private void WriteFieldValue(FieldType fieldType, object value)
         {
             int paddingBytes = (BigTiff ? 8 : 4);
             switch (fieldType)
             {
                 case FieldType.Int64:
-                    _writer.Write((long)value);
+                    _writer.Write((long)Convert.ChangeType(value, typeof(long)));
                     paddingBytes -= 8;
                     break;
                 case FieldType.UInt64:
-                    _writer.Write((ulong)value);
+                    _writer.Write((ulong)Convert.ChangeType(value, typeof(ulong)));
                     paddingBytes -= 8;
                     break;
                 case FieldType.Int32:
-                    _writer.Write((int)value);
+                    _writer.Write((int)Convert.ChangeType(value, typeof(int)));
                     paddingBytes -= 4;
                     break;
                 case FieldType.UInt32:
-                    _writer.Write((uint)value);
+                    _writer.Write((uint)Convert.ChangeType(value, typeof(uint)));
                     paddingBytes -= 4;
                     break;
                 case FieldType.Int16:
-                    _writer.Write((short)value);
+                    _writer.Write((short)Convert.ChangeType(value, typeof(short)));
                     paddingBytes -= 2;
                     break;
                 case FieldType.UInt16:
-                    _writer.Write((ushort)value);
+                    _writer.Write((ushort)Convert.ChangeType(value, typeof(ushort)));
                     paddingBytes -= 2;
                     break;
                 case FieldType.Byte:
-                    _writer.Write((byte)value);
+                    _writer.Write((byte)Convert.ChangeType(value, typeof(byte)));
                     paddingBytes -= 1;
                     break;
                 case FieldType.SByte:
-                    _writer.Write((sbyte)value);
+                    _writer.Write((sbyte)Convert.ChangeType(value, typeof(sbyte)));
                     paddingBytes -= 1;
+                    break;
+                case FieldType.Rational:
+                    {
+                        var rValue = (Rational)value;
+                        _writer.Write(rValue.Numerator);
+                        _writer.Write(rValue.Denominator);
+                        paddingBytes -= 8;
+                    }
+                    break;
+                case FieldType.SRational:
+                    {
+                        var rValue = (SRational)value;
+                        _writer.Write(rValue.Numerator);
+                        _writer.Write(rValue.Denominator);
+                        paddingBytes -= 8;
+                    }
                     break;
                 default:
                     throw new Exception($"Unknown field type {fieldType}");
@@ -151,15 +166,15 @@ namespace TiffExpress
 
         private void PrepareImageFileDirectory(ImageFileDirectory ifd)
         {
-            ifd.Entries[IfdTag.ImageWidth] = new IfdEntry { Tag = IfdTag.ImageWidth, FieldType = FieldType.UInt32, NumValues = 1, ValueOffset = ifd.ImageWidth };
-            ifd.Entries[IfdTag.ImageHeight] = new IfdEntry { Tag = IfdTag.ImageHeight, FieldType = FieldType.UInt32, NumValues = 1, ValueOffset = ifd.ImageHeight };
-            ifd.Entries[IfdTag.BitsPerSample] = new IfdEntry { Tag = IfdTag.BitsPerSample, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = ifd.BitsPerSample };
-            ifd.Entries[IfdTag.PhotometricInterpretation] = new IfdEntry { Tag = IfdTag.PhotometricInterpretation, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (ushort)ifd.PhotometricInterpretation };
-            ifd.Entries[IfdTag.Compression] = new IfdEntry { Tag = IfdTag.Compression, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (ushort)ifd.Compression };
-            ifd.Entries[IfdTag.SamplesPerPixel] = new IfdEntry { Tag = IfdTag.SamplesPerPixel, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (ushort)ifd.SamplesPerPixel };
-            ifd.Entries[IfdTag.RowsPerStrip] = new IfdEntry { Tag = IfdTag.RowsPerStrip, FieldType = FieldType.UInt32, NumValues = 1, ValueOffset = (uint)ifd.RowsPerStrip };
-            ifd.Entries[IfdTag.PlanarConfiguration] = new IfdEntry { Tag = IfdTag.PlanarConfiguration, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (uint)ifd.PlanarConfiguration };
-            ifd.Entries[IfdTag.SampleFormat] = new IfdEntry { Tag = IfdTag.SampleFormat, FieldType = FieldType.UInt16, NumValues = 1, ValueOffset = (uint)ifd.SampleFormat };
+            ifd.Entries[IfdTag.ImageWidth] = new IfdEntry { Tag = IfdTag.ImageWidth, FieldType = FieldType.UInt32, NumValues = 1, Value = ifd.ImageWidth };
+            ifd.Entries[IfdTag.ImageHeight] = new IfdEntry { Tag = IfdTag.ImageHeight, FieldType = FieldType.UInt32, NumValues = 1, Value = ifd.ImageHeight };
+            ifd.Entries[IfdTag.BitsPerSample] = new IfdEntry { Tag = IfdTag.BitsPerSample, FieldType = FieldType.UInt16, NumValues = 1, Value = ifd.BitsPerSample };
+            ifd.Entries[IfdTag.PhotometricInterpretation] = new IfdEntry { Tag = IfdTag.PhotometricInterpretation, FieldType = FieldType.UInt16, NumValues = 1, Value = (ushort)ifd.PhotometricInterpretation };
+            ifd.Entries[IfdTag.Compression] = new IfdEntry { Tag = IfdTag.Compression, FieldType = FieldType.UInt16, NumValues = 1, Value = (ushort)ifd.Compression };
+            ifd.Entries[IfdTag.SamplesPerPixel] = new IfdEntry { Tag = IfdTag.SamplesPerPixel, FieldType = FieldType.UInt16, NumValues = 1, Value = (ushort)ifd.SamplesPerPixel };
+            ifd.Entries[IfdTag.RowsPerStrip] = new IfdEntry { Tag = IfdTag.RowsPerStrip, FieldType = FieldType.UInt32, NumValues = 1, Value = (uint)ifd.RowsPerStrip };
+            ifd.Entries[IfdTag.PlanarConfiguration] = new IfdEntry { Tag = IfdTag.PlanarConfiguration, FieldType = FieldType.UInt16, NumValues = 1, Value = (uint)ifd.PlanarConfiguration };
+            ifd.Entries[IfdTag.SampleFormat] = new IfdEntry { Tag = IfdTag.SampleFormat, FieldType = FieldType.UInt16, NumValues = 1, Value = (uint)ifd.SampleFormat };
 
             ifd.Entries[IfdTag.StripOffsets] = new IfdEntry { Tag = IfdTag.StripOffsets, FieldType = BigTiff ? FieldType.UInt64 : FieldType.UInt32 };
             ifd.Entries[IfdTag.StripByteCounts] = new IfdEntry { Tag = IfdTag.StripByteCounts, FieldType = BigTiff ? FieldType.UInt64 : FieldType.UInt32 };
@@ -184,7 +199,7 @@ namespace TiffExpress
         }
         private void WriteArrayField(IfdEntry entry, long[] array)
         {
-            entry.ValueOffset = _writer.BaseStream.Position;
+            entry.Offset = _writer.BaseStream.Position;
             entry.NumValues = array.Length;
 
             if (entry.FieldType == FieldType.UInt64)

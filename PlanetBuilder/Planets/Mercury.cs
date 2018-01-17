@@ -64,7 +64,7 @@ namespace PlanetBuilder.Planets
             CreatePlanetVertexes(RecursionLevel);
             Console.WriteLine($"Time used to create planet vertexes: {sw.Elapsed}");
 
-            SaveSTL($@"Generated\Planets\Mercury\Mercury{RecursionLevel}.stl");
+            SaveStl($@"Generated\Planets\Mercury\Mercury{RecursionLevel}.stl");
         }
 
     }
