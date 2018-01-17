@@ -43,6 +43,9 @@ namespace TiffExpress.Tiff
         Threshholding = 263,
         DocumentName = 269,
 
+        // Adobe
+        XMP = 700,
+
         // GeoTiff
         ModelPixelScaleTag     = 33550,
         ModelTiepointTag       = 33922,
