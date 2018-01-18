@@ -166,7 +166,7 @@ namespace PlanetBuilder.Planets
 
             double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
-            return r * 0.00001;
+            return r * ModelScale;
         }
 
     }

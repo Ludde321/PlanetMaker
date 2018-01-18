@@ -126,7 +126,7 @@ namespace PlanetBuilder.Planets
                 r = PlanetRadius - 12000;
             }
 
-            return Vector3d.Multiply(v, r * 0.00001);
+            return Vector3d.Multiply(v, r * ModelScale);
         }
 
     }

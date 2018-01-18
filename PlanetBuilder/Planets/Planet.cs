@@ -16,6 +16,7 @@ namespace PlanetBuilder.Planets
     {
         public double PlanetRadius;
         public double ElevationScale;
+        public double ModelScale = 0.0005;
         public int RecursionLevel = 8;
 
         public string Name;
@@ -47,7 +48,7 @@ namespace PlanetBuilder.Planets
 
             double r = PlanetRadius + (h - hAvg) * ElevationScale + hAvg;
 
-            return Vector3d.Multiply(v, r * 0.00001);
+            return Vector3d.Multiply(v, r * ModelScale);
         }
 
         protected void SaveStl(string outputFilename)

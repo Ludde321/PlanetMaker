@@ -69,7 +69,7 @@ namespace PlanetBuilder.Planets
 
             double r = (h - hAvg) * ElevationScale + hAvg;
 
-            return Vector3d.Multiply(v, r * 0.00001);
+            return Vector3d.Multiply(v, r * ModelScale);
         }
     }
 }
