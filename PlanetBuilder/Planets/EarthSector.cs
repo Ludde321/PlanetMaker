@@ -24,6 +24,8 @@ namespace PlanetBuilder.Planets
 
         private double _sx, _sy, _sx0, _sy0;
 
+        public double ElevationBottom = -300;
+
         public bool UseAster;
 
         public EarthSector()
@@ -108,7 +110,7 @@ namespace PlanetBuilder.Planets
             var sphericalSector = new SphericalSector();
             sphericalSector.ComputeRadiusTop = ComputeModelElevationTop;
 
-            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon, ModelScale * (PlanetRadius - 400 * ElevationScale));
+            sphericalSector.Create(Lat0, Lon0, Lat1, Lon1, NumSegmentsLat, NumSegmentsLon, ModelScale * (PlanetRadius + ElevationBottom * ElevationScale));
 
             CenterVertexes(sphericalSector.Vertexes);
 

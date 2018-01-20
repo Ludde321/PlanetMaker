@@ -7,13 +7,13 @@ using System.Linq;
 using Common;
 using TiffExpress;
 
-namespace PlanetBuilder.Planets
+namespace PlanetBuilder.Planets.Earth
 {
-    public class EarthPlanet : Planet
+    public class PlanetEarth : Planet
     {
         private Bitmap<byte> _landcoverTextureSmall;
 
-        public EarthPlanet()
+        public PlanetEarth()
         {
             PlanetRadius = 6371000;
             ElevationScale = 15;

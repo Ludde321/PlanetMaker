@@ -54,6 +54,10 @@ namespace TiffExpress.Tiff
         ModelPixelScaleTag     = 33550,
         ModelTiepointTag       = 33922,
         GeoKeyDirectoryTag     = 34735,
+
+        GeoDoubleParamsTag      = 34736,
+        GeoAsciiParamsTag       = 34737,
+        GDAL_NODATA             = 42113,
     }
 
 }

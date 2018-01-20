@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using PlanetBuilder.Planets;
 using PlanetBuilder.Planets.Earth;
+using PlanetBuilder.Planets.Mars;
 using PlanetBuilder.Roam;
 
 namespace PlanetBuilder
@@ -37,8 +38,8 @@ namespace PlanetBuilder
             // var mercury = new Mercury();
             // mercury.Create();
 
-            // var mars = new Mars();
-            // mars.Create();
+            var mars = new PlanetMars();
+            mars.Create();
 
             // var mars2 = new Mars2();
             // mars2.Create();
@@ -67,8 +68,14 @@ namespace PlanetBuilder
             // var discoIsland = new DiscoIsland();
             // discoIsland.Create();
 
-            var bylotIsland = new BylotIsland();
-            bylotIsland.Create();
+            // var bylotIsland = new BylotIsland();
+            // bylotIsland.Create();
+
+            // var newZealand = new NewZealand();
+            // newZealand.Create();
+
+            // var mountCook = new MountCook();
+            // mountCook.Create();
 
             // var matterhorn = new Matterhorn();
             // matterhorn.Create();
