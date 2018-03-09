@@ -7,9 +7,9 @@ namespace PlanetBuilder.Planets.Earth
         public NewZealand()
         {
             ElevationScale = 6;
-            NumSegmentsLon = 1500;
-            NumSegmentsLat = 1500;
-            ElevationBottom = -400;
+            NumSegmentsLon = 20;
+            NumSegmentsLat = 20;
+            ElevationBottom = -8000;
 
             // ,170.848834
             Name = "NewZealand";

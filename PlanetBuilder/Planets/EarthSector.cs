@@ -77,8 +77,8 @@ namespace PlanetBuilder.Planets
                     
                     Console.WriteLine($"Loading ASTER image {elevationSectorBitmap.Width}x{elevationSectorBitmap.Height}");
 
-                    int w = (elevationSectorBitmap.Width * NumSegmentsLon) / sectorWidth;
-                    int h = (elevationSectorBitmap.Height * NumSegmentsLat) / sectorHeight;
+                    int w = Math.Min(elevationSectorBitmap.Width, (elevationSectorBitmap.Width * NumSegmentsLon) / sectorWidth);
+                    int h = Math.Min(elevationSectorBitmap.Height, (elevationSectorBitmap.Height * NumSegmentsLat) / sectorHeight);
 
                     _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, w, h).ToBitmap();                }
             }
@@ -90,11 +90,11 @@ namespace PlanetBuilder.Planets
 
                     Console.WriteLine($"Loading SRTM image {elevationSectorBitmap.Width}x{elevationSectorBitmap.Height}");
 
-                    int w = (elevationSectorBitmap.Width * NumSegmentsLon) / sectorWidth;
-                    int h = (elevationSectorBitmap.Height * NumSegmentsLat) / sectorHeight;
+                    int w = Math.Min(elevationSectorBitmap.Width, (elevationSectorBitmap.Width * NumSegmentsLon) / sectorWidth);
+                    int h = Math.Min(elevationSectorBitmap.Height, (elevationSectorBitmap.Height * NumSegmentsLat) / sectorHeight);
 
-                    _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, w, h).ToBitmap();
-                    //_elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
+//                    _elevationSectorBitmap = Resampler.Resample(elevationSectorBitmap, w, h).ToBitmap();
+                    _elevationSectorBitmap = elevationSectorBitmap.ToBitmap();
                 }
             }
             Console.WriteLine($"Loading image sector {_elevationSectorBitmap.Width}x{_elevationSectorBitmap.Height} used {sw.Elapsed}");
